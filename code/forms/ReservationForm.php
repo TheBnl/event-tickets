@@ -38,7 +38,7 @@ class ReservationForm extends FormStep
         }
 
         $actions = FieldList::create(
-            FormAction::create('payment', _t('ReservationForm.PAYMENT', 'Continue to payment'))
+            FormAction::create('goToNextStep', _t('ReservationForm.PAYMENT', 'Continue to payment'))
         );
 
         $required = new RequiredFields($requiredFields);
@@ -65,7 +65,7 @@ class ReservationForm extends FormStep
      *
      * @return \SS_HTTPResponse
      */
-    public function payment(array $data, ReservationForm $form)
+    public function goToNextStep(array $data, ReservationForm $form)
     {
         foreach ($data['Attendee'] as $attendeeID => $attendeeData) {
             $attendee = Attendee::get()->byID($attendeeID);
@@ -75,6 +75,7 @@ class ReservationForm extends FormStep
             $attendee->write();
         }
 
+        $this->extend('beforeNextStep', $data, $form);
         return $this->nextStep();
     }
 }

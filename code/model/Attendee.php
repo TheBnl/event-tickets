@@ -76,7 +76,7 @@ class Attendee extends DataObject
         'CheckedIn' => 'Boolean'
     );
 
-    private static $default_sort = 'NameASC, Surname ASC';
+    private static $default_sort = 'FirstName ASC, Surname ASC';
 
     private static $has_one = array(
         'Reservation' => 'Broarm\EventTickets\Reservation',
