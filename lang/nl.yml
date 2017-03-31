@@ -1,0 +1,56 @@
+nl:
+  Ticket:
+    TITLE_LABEL: 'Titel voor op de tiket'
+    PRICE_LABEL: 'Tiket prijs'
+    SALE_START_LABEL: 'Tiket verkoop begint vanaf'
+    SALE_START_DESCRIPTION: 'Wanneer er geen datum is opgegeven word de volgende verkoopdatum gebruikt: {date}'
+    SALE_END_LABEL: 'Tiket verkoop eindigt op'
+    SALE_END_DESCRIPTION: 'Wanneer er geen datum is opgegeven word de startdatum van het evenement gebruikt: {date}'
+    AVAILABLE: 'Beschikbaar'
+    UNAVAILABLE: 'Niet te koop'
+  CheckoutSteps:
+    TICKETS_FOR: 'Tickets voor {event}'
+    HAVE_FUN_AT: 'Veel plezier bij {event}'
+    register: 'Registreren'
+    summary: 'Samenvatting'
+    success: 'Succes'
+  SiteConfigExtension:
+    SUCCESS_MESSAGE_HELP: 'Dit bericht word getoond op de succes pagina. Hij is per evenement te overschijven onder de "tickets" tab'
+    MAIL_MESSAGE_HELP: 'Dit bericht word getoond op het ticket en in the mail. Hij is per evenement te overschijven onder de "tickets" tab'
+  TicketForm:
+    MAKE_RESERVATION: 'Reserveer tickets'
+  TicketsField:
+    TICKETS: 'Tickets'
+    PRICE: 'Prijs'
+    AMOUNT: 'Hoeveelheid'
+  TicketExtension:
+    Tickets: 'Tickets'
+    Capacity: 'Plaatsen'
+    Reservations: 'Reserveringen'
+    GuestList: 'Gastenlijst'
+  Reservation:
+    CART: 'Winkelwagen'
+    PENDING: 'Word verwerkt'
+    PAID: 'Betaald'
+    CANCELED: 'Afgezegd'
+  ReservationForm:
+    PAYMENT: 'Ga verder naar betalen'
+  Attendee:
+    Ticket: 'Ticket'
+    Title: 'Naam'
+    Email: 'E-mail'
+  AttendeesField:
+    FirstName: 'Voornaam'
+    Surname: 'Achternaam'
+    Email: 'Email'
+    TicketReceiver: 'Stuur ticket per mail'
+  SuccessController:
+    DOWNLOAD_TICKETS: 'Download uw tickets'
+  SummaryForm:
+    COMMENTS: 'Opmerkingen'
+  SummaryField:
+    EMAIL_RECEIVER: 'Email ontvanger'
+    TICKET: 'Ticket'
+    PRICE: 'Prijs'
+    TOTAL: 'Totaal'
+    TICKET_RECEIVER_HELP: 'Verstuur tickets naar deze persoon'

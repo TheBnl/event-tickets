@@ -1,0 +1,85 @@
+<?php
+/**
+ * CheckoutStepController.php
+ *
+ * @author Bram de Leeuw
+ * Date: 16/03/17
+ */
+
+namespace Broarm\EventTickets;
+
+use Page_Controller;
+use SSViewer;
+
+/**
+ * Class CheckoutStepController
+ *
+ * @package Broarm\EventTickets
+ */
+abstract class CheckoutStepController extends Page_Controller
+{
+    protected $step = null;
+
+    public function init()
+    {
+        // If the step is not a registered step exit
+        if (!in_array($this->step, CheckoutSteps::getSteps())) {
+            $this->redirect($this->Link('/'));
+        }
+
+        // If no ReservationSession exists redirect back to the base event controller
+        elseif (empty(ReservationSession::get())) {
+            $this->redirect($this->Link('/'));
+        }
+
+        // If the reservation has been processed end the session and redirect
+        elseif (ReservationSession::get()->Status === 'PAID' && $this->step != 'success') {
+            ReservationSession::end();
+            $this->redirect($this->Link('/'));
+        } else {
+            parent::init();
+        }
+    }
+
+    /**
+     * Force the controller action
+     *
+     * @param string $action
+     *
+     * @return SSViewer
+     */
+    public function getViewer($action)
+    {
+        if ($action === 'index') {
+            $action = $this->step;
+        }
+
+        return parent::getViewer($action);
+    }
+
+    /**
+     * Get a relative link to the current controller
+     *
+     * @param null $action
+     *
+     * @return string
+     */
+    public function Link($action = null)
+    {
+        if (!$action) {
+            $action = $this->step;
+        }
+
+        return $this->dataRecord->RelativeLink($action);
+    }
+
+    /**
+     * Get the checkout steps
+     *
+     * @return \ArrayList
+     */
+    public function CheckoutSteps()
+    {
+        return CheckoutSteps::get($this);
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "bramdeleeuw/silverstripe-event-tickets",
+  "description": "Event tickets for SilverStripe Event Calendar",
+  "type": "silverstripe-module",
+  "keywords": ["silverstripe", "ticket", "omnipay", "event"],
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Bram de Leeuw",
+      "email": "bram-de-leeuw@hotmai.com"
+    }
+  ],
+  "require": {
+    "silverstripe/framework": ">=3.1",
+    "silverstripe/cms": ">=3.1",
+    "silverstripe/silverstripe-omnipay": "*",
+    "bacon/bacon-qr-code": "*",
+    "dompdf/dompdf": "*",
+    "jonom/silverstripe-share-care": "*"
+  },
+  "extra": {
+    "installer-name": "event-tickets"
+  }
+}

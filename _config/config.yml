@@ -1,0 +1,28 @@
+---
+Name: event-tickets
+After: 'event_calendar/*'
+---
+CalendarEvent:
+  extensions:
+    - 'Broarm\EventTickets\TicketExtension'
+CalendarEvent_Controller:
+  extensions:
+    - 'Broarm\EventTickets\TicketControllerExtension'
+    - 'Broarm\EventTickets\RegisterStep'
+    - 'Broarm\EventTickets\SummaryStep'
+    - 'Broarm\EventTickets\SuccessStep'
+SiteConfig:
+  extensions:
+    - 'Broarm\EventTickets\SiteConfigExtension'
+Image:
+  extensions:
+    - 'Broarm\EventTickets\ImageExtension'
+Currency:
+  extensions:
+    - 'Broarm\EventTickets\CurrencyExtension'
+Broarm\EventTickets\Reservation:
+  extensions:
+    - Payable
+Payment:
+  has_one:
+    Reservation: 'Broarm\EventTickets\Reservation'
