@@ -86,6 +86,7 @@
             padding: 7px 20px;
         }
 
+        .email-reservation__modifier-value,
         .email-reservation__total-price,
         .attendee__ticket-price {
             width: 300px;
