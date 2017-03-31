@@ -4,6 +4,6 @@ Add tickets to Event Calendar events. Payments handled trough the SilverStripe O
 
 Documentation to be written
 
-###Maintainers
+### Maintainers
 
 [Bram de Leeuw](http://www.twitter.com/bramdeleeuw)
