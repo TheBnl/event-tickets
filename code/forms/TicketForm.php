@@ -84,6 +84,7 @@ class TicketForm extends FormStep
         $reservation->calculateTotal();
         $reservation->write();
 
+        $this->extend('beforeNextStep', $data, $form, $reservation);
         return $this->nextStep();
     }
 }

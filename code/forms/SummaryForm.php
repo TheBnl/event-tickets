@@ -93,6 +93,8 @@ class SummaryForm extends FormStep
             ));
 
             $response = $paymentProcessor->createServiceFactory();
+
+            $this->extend('beforeNextStep', $data, $form, $response);
             return $response->redirectOrRespond();
         }
 
@@ -100,6 +102,8 @@ class SummaryForm extends FormStep
         else {
             $form->reservation->changeState('PENDING');
             $form->reservation->write();
+
+            $this->extend('beforeNextStep', $data, $form);
             return $this->nextStep();
         }
     }
