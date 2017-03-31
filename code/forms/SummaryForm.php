@@ -84,7 +84,7 @@ class SummaryForm extends FormStep
             $paymentProcessor = PaymentProcessor::create($this->reservation);
             $paymentProcessor
                 ->createPayment($data['Gateway'])
-                ->setSuccessUrl($this->nextStep())
+                ->setSuccessUrl($this->getController()->Link($this->nextStep))
                 ->setFailureUrl($this->getController()->Link())
                 ->write();
 

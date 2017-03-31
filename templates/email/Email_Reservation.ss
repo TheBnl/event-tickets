@@ -27,7 +27,7 @@
         <% if $PriceModifiers %>
             <% loop $PriceModifiers %>
             <tr class="email-reservation__modifier">
-                <td class="email-reservation__modifier email-reservation__modifier--modifier-title">$TableTitle</td>
+                <td class="email-reservation__modifier email-reservation__modifier--modifier-title" colspan="2">$TableTitle</td>
                 <td class="email-reservation__modifier email-reservation__modifier--modifier-value">$TableValue</td>
             </tr>
             <% end_loop %>
