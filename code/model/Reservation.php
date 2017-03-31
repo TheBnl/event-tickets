@@ -59,8 +59,6 @@ class Reservation extends DataObject
         'ReservationCode' => 'Varchar(255)'
     );
 
-    private static $default_sort = 'PlacedDate DESC';
-
     private static $has_one = array(
         'Event' => 'CalendarEvent',
         'TicketFile' => 'File'
