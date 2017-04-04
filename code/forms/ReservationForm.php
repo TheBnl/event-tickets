@@ -30,6 +30,7 @@ class ReservationForm extends FormStep
     {
         $requiredFields = array();
         $fields = FieldList::create();
+        $this->reservation = $reservation;
 
         // Ask details about created attendees
         foreach ($reservation->Attendees() as $attendee) {
