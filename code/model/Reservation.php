@@ -68,7 +68,7 @@ class Reservation extends DataObject
         'Attendees' => 'Broarm\EventTickets\Attendee.Reservation'
     );
 
-    private static $many_many = array(
+    private static $belongs_many_many = array(
         'PriceModifiers' => 'Broarm\EventTickets\PriceModifier'
     );
 

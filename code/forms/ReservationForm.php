@@ -47,8 +47,6 @@ class ReservationForm extends FormStep
         parent::__construct($controller, $name, $fields, $actions, $required);
     }
 
-
-
     /**
      * Get the attached reservation
      *

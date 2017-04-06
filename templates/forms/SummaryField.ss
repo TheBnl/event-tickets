@@ -33,17 +33,15 @@
             <% if $Reservation.PriceModifiers %>
                 <% loop $Reservation.PriceModifiers %>
                 <tr class="summary-table__footer-row summary-table__footer-row--modifier">
-                    <td class="summary-table__footer-col summary-table__footer-col--modifier-title">$TableTitle</td>
-                    <% if $Top.Editable %><td class="summary-table__footer-col summary-table__footer-col--spacer">&nbsp;</td><% end_if %>
-                    <td class="summary-table__footer-col summary-table__footer-col--spacer" colspan="{$Top.Attendees.First.TableFields.Count}">&nbsp;</td>
-                    <td class="summary-table__footer-col summary-table__footer-col--modifier-value">$TableValue</td>
+                    <td class="summary-table__footer-col summary-table__footer-col--modifier-title" colspan="{$Top.Attendees.First.TableFields.Count}">$TableTitle</td>
+                    <td class="summary-table__footer-col summary-table__footer-col--spacer"<% if $Top.Editable %> colspan="2"<% end_if %>>&nbsp;</td>
+                    <td class="summary-table__footer-col summary-table__footer-col--modifier-value">$TableValue.NiceDecimalPoint</td>
                 </tr>
                 <% end_loop %>
             <% end_if %>
         <tr class="summary-table__footer-row summary-table__footer-row--total">
-            <td class="summary-table__footer-col summary-table__footer-col--total-label"><%t SummaryField.TOTAL 'Total' %></td>
-            <% if $Editable %><td class="summary-table__footer-col summary-table__footer-col--spacer">&nbsp;</td><% end_if %>
-            <td class="summary-table__footer-col summary-table__footer-col--spacer" colspan="{$Attendees.First.TableFields.Count}">&nbsp;</td>
+            <td class="summary-table__footer-col summary-table__footer-col--total-label" colspan="{$Attendees.First.TableFields.Count}"><%t SummaryField.TOTAL 'Total' %></td>
+            <td class="summary-table__footer-col summary-table__footer-col--spacer"<% if $Editable %> colspan="2"<% end_if %>>&nbsp;</td>
             <td class="summary-table__footer-col summary-table__footer-col--total-value">$Reservation.Total.NiceDecimalPoint</td>
         </tr>
         </tfoot>

@@ -5,12 +5,14 @@
  * @author Bram de Leeuw
  * Date: 31/03/17
  */
- 
+
 
 namespace Broarm\EventTickets;
 
 use DataObject;
 use FieldList;
+use ManyManyList;
+use SQLUpdate;
 use Tab;
 use TabSet;
 use TextField;
@@ -18,17 +20,39 @@ use TextField;
 /**
  * Class PriceModifier
  *
+ * @package Broarm\EventTickets
+ *
  * @property string Title
+ * @property float  PriceModification
+ * @method ManyManyList Reservations
  */
-class PriceModifier extends DataObject
+class PriceModifier extends DataObject implements PriceModifierInterface
 {
     private static $db = array(
         'Title' => 'Varchar(255)'
     );
 
-    private static $belongs_many_many = array(
+    private static $many_many = array(
         'Reservations' => 'Broarm\EventTickets\Reservation'
     );
+
+    private static $many_many_extraFields = array(
+        'Reservations' => array(
+            'PriceModification' => 'Currency'
+        )
+    );
+
+    private static $casting = array(
+        'TableValue' => 'Currency'
+    );
+
+    /**
+     * Modify the given total
+     * Implement this on you modifier
+     *
+     * @param $total
+     */
+    public function updateTotal(&$total) {}
 
     public function getCMSFields()
     {
@@ -46,20 +70,41 @@ class PriceModifier extends DataObject
      *
      * @return string
      */
-    public function getTableTitle() {
+    public function getTableTitle()
+    {
         return $this->Title;
     }
 
     /**
      * Return a value to display in the summary table
+     *
+     * By default go out from a price reduction.
+     * if you created a modifier that adds value, like a shipping calculator, make sure to overwrite this method
+     *
+     * @return float
      */
-    public function getTableValue() {}
+    public function getTableValue()
+    {
+        return $this->PriceModification * -1;
+    }
 
     /**
-     * Modify the given total
+     * Set the price modification on the join
      *
-     * @param $total
+     * @param $value
      */
-    public function updateTotal(&$total) {}
+    public function setPriceModification($value)
+    {
+        if ($this->exists()) {
+            $join = $this->manyMany('Reservations');
+            $table = end($join);
+            $where = $this->getSourceQueryParam('Foreign.Filter');
+            $where["`{$this->baseTable()}ID`"] = $this->ID;
+            SQLUpdate::create(
+                "`{$table}`",
+                array('`PriceModification`' => $value),
+                $where
+            )->execute();
+        }
+    }
 }
-
