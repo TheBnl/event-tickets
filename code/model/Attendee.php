@@ -55,6 +55,15 @@ use ViewableData;
  */
 class Attendee extends DataObject
 {
+    /**
+     * Set this to true when you want to have a QR code that opens the check in page and validates the code.
+     * The validation is only done with proper authorisation so guest cannot check themselves in by mistake.
+     * By default only the ticket number is translated to an QR code. (for use with USB QR scanners)
+     *
+     * @var bool
+     */
+    private static $qr_as_link = false;
+
     private static $savable_fields = array(
         'FirstName' => 'TextField',
         'Surname' => 'TextField',
@@ -224,7 +233,11 @@ class Attendee extends DataObject
             $renderer->setHeight(256);
             $renderer->setWidth(256);
             $writer = new BaconQrCode\Writer($renderer);
-            $writer->writeFile($this->TicketCode, $absoluteFilePath);
+            if (self::config()->get('qr_as_link')) {
+                $writer->writeFile($this->Event()->AbsoluteLink("checkin/$this->TicketCode"), $absoluteFilePath);
+            } else {
+                $writer->writeFile($this->TicketCode, $absoluteFilePath);
+            }
 
             // Store the image in an image object
             $image = Image::create();

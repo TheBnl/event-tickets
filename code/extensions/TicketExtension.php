@@ -9,11 +9,11 @@
 namespace Broarm\EventTickets;
 
 use DataExtension;
-use DataObject;
 use FieldList;
 use GridField;
 use GridFieldConfig_RecordEditor;
 use HtmlEditorField;
+use LiteralField;
 use NumericField;
 use SiteConfig;
 
@@ -74,6 +74,28 @@ class TicketExtension extends DataExtension
         }
 
         return $fields;
+    }
+
+    /**
+     * Extend the page actions with an start check in action
+     *
+     * @param FieldList $actions
+     */
+    public function updateCMSActions(FieldList $actions)
+    {
+        $checkInButton = new LiteralField('StartCheckIn',
+            "<a class='action ss-ui-button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only'
+                id='Edit_StartCheckIn'
+                role='button'
+                href='{$this->owner->Link('checkin')}'
+                target='_blank'>
+                Start check in
+            </a>"
+        );
+
+        if ($this->owner->Attendees()->exists()) {
+            $actions->push($checkInButton);
+        }
     }
 
     /**

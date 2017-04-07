@@ -14,6 +14,17 @@ nl:
     register: 'Registreren'
     summary: 'Samenvatting'
     success: 'Succes'
+  CheckIn:
+    GUESTLIST: 'Gastenlijst'
+    CHECK_IN_TITLE: 'Gasten inchecken voor {event}'
+  CheckInForm:
+    TICKET_CODE: 'ticketnummer'
+    CheckIn: 'Inchecken'
+    NO_CODE: 'Voer een ticketnummer in'
+    NO_ATTENDEES: 'Er zijn geen geregistreerde gasten'
+    CODE_NOT_FOUND: 'Het ingevoerde ticketnummer is niet gevonden op het evenement'
+    ALREADY_CHECKED_IN: 'Het ingevoerde ticketnummer is al ingecheckt'
+    SUCCESS: 'Het ticket is valide. <strong>{name}</strong> heeft een <strong>{ticket}</strong> ticket met nummer {number}'
   SiteConfigExtension:
     SUCCESS_MESSAGE_HELP: 'Dit bericht word getoond op de succes pagina. Hij is per evenement te overschijven onder de "tickets" tab'
     MAIL_MESSAGE_HELP: 'Dit bericht word getoond op het ticket en in the mail. Hij is per evenement te overschijven onder de "tickets" tab'
@@ -28,6 +39,9 @@ nl:
     Capacity: 'Plaatsen'
     Reservations: 'Reserveringen'
     GuestList: 'Gastenlijst'
+  TicketControllerExtension:
+    PERMISSIONS_CAT: 'Event tickets'
+    HANDLE_CHECK_IN: 'Geautoriseerd voor ticket controle'
   Reservation:
     CART: 'Winkelwagen'
     PENDING: 'Word verwerkt'

@@ -21,7 +21,8 @@ use Extension;
 class TicketControllerExtension extends Extension
 {
     private static $allowed_actions = array(
-        'TicketForm'
+        'TicketForm',
+        'checkin'
     );
 
     /**
@@ -38,5 +39,15 @@ class TicketControllerExtension extends Extension
         } else {
             return null;
         }
+    }
+
+    /**
+     * Go to the check in controller
+     *
+     * @return CheckInController
+     */
+    public function checkIn()
+    {
+        return new CheckInController($this->owner->dataRecord);
     }
 }
