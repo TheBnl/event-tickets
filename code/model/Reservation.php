@@ -72,6 +72,10 @@ class Reservation extends DataObject
         'PriceModifiers' => 'Broarm\EventTickets\PriceModifier'
     );
 
+    private static $indexes = array(
+        'ReservationCode' => 'unique("ReservationCode")'
+    );
+
     private static $summary_fields = array(
         'Title' => 'Customer',
         'Total.Nice' => 'Total',

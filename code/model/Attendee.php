@@ -78,6 +78,10 @@ class Attendee extends DataObject
 
     private static $default_sort = 'FirstName ASC, Surname ASC';
 
+    private static $indexes = array(
+        'TicketCode' => 'unique("TicketCode")'
+    );
+
     private static $has_one = array(
         'Reservation' => 'Broarm\EventTickets\Reservation',
         'Ticket' => 'Broarm\EventTickets\Ticket',

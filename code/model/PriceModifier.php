@@ -46,14 +46,6 @@ class PriceModifier extends DataObject implements PriceModifierInterface
         'TableValue' => 'Currency'
     );
 
-    /**
-     * Modify the given total
-     * Implement this on you modifier
-     *
-     * @param $total
-     */
-    public function updateTotal(&$total) {}
-
     public function getCMSFields()
     {
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));
@@ -64,6 +56,14 @@ class PriceModifier extends DataObject implements PriceModifierInterface
         $this->extend('updateCMSFields', $fields);
         return $fields;
     }
+
+    /**
+     * Modify the given total
+     * Implement this on your modifier
+     *
+     * @param $total
+     */
+    public function updateTotal(&$total) {}
 
     /**
      * Return a title to display in the summary table
