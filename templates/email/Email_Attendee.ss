@@ -2,7 +2,6 @@
 <tbody>
 <tr>
     <td rowspan="3" class="attendee__qr">
-        <%--<img src="$TicketQRCode.Base64" alt="$TicketQRCode.Title" width="192" height="192">--%>
         <img src="$TicketQRCode.Base64" alt="$TicketQRCode.Title" width="256" height="256">
     </td>
     <td  class="attendee__ticket-title">
@@ -33,17 +32,6 @@
                  class="attendee__link-icon">
             <span class="attendee__link-label"><%t TicketEmail.Print 'Print' %></span>
         </a>
-
-        <%-- Wallet
-        <a href="#walletlink" class="attendee__link attendee__link--wallet">
-            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAxNiIgb3ZlcmZsb3c9InZpc2libGUiPg0KICA8cGF0aCBkPSJNNy4wNCAxNS42NWMtLjQ4LjQ3LTEuMjUuNDctMS43MiAwbC0xLjItMS4yYy43Mi0uNy43Mi0xLjg2IDAtMi41OC0uNy0uNy0xLjg3LS43LTIuNTggMGwtMS4xOC0xLjJjLS40OC0uNDYtLjQ4LTEuMjQgMC0xLjdsOC42LTguNmMuNDctLjUgMS4yNS0uNSAxLjcyIDBsMS4yIDEuMTdjLS43Mi43LS43MiAxLjg3IDAgMi41OC43LjcyIDEuODYuNzIgMi41NyAwbDEuMiAxLjJjLjQ3LjQ3LjQ3IDEuMjQgMCAxLjdsLTguNiA4LjYzem02LjA0LTguNDRjLjIzLS4yMi4yMy0uNiAwLS44NEw5LjY0IDIuOTJjLS4yMy0uMjMtLjYzLS4yMy0uODUgMEwyLjkgOC44Yy0uMjQuMjMtLjI0LjYgMCAuODRsMy40NCAzLjQ0Yy4xLjEuMjYuMTcuNDIuMTcuMTcgMCAuMzItLjA2LjQzLS4xN0wxMy4xIDcuMnptLS44Ny0uNDJMNi44IDEyLjIybC0zLTMgNS40NC01LjQ0IDMgM3oiLz4NCjwvc3ZnPg=="
-                 width="32" height="32"
-                 alt="<%t TicketEmail.Wallet 'Wallet' %>"
-                 class="attendee__link-icon">
-            <span class="attendee__link-label"><%t TicketEmail.Wallet 'Wallet' %></span>
-        </a>
-        --%>
-
         <a href="$Event.FacebookShareLink" class="attendee__link attendee__link--share">
             <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5IDE2IiBvdmVyZmxvdz0idmlzaWJsZSI+DQogIDxwYXRoIGQ9Ik04LjMgMi42NUg2LjhjLTEuMiAwLTEuNC41Ny0xLjQgMS40djEuOGgyLjhMNy44NSA4LjdINS40VjE2SDIuNDRWOC43SDBWNS44NmgyLjQ1di0yLjFDMi40NSAxLjMzIDMuOTUgMCA2LjEyIDBjMS4wMyAwIDEuOTMuMDggMi4yLjF2Mi41NXoiLz4NCjwvc3ZnPg=="
                  width="18" height="32"

@@ -115,20 +115,13 @@ class Ticket extends DataObject
 
     /**
      * Get the formatted price
-     * @deprecated Use the "Price.Nice" method instead
+     * @deprecated Use the "Price.NiceDecimalPoint" method instead
      *
      * @return string
      */
     public function getPriceNice()
     {
         return $this->dbObject('Price')->NiceDecimalPoint();
-        /*
-        $currency = self::config()->get('currency');
-        $decimalPoint = self::config()->get('decimal_point');
-        $thousandsSeparator = self::config()->get('thousands_separator');
-        $priceFormat = number_format($this->Price, 2, $decimalPoint, $thousandsSeparator);
-        return "{$currency}{$priceFormat}";
-        */
     }
 
     /**

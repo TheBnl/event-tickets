@@ -11,7 +11,7 @@
                 <th class="guest-list-table__header-col"><%t CheckIn.NAME_HEADER 'Name' %></th>
                 <th class="guest-list-table__header-col"><%t CheckIn.TICKET_HEADER 'Ticket' %></th>
                 <th class="guest-list-table__header-col"><%t CheckIn.TICKET_NUMBER_HEADER 'Ticket number' %></th>
-                <th class="guest-list-table__header-col"><%t CheckIn.CHECKED_IN_HEADER 'Checked in' %></th>
+                <th class="guest-list-table__header-col"><%t CheckIn.CHECKED_IN_HEADER 'Checked in' %> $CheckedInCount</th>
             </tr>
             </thead>
             <tbody class="guest-list-table__body">

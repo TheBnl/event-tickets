@@ -147,7 +147,7 @@ class TicketsField extends FormField
         if ($ticketCount > $available) {
             $validator->validationError($this->name, _t(
                 'TicketsField.VALIDATION_TO_MUCH',
-                'There are only {ticketCount} tickets left',
+                'There are {ticketCount} tickets left',
                 null,
                 array(
                     'ticketCount' => $available

@@ -35,13 +35,14 @@ class TicketForm extends FormStep
     public function __construct($controller, $name, DataList $tickets = null, CalendarEvent $event = null)
     {
         $this->event = $event;
-
+        
         $fields = FieldList::create(
             TicketsField::create('Tickets', '', $this->tickets = $tickets)
         );
 
         $actions = FieldList::create(
             FormAction::create('handleTicketForm', _t('TicketForm.MAKE_RESERVATION', 'Make reservation'))
+                ->setDisabled($event->getAvailability() === 0)
         );
 
         $requiredFields = RequiredFields::create(array('Tickets'));

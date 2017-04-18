@@ -34,6 +34,8 @@ nl:
     TICKETS: 'Tickets'
     PRICE: 'Prijs'
     AMOUNT: 'Hoeveelheid'
+    VALIDATION_TO_MUCH: 'Er zijn {ticketCount} tickets over'
+    VALIDATION_EMPTY: 'Selecteer minstens een ticket'
   TicketExtension:
     Tickets: 'Tickets'
     Capacity: 'Plaatsen'
@@ -42,6 +44,13 @@ nl:
   TicketControllerExtension:
     PERMISSIONS_CAT: 'Event tickets'
     HANDLE_CHECK_IN: 'Geautoriseerd voor ticket controle'
+  TicketEmail:
+    Title: 'Uw tickets'
+    Total: 'Totaal'
+    Agenda: 'Agenda'
+    Print: 'Print'
+    Share: 'Deel'
+    TERMS_CONDITIONS: 'Algemene voorwaarden'
   Reservation:
     CART: 'Winkelwagen'
     PENDING: 'Word verwerkt'
@@ -60,6 +69,7 @@ nl:
     TicketReceiver: 'Stuur ticket per mail'
   SuccessController:
     DOWNLOAD_TICKETS: 'Download uw tickets'
+    BACK: 'Ga terug'
   SummaryForm:
     COMMENTS: 'Opmerkingen'
   SummaryField:

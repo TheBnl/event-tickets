@@ -43,11 +43,9 @@ class PreviewTicketTask extends BuildTask
         if ($preview && in_array($preview, $this->previews)) {
             $reservation = Reservation::get()->filter('TicketFileID:not', 0)->last();
 
-            $data = $reservation->Me();
-            $calendarController = new CalendarEvent_Controller($reservation->Event());
-            $data->CurrentDate = $calendarController->CurrentDate();
-
             // Set the template and parse the data
+            $data = $reservation->getViewableData();
+
             $template = new SSViewer($preview);
             $html = $template->process($data);
 

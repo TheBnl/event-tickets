@@ -19,6 +19,7 @@ use Folder;
 use HasManyList;
 use ManyManyList;
 use Member;
+use SiteConfig;
 use SSViewer;
 use Tab;
 use TabSet;
@@ -48,6 +49,14 @@ use ViewableData;
  */
 class Reservation extends DataObject
 {
+    /**
+     * Time to wait before deleting the discarded cart
+     * Give a string that is parsable by strtotime
+     *
+     * @var string
+     */
+    private static $delete_after = '+1 week';
+
     private static $db = array(
         'Status' => 'Enum("CART,PENDING,PAID,CANCELED","CART")', // State 'CANCELED' is more for administrative purposes
         'Title' => 'Varchar(255)',
@@ -130,6 +139,17 @@ class Reservation extends DataObject
     {
         $name = explode('\\', parent::singular_name());
         return trim(end($name));
+    }
+
+    /**
+     * Check if the cart is still in cart state and the delete_after time period has been exceeded
+     *
+     * @return bool
+     */
+    public function isDiscarded()
+    {
+        $deleteAfter = strtotime(self::config()->get('delete_after'), strtotime($this->Created));
+        return ($this->Status === 'CART') && (time() > $deleteAfter);
     }
 
     /**
@@ -280,9 +300,11 @@ class Reservation extends DataObject
      */
     public function getViewableData()
     {
+        $config = SiteConfig::current_site_config();
         $data = $this->Me();
         $calendarController = new CalendarEvent_Controller($this->Event());
         $data->CurrentDate = $calendarController->CurrentDate();
+        $data->Logo = $config->TicketLogo();
         $this->extend('updateViewableData', $data);
         return $data;
     }
