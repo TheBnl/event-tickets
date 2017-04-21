@@ -26,3 +26,5 @@ Broarm\EventTickets\Reservation:
 Payment:
   has_one:
     Reservation: 'Broarm\EventTickets\Reservation'
+  allowed_gateways:
+    - 'Manual'

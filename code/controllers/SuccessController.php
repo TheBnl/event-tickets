@@ -46,6 +46,7 @@ class SuccessController extends CheckoutStepController
                 $this->reservation->createFiles();
                 if ($this->sendReservation()) {
                     $this->reservation->changeState('PAID');
+                    $this->extend('afterPaymentComplete', $this->reservation);
                     $this->reservation->write();
                 }
             }

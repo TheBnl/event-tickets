@@ -22,6 +22,14 @@ use TextField;
 class ReservationForm extends FormStep
 {
     /**
+     * Set this to true if you want to require credentials for all attendees
+     *
+     * @config
+     * @var bool
+     */
+    private static $require_all_attendees = false;
+
+    /**
      * @var Reservation
      */
     protected $reservation;
@@ -33,8 +41,15 @@ class ReservationForm extends FormStep
         $this->reservation = $reservation;
 
         // Ask details about created attendees
-        foreach ($reservation->Attendees() as $attendee) {
-            $fields->add($field = AttendeeField::create($attendee));
+        foreach ($reservation->Attendees() as $index => $attendee) {
+            // The main reservation information is the first field
+            $main = $index === 0;
+            // Set required to true for all attendees or for the first only
+            $required = self::config()->get('require_all_attendees')
+                ? self::config()->get('require_all_attendees')
+                : $main;
+
+            $fields->add($field = AttendeeField::create($attendee, $main, $required));
             $requiredFields = array_merge($requiredFields, $field->getRequiredFields());
         }
 
@@ -66,12 +81,20 @@ class ReservationForm extends FormStep
      */
     public function goToNextStep(array $data, ReservationForm $form)
     {
+        $reservation = $form->getReservation();
         foreach ($data['Attendee'] as $attendeeID => $attendeeData) {
             $attendee = Attendee::get()->byID($attendeeID);
+
+            // populate the attendees
             foreach ($attendeeData as $field => $value) {
                 $attendee->setField($field, $value);
             }
             $attendee->write();
+
+            // Set the main contact
+            if (isset($attendeeData['Main']) && (bool)$attendeeData['Main']) {
+                $reservation->setMainContact($attendeeID);
+            }
         }
 
         $this->extend('beforeNextStep', $data, $form);

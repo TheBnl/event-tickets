@@ -33,11 +33,18 @@ class PaymentGatewayField extends FieldGroup
      */
     public function __construct()
     {
+        parent::__construct();
         $children = FieldList::create();
 
         if ($gateways = GatewayInfo::getSupportedGateways(true)) {
+            $this->extend('updateGateways', $gateways);
+
             if (count($gateways) > 1) {
-                $children->add(OptionsetField::create('Gateway', 'Select a gateway', $gateways)->setValue(array_shift($gateways)));
+                $children->add(OptionsetField::create(
+                    'Gateway',
+                    _t('PaymentGatewayField.SELECT_GATEWAY', 'Select a gateway'),
+                    $gateways
+                )->setValue(key($gateways)));
             } else {
                 $children->add(HiddenField::create('Gateway', 'Gateway', key($gateways)));
             }
@@ -47,7 +54,7 @@ class PaymentGatewayField extends FieldGroup
             );
         }
 
-        parent::__construct();
+        $this->extend('updateGatewayField');
         $this->setChildren($children);
     }
 }

@@ -85,8 +85,6 @@ class Attendee extends DataObject
         'CheckedIn' => 'Boolean'
     );
 
-    private static $default_sort = 'FirstName ASC, Surname ASC';
-
     private static $indexes = array(
         'TicketCode' => 'unique("TicketCode")'
     );
@@ -186,7 +184,13 @@ class Attendee extends DataObject
      */
     public function getName()
     {
-        return trim("$this->FirstName $this->Surname");
+        if (!empty($this->FirstName)) {
+            return trim("$this->FirstName $this->Surname");
+        } elseif ($this->Reservation()->MainContact()->exists() && $mainContact = $this->Reservation()->MainContact()) {
+            return _t('Attendee.GUEST_OF', 'Guest of {name}', null, array('name' => $mainContact->getName()));
+        } else {
+            return null;
+        }
     }
 
     /**

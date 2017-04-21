@@ -8,14 +8,10 @@
 
 namespace Broarm\EventTickets;
 
-use Config;
 use FieldList;
 use FormAction;
-use Payment;
-use SilverStripe\Omnipay\GatewayFieldsFactory;
-use SilverStripe\Omnipay\Service\ServiceFactory;
+use SilverStripe\Omnipay\GatewayInfo;
 use TextareaField;
-use TextField;
 
 /**
  * Class SummaryForm
@@ -76,36 +72,31 @@ class SummaryForm extends FormStep
         // Hook trough where optional extra field data can be saved on the reservation
         $this->extend('updateReservationBeforePayment', $form->reservation, $data, $form);
 
-        // If there is need to check out make a payment
-        if ($form->reservation->Total > 0) {
-            $form->reservation->changeState('PENDING');
-            $form->reservation->write();
+        // Check if there is a payment to process otherwise continue with manual processing
+        $gateway = $form->reservation->Total > 0
+            ? $data['Gateway']
+            : 'Manual';
 
-            $paymentProcessor = PaymentProcessor::create($this->reservation);
-            $paymentProcessor
-                ->createPayment($data['Gateway'])
-                ->setSuccessUrl($this->getController()->Link($this->nextStep))
-                ->setFailureUrl($this->getController()->Link())
-                ->write();
+        $form->reservation->changeState('PENDING');
+        $form->reservation->Gateway = $gateway;
+        $form->reservation->write();
 
-            $paymentProcessor->setGateWayData(array(
-                'transactionId' => $this->reservation->ReservationCode
-            ));
+        $paymentProcessor = PaymentProcessor::create($this->reservation);
+        $paymentProcessor
+            ->createPayment($gateway)
+            ->setSuccessUrl($this->getController()->Link($this->nextStep))
+            ->setFailureUrl($this->getController()->Link())
+            ->write();
 
-            $response = $paymentProcessor->createServiceFactory();
+        $paymentProcessor->setGateWayData(array(
+            'transactionId' => $this->reservation->ReservationCode
+        ));
 
-            $this->extend('beforeNextStep', $data, $form, $response);
-            return $response->redirectOrRespond();
-        }
+        $response = $paymentProcessor->createServiceFactory();
 
-        // else go straight to success
-        else {
-            $form->reservation->changeState('PENDING');
-            $form->reservation->write();
+        $this->extend('beforeNextStep', $data, $form, $response);
+        return $response->redirectOrRespond();
 
-            $this->extend('beforeNextStep', $data, $form);
-            return $this->nextStep();
-        }
     }
 
 

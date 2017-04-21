@@ -57,7 +57,7 @@ nl:
     PAID: 'Betaald'
     CANCELED: 'Afgezegd'
   ReservationForm:
-    PAYMENT: 'Ga verder naar betalen'
+    PAYMENT: 'Ga verder met betalen'
   Attendee:
     Ticket: 'Ticket'
     Title: 'Naam'

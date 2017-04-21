@@ -57,9 +57,10 @@ class SummaryField extends FormField
         foreach ($this->getReservation()->Attendees() as $key => $attendee) {
             $fieldName = $this->name . "[{$attendee->ID}][TicketReceiver]";
             $attendee->TicketReceiverField = CheckboxField::create($fieldName)
-                ->setAttribute('Title', _t('SummaryField.TICKET_RECEIVER_HELP', 'Send tickets to this person'));
+                ->setAttribute('Title', _t('SummaryField.TICKET_RECEIVER_HELP', 'Send tickets to this person'))
+                ->setDisabled(empty($attendee->Email));
             // Select the first by default
-            if ($key === 0) {
+            if ($this->getReservation()->MainContact()->ID === $attendee->ID) {
                 $attendee->TicketReceiverField->setValue(1);
             }
             $attendees->push($attendee);

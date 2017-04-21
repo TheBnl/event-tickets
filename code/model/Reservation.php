@@ -38,12 +38,15 @@ use ViewableData;
  * @property string Email
  * @property string Comments
  * @property string ReservationCode
+ * @property string Gateway
  *
  * @property int    EventID
  * @property int    TicketFileID
+ * @property int    MainContactID
  *
  * @method File TicketFile
  * @method CalendarEvent|TicketExtension Event
+ * @method Attendee MainContact
  * @method HasManyList Attendees
  * @method ManyManyList PriceModifiers
  */
@@ -64,13 +67,15 @@ class Reservation extends DataObject
         'FirstName' => 'Varchar(255)',
         'Surname' => 'Varchar(255)',
         'Email' => 'Varchar(255)',
+        'Gateway' => 'Varchar(255)',
         'Comments' => 'Text',
         'ReservationCode' => 'Varchar(255)'
     );
 
     private static $has_one = array(
         'Event' => 'CalendarEvent',
-        'TicketFile' => 'File'
+        'TicketFile' => 'File',
+        'MainContact' => 'Broarm\EventTickets\Attendee'
     );
 
     private static $has_many = array(
@@ -160,9 +165,8 @@ class Reservation extends DataObject
     public function getName()
     {
         /** @var Attendee $attendee */
-        if ($this->Attendees()->exists() && $attendee = $this->Attendees()->first()) {
-            $attendee = $this->Attendees()->first();
-            return $attendee->getName();
+        if ($this->MainContact()->exists()) {
+            return $this->MainContact()->getName();
         } else {
             return 'new reservation';
         }
@@ -212,6 +216,16 @@ class Reservation extends DataObject
         } else {
             user_error(_t('Reservation.STATE_CHANGE_ERROR', 'Selected state is not available'));
         }
+    }
+
+    /**
+     * Set the main contact id
+     *
+     * @param $id
+     */
+    public function setMainContact($id) {
+        $this->MainContactID = $id;
+        $this->write();
     }
 
     /**

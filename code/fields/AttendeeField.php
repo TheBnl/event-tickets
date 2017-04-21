@@ -14,6 +14,7 @@ use DBField;
 use FieldGroup;
 use FieldList;
 use FormField;
+use HiddenField;
 use LiteralField;
 
 /**
@@ -33,17 +34,18 @@ class AttendeeField extends CompositeField
 
     protected $requiredFields = array();
 
-    public function __construct(Attendee $attendee)
+    public function __construct(Attendee $attendee, $main = false, $required = true)
     {
         parent::__construct();
         $this->setTag('fieldset');
         $this->setLegend("{$attendee->Ticket()->Title} t.w.v {$attendee->Ticket()->getPriceNice()}");
+        if ($required) $this->addExtraClass('required');
 
         $children = FieldList::create();
         $savableFields = Attendee::config()->get('savable_fields');
         foreach ($savableFields as $field => $fieldClass) {
-            $fieldName = $this->name . "[{$attendee->ID}][$field]";
-            if (in_array($field, self::config()->get('required_fields'))) {
+            $fieldName = "{$this->name}[{$attendee->ID}][$field]";
+            if (in_array($field, self::config()->get('required_fields')) && $required) {
                 $this->addRequiredField($fieldName);
             }
 
@@ -51,6 +53,9 @@ class AttendeeField extends CompositeField
                 $fieldClass::create($fieldName, _t("AttendeesField.$field", $field))
             );
         }
+
+        // Set the main field
+        $children->add(HiddenField::create("{$this->name}[{$attendee->ID}][Main]", 'Main', (int)$main));
 
         // set the children
         $this->setChildren($children);
