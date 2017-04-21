@@ -38,9 +38,9 @@ class SummaryForm extends FormStep
         );
 
         // Update the summary form with extra fields
-        $this->extend('updateSummaryForm');
-        
+
         parent::__construct($controller, $name, $fields, $actions);
+        $this->extend('updateSummaryForm');
     }
 
     /**

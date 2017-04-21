@@ -33,19 +33,10 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.25);
         }
 
-        .email-reservation__title th {
-            text-align: center;
-        }
-
-        .email-reservation__title img {
-            display: inline-block;
-            max-width: 50%;
-            padding-bottom: 1rem;
-        }
-
         .email-reservation__total td {
             line-height: 3rem;
             border-bottom: 1px solid #efefef;
+            border-top: 1px solid #efefef;
         }
 
         .email-reservation__total-price {
@@ -117,6 +108,6 @@
     </style>
 </head>
 <body>
-    <% include Email_Reservation %>
+    <% include Email_Notification %>
 </body>
 </html>

@@ -46,6 +46,7 @@ class SuccessController extends CheckoutStepController
                 $this->reservation->createFiles();
                 if ($this->sendReservation()) {
                     $this->reservation->changeState('PAID');
+                    $this->sendNotification();
                     $this->extend('afterPaymentComplete', $this->reservation);
                     $this->reservation->write();
                 }
@@ -76,12 +77,12 @@ class SuccessController extends CheckoutStepController
         if ($attendees->filter('TicketReceiver', 1)->exists()) {
             $receivers = implode(',', $attendees->filter('TicketReceiver', 1)->column('Email'));
         } else {
-            $receivers = $this->reservation->Attendees()->first()->Email;
+            $receivers = $this->reservation->MainContact()->Email;
         }
 
         // Create the email with given template and reservation data
         $email = new Email();
-        $email->setSubject(_t('ReservationMail.SUBJECT', ''));
+        $email->setSubject(_t('TicketEmail.Title', 'Your tickets'));
         $email->setFrom($from);
         $email->setTo($receivers);
         $email->setTemplate('ReservationMail');
@@ -89,6 +90,26 @@ class SuccessController extends CheckoutStepController
         $this->extend('updateTicketMail', $email);
         $email->send();
         return true;
+    }
+
+    public function sendNotification()
+    {
+        if (empty($to = self::config()->get('ticket_mail_sender'))) {
+            $to = Config::inst()->get('Email', 'admin_email');
+        }
+
+        $email = new Email();
+        $email->setSubject(_t(
+            'TicketEmail.Notification',
+            'New ticket order {order}',
+            null, array('order' => $this->reservation->ReservationCode)
+        ));
+        $email->setFrom($to);
+        $email->setTo($to);
+        $email->setTemplate('NotificationMail');
+        $email->populateTemplate($this->reservation->getViewableData());
+        $this->extend('updateNotificationMail', $email);
+        $email->send();
     }
 
     /**

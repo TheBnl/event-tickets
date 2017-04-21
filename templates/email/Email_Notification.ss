@@ -2,11 +2,7 @@
     <thead>
     <tr class="email-reservation__title">
         <th colspan="3">
-            <% if $Logo %>
-                <img src="$Logo.Base64" alt="$Logo.Title">
-            <% else %>
-                <h1><%t TicketEmail.Title 'Your tickets' %></h1>
-            <% end_if %>
+            <h1><%t TicketEmail.Notification 'New ticket order {order}' order=$ReservationCode %></h1>
         </th>
     </tr>
     <tr class="email-reservation__event-summary">
@@ -23,7 +19,7 @@
     <tr class="email-reservation__attendees">
         <td colspan="3">
             <% loop $Attendees %>
-                <% include Email_Attendee ICSLink=$Top.CurrentDate.ICSLink, TicketLink=$Top.TicketFile.AbsoluteLink %>
+                <% include Email_NotificationAttendee %>
             <% end_loop %>
         </td>
     </tr>
@@ -43,11 +39,6 @@
         </td>
         <td class="email-reservation__total-price">
             $Total.NiceDecimalPoint
-        </td>
-    </tr>
-    <tr class="email-reservation__content">
-        <td colspan="3">
-            $Event.MailContent
         </td>
     </tr>
     </tbody>

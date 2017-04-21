@@ -70,20 +70,4 @@ class SiteConfigExtension extends DataExtension
 
         return $fields;
     }
-
-    /**
-     * Fixme: doesn't work
-     * /
-    public function populateDefaults()
-    {
-        if (empty($this->owner->SuccessMessage)) {
-            $this->owner->SuccessMessage = SiteConfig::config()->get('defaults')['SuccessMessage'];
-        }
-
-        if (empty($this->owner->SuccessMessageMail)) {
-            $this->owner->SuccessMessageMail = SiteConfig::config()->get('defaults')['SuccessMessageMail'];
-        }
-
-        parent::populateDefaults();
-    } //*/
 }

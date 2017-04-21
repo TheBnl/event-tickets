@@ -28,7 +28,8 @@ class PreviewTicketTask extends BuildTask
 
     protected $previews = array(
         'PrintableTicket',
-        'ReservationMail'
+        'ReservationMail',
+        'NotificationMail'
     );
 
     /**

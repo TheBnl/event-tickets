@@ -132,6 +132,7 @@ class Reservation extends DataObject
         if ($this->TicketFile()->exists()) {
             $this->TicketFile()->delete();
         }
+
         // Remove the folder
         if ($this->fileFolder()->exists()) {
             $this->fileFolder()->delete();
@@ -192,7 +193,7 @@ class Reservation extends DataObject
             'Broarm\EventTickets\Ticket',
             '`Broarm\EventTickets\Attendee`.`TicketID` = `Broarm\EventTickets\Ticket`.`ID`'
         )->sum('Price');
-
+        
         // Calculate any price modifications if added
         if ($this->PriceModifiers()->exists()) {
             foreach ($this->PriceModifiers() as $priceModifier) {
