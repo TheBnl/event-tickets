@@ -10,6 +10,8 @@ namespace Broarm\EventTickets;
 
 use FieldList;
 use FormAction;
+use GatewayErrorMessage;
+use Payment;
 use SilverStripe\Omnipay\GatewayInfo;
 use TextareaField;
 
@@ -37,9 +39,14 @@ class SummaryForm extends FormStep
             FormAction::create('makePayment', _t('ReservationForm.PAYMENT', 'Continue to payment'))
         );
 
-        // Update the summary form with extra fields
-
         parent::__construct($controller, $name, $fields, $actions);
+
+        // check if there is an error message and show it
+        if ($error = $this->getPaymentErrorMessage()) {
+            $this->setMessage($error, 'error');
+        }
+
+        // Update the summary form with extra fields
         $this->extend('updateSummaryForm');
     }
 
@@ -93,11 +100,40 @@ class SummaryForm extends FormStep
         ));
 
         $response = $paymentProcessor->createServiceFactory();
-
         $this->extend('beforeNextStep', $data, $form, $response);
         return $response->redirectOrRespond();
-
     }
 
+
+    /**
+     * Get the last error message from the payment attempts
+     *
+     * @return bool|string
+     */
+    public function getPaymentErrorMessage()
+    {
+        /** @var Payment $lastPayment */
+        // Get the last payment
+        if (!$lastPayment = $this->reservation->Payments()->first()) {
+            return false;
+        }
+
+        // Find the gateway error
+        $lastErrorMessage = null;
+        $errorMessages = $lastPayment->Messages()->exclude('Message', '')->sort('Created', 'DESC');
+        foreach ($errorMessages as $errorMessage) {
+            if ($errorMessage instanceof GatewayErrorMessage) {
+                $lastErrorMessage = $errorMessage;
+                break;
+            }
+        }
+
+        // If no error is found return
+        if (!$lastErrorMessage) {
+            return false;
+        }
+
+        return _t("{$lastErrorMessage->Gateway}.{$lastErrorMessage->Code}", $lastErrorMessage->Message);
+    }
 
 }

@@ -47,6 +47,7 @@ use ViewableData;
  * @method File TicketFile
  * @method CalendarEvent|TicketExtension Event
  * @method Attendee MainContact
+ * @method HasManyList Payments
  * @method HasManyList Attendees
  * @method ManyManyList PriceModifiers
  */
@@ -79,6 +80,7 @@ class Reservation extends DataObject
     );
 
     private static $has_many = array(
+        'Payments' => 'Payment',
         'Attendees' => 'Broarm\EventTickets\Attendee.Reservation'
     );
 

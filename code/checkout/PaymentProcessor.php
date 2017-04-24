@@ -113,7 +113,7 @@ class PaymentProcessor extends Object
             user_error($ex->getMessage(), E_USER_WARNING);
             return null;
         }
-        
+
         return $serviceResponse;
     }
 
