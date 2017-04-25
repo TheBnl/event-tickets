@@ -2,7 +2,8 @@
   "name": "bramdeleeuw/silverstripe-event-tickets",
   "description": "Event tickets for SilverStripe Event Calendar",
   "type": "silverstripe-module",
-  "keywords": ["silverstripe", "ticket", "omnipay", "event"],
+  "homepage": "https://github.com/TheBnl/event-tickets",
+  "keywords": ["silverstripe", "ticket", "omnipay", "event", "calendar"],
   "license": "BSD-3-Clause",
   "authors": [
     {
@@ -11,8 +12,8 @@
     }
   ],
   "require": {
-    "silverstripe/framework": ">=3.1",
-    "silverstripe/cms": ">=3.1",
+    "silverstripe/framework": "~3.1",
+    "silverstripe/cms": "~3.1",
     "silverstripe/event-calendar": "*",
     "silverstripe/silverstripe-omnipay": "*",
     "omnipay/manual": "*",
