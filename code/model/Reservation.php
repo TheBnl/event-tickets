@@ -16,9 +16,13 @@ use Dompdf\Dompdf;
 use FieldList;
 use File;
 use Folder;
+use GridField;
+use GridFieldConfig_RecordViewer;
 use HasManyList;
+use LiteralField;
 use ManyManyList;
 use Member;
+use ReadonlyField;
 use SiteConfig;
 use SSViewer;
 use Tab;
@@ -62,11 +66,9 @@ class Reservation extends DataObject
     private static $delete_after = '+1 week';
 
     private static $db = array(
-        'Status' => 'Enum("CART,PENDING,PAID,CANCELED","CART")', // State 'CANCELED' is more for administrative purposes
+        'Status' => 'Enum("CART,PENDING,PAID,CANCELED","CART")',
         'Title' => 'Varchar(255)',
         'Total' => 'Currency',
-        'FirstName' => 'Varchar(255)',
-        'Surname' => 'Varchar(255)',
         'Email' => 'Varchar(255)',
         'Gateway' => 'Varchar(255)',
         'Comments' => 'Text',
@@ -101,7 +103,22 @@ class Reservation extends DataObject
     public function getCMSFields()
     {
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));
-
+        $gridFieldConfig = GridFieldConfig_RecordViewer::create();
+        $fields->addFieldsToTab('Root.Main', array(
+            ReadonlyField::create('ReservationCode', _t('Reservation.Code', 'Code')),
+            ReadonlyField::create('Title', _t('Reservation.MainContact', 'Main contact')),
+            ReadonlyField::create('Gateway', _t('Reservation.Gateway', 'Gateway')),
+            ReadonlyField::create('Total', _t('Reservation.Total', 'Total')),
+            ReadonlyField::create('Comments', _t('Reservation.Comments', 'Comments')),
+            $reservationFileField = ReadonlyField::create(
+                'ReservationFile',
+                _t('Attendee.Reservation', 'Reservation'),
+                "<a class='readonly' href='{$this->TicketFile()->Link()}' target='_blank'>Download reservation PDF</a>"
+            ),
+            GridField::create('Attendees', 'Attendees', $this->Attendees(), $gridFieldConfig),
+            GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig)
+        ));
+        $reservationFileField->dontEscape = true;
         $fields->addFieldsToTab('Root.Main', array());
         $this->extend('updateCMSFields', $fields);
         return $fields;
@@ -286,10 +303,6 @@ class Reservation extends DataObject
             $file->Title = $this->ReservationCode;
             $file->setFilename($relativeFilePath);
             $file->write();
-
-            // Attach the ticket file to the Attendee
-            $this->TicketFileID = $file->ID;
-            $this->write();
         }
 
         // Set the template and parse the data
@@ -305,6 +318,10 @@ class Reservation extends DataObject
 
         // Save the pdf stream as a file
         file_put_contents($absoluteFilePath, $domPDF->output());
+
+        // Attach the ticket file to the Attendee
+        $this->TicketFileID = $file->ID;
+        $this->write();
 
         return $file;
     }

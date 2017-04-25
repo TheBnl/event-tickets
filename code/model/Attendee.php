@@ -108,24 +108,17 @@ class Attendee extends DataObject
     {
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));
         $fields->addFieldsToTab('Root.Main', array(
-            ReadonlyField::create('Title', 'Name'),
-            ReadonlyField::create('Email', 'Email'),
-            ReadonlyField::create('TicketCode', 'Ticket'),
-            LiteralField::create('CheckedIn', "
-                <div class='field readonly'>
-                    <label class='left'>Checked in</label>
-                    <div class='middleColumn'><span class='readonly'>{$this->dbObject('CheckedIn')->Nice()}</span></div>
-                </div>
-            "),
-            LiteralField::create('ReservationFile', "
-                <div class='field readonly'>
-                    <label class='left'>Reservation</label>
-                    <div class='middleColumn'>
-                        <span class='readonly'><a class='readonly' href='{$this->Reservation()->TicketFile()->Link()}' target='_blank'>Download reservation PDF</a></span>
-                    </div>
-                </div>
-            ")
+            ReadonlyField::create('Title', _t('Attendee.Name', 'Name')),
+            ReadonlyField::create('Email', _t('Attendee.Email', 'Email')),
+            ReadonlyField::create('TicketCode', _t('Attendee.Ticket', 'Ticket')),
+            ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice()),
+            $reservationFileField = ReadonlyField::create(
+                'ReservationFile',
+                _t('Attendee.Reservation', 'Reservation'),
+                "<a class='readonly' href='{$this->Reservation()->TicketFile()->Link()}' target='_blank'>Download reservation PDF</a>"
+            )
         ));
+        $reservationFileField->dontEscape = true;
         $this->extend('updateCMSFields', $fields);
         return $fields;
     }

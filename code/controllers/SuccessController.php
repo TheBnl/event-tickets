@@ -73,9 +73,9 @@ class SuccessController extends CheckoutStepController
         }
 
         // Get the attendees for this event that are checked as receiver
-        $attendees = $this->reservation->Attendees();
-        if ($attendees->filter('TicketReceiver', 1)->exists()) {
-            $receivers = implode(',', $attendees->filter('TicketReceiver', 1)->column('Email'));
+        $ticketReceivers = $this->reservation->Attendees()->filter('TicketReceiver', 1);
+        if ($ticketReceivers->exists()) {
+            $receivers = implode(',', $ticketReceivers->column('Email'));
         } else {
             $receivers = $this->reservation->MainContact()->Email;
         }
@@ -92,6 +92,9 @@ class SuccessController extends CheckoutStepController
         return true;
     }
 
+    /**
+     * Send a booking notification tot the ticket mail sender or the site admin
+     */
     public function sendNotification()
     {
         if (empty($to = self::config()->get('ticket_mail_sender'))) {
