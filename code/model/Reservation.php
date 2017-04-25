@@ -1,6 +1,6 @@
 <?php
 /**
- * EventReservation.php
+ * Reservation.php
  *
  * @author Bram de Leeuw
  * Date: 09/03/17

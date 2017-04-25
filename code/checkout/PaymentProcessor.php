@@ -90,7 +90,7 @@ class PaymentProcessor extends Object
                 "PaymentProcessor.INVALID_GATEWAY",
                 "`{gateway}` is not supported.",
                 null,
-                array('gateway' => $gateway)
+                array('gateway' => (string)$gateway)
             ), E_USER_ERROR);
         }
 
