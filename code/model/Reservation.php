@@ -19,7 +19,6 @@ use Folder;
 use GridField;
 use GridFieldConfig_RecordViewer;
 use HasManyList;
-use LiteralField;
 use ManyManyList;
 use Member;
 use ReadonlyField;
@@ -30,7 +29,7 @@ use TabSet;
 use ViewableData;
 
 /**
- * Class EventReservation
+ * Class Reservation
  *
  * @package Broarm\EventTickets
  *
@@ -261,7 +260,7 @@ class Reservation extends DataObject
     /**
      * Create the folder for the qr code and ticket file
      *
-     * @return Folder|null
+     * @return Folder|DataObject|null
      */
     public function fileFolder()
     {

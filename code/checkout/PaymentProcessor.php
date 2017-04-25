@@ -10,9 +10,10 @@ namespace Broarm\EventTickets;
 
 use Object;
 use Payment;
-use SilverStripe\Omnipay\GatewayFieldsFactory;
+use SilverStripe\Omnipay\Exception\Exception;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\Omnipay\Service\ServiceFactory;
+use SilverStripe\Omnipay\Service\ServiceResponse;
 
 /**
  * Class PaymentProcessor
@@ -64,6 +65,11 @@ class PaymentProcessor extends Object
         'description' => 'test'
     );
 
+    /**
+     * PaymentProcessor constructor.
+     *
+     * @param Reservation $reservation
+     */
     public function __construct(Reservation $reservation)
     {
         $this->reservation = $reservation;
@@ -73,7 +79,7 @@ class PaymentProcessor extends Object
     /**
      * Create a payment trough the given payment gateway
      *
-     * @param $gateway
+     * @param string $gateway
      *
      * @return Payment
      */
@@ -101,6 +107,12 @@ class PaymentProcessor extends Object
         return $this->payment;
     }
 
+    /**
+     * Create the service factory
+     * Catch any exceptions that might occur
+     *
+     * @return null|ServiceResponse
+     */
     public function createServiceFactory()
     {
         $factory = ServiceFactory::create();
@@ -108,7 +120,7 @@ class PaymentProcessor extends Object
 
         try {
             $serviceResponse = $service->initiate($this->getGatewayData());
-        } catch (SilverStripe\Omnipay\Exception\Exception $ex) {
+        } catch (Exception $ex) {
             // error out when an exception occurs
             user_error($ex->getMessage(), E_USER_WARNING);
             return null;
@@ -117,11 +129,21 @@ class PaymentProcessor extends Object
         return $serviceResponse;
     }
 
+    /**
+     * Set and merges the gateway data
+     *
+     * @param array $data
+     */
     public function setGatewayData($data = array())
     {
         array_merge($data, $this->gatewayData);
     }
 
+    /**
+     * Get the gateway data
+     *
+     * @return array
+     */
     public function getGateWayData()
     {
         return $this->gatewayData;
