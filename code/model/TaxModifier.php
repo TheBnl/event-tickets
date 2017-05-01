@@ -22,7 +22,7 @@ class TaxModifier extends PriceModifier
      *
      * @var string
      */
-    private static $tax_rate = '21';
+    private static $tax_rate = 21;
 
     /**
      * Set if the tax rate is inclusive or exclusive
@@ -41,6 +41,11 @@ class TaxModifier extends PriceModifier
         'Sort' => 9999
     );
 
+    /**
+     * Update the total, if the tax is not inclusive the total gets altered
+     *
+     * @param float $total
+     */
     public function updateTotal(&$total) {
         $rate = (float)self::config()->get('tax_rate') / 100;
         $tax = $total * $rate;
