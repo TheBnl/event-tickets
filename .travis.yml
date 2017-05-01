@@ -33,4 +33,4 @@ before_script:
 
 # TODO write actual tests to do
 #script:
-#  - vendor/bin/phpunit focuspoint/tests
+#  - vendor/bin/phpunit event-tickets/tests
