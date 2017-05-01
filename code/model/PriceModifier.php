@@ -29,7 +29,14 @@ use TextField;
 class PriceModifier extends DataObject implements PriceModifierInterface
 {
     private static $db = array(
-        'Title' => 'Varchar(255)'
+        'Title' => 'Varchar(255)',
+        'Sort' => 'Int'
+    );
+
+    private static $default_sort = 'Sort ASC, ID DESC';
+
+    private static $defaults = array(
+        'Sort' => 0
     );
 
     private static $many_many = array(

@@ -35,7 +35,7 @@ nl:
     PRICE: 'Prijs'
     AMOUNT: 'Hoeveelheid'
     VALIDATION_TO_MUCH: 'Er zijn {ticketCount} tickets over'
-    VALIDATION_EMPTY: 'Selecteer minstens een ticket'
+    VALIDATION_EMPTY: 'Selecteer minstens één ticket'
   TicketExtension:
     Tickets: 'Tickets'
     Capacity: 'Plaatsen'

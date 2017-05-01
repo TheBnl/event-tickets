@@ -97,6 +97,11 @@ class ReservationForm extends FormStep
             }
         }
 
+        // add the tax modifier
+        $reservation->PriceModifiers()->add(TaxModifier::findOrMake($reservation));
+        $reservation->calculateTotal();
+        $reservation->write();
+
         $this->extend('beforeNextStep', $data, $form);
         return $this->nextStep();
     }

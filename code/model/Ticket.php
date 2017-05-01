@@ -36,11 +36,6 @@ use TextField;
 class Ticket extends DataObject
 {
     /**
-     * @var CalendarEvent_Controller
-     */
-    private $calendarController;
-
-    /**
      * The default sale start date
      * This defaults to the event start date '-1 week'
      *
@@ -100,11 +95,6 @@ class Ticket extends DataObject
 
         $this->extend('updateCMSFields', $fields);
         return $fields;
-    }
-
-    public function onBeforeWrite()
-    {
-        parent::onBeforeWrite();
     }
 
     public function singular_name()
@@ -224,23 +214,11 @@ class Ticket extends DataObject
      */
     private function getEventStartDate()
     {
-        if ($this->getCalendarController()->UpcomingDates()->exists()) {
-            return $this->getCalendarController()->UpcomingDates()->first()->obj('StartDate');
+        if ($this->Event()->getController()->CurrentDate()->exists()) {
+            return $this->Event()->getController()->CurrentDate()->obj('StartDate');
         } else {
             return null;
         }
-    }
-
-    /**
-     * Get the calendar controller
-     *
-     * @return CalendarEvent_Controller
-     */
-    private function getCalendarController()
-    {
-        return $this->calendarController
-            ? $this->calendarController
-            : $this->calendarController = CalendarEvent_Controller::create($this->Event());
     }
 
     public function canView($member = null)

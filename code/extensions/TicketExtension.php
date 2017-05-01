@@ -8,9 +8,11 @@
 
 namespace Broarm\EventTickets;
 
+use CalendarEvent_Controller;
 use DataExtension;
 use FieldList;
 use GridField;
+use GridFieldAddNewButton;
 use GridFieldConfig_RecordEditor;
 use HtmlEditorField;
 use LiteralField;
@@ -33,6 +35,11 @@ use SiteConfig;
  */
 class TicketExtension extends DataExtension
 {
+    /**
+     * @var CalendarEvent_Controller
+     */
+    protected $controller;
+
     private static $db = array(
         'Capacity' => 'Int',
         'SuccessMessage' => 'HTMLText',
@@ -48,20 +55,27 @@ class TicketExtension extends DataExtension
     public function updateCMSFields(FieldList $fields)
     {
         $gridFieldConfig = GridFieldConfig_RecordEditor::create();
+
+        // If the event dates are in the past remove ability to create new tickets, reservations and attendees.
+        // This is done here instead of in the canCreate method because of the lack of context there.
+        if (!$this->canCreateTickets()) {
+            $gridFieldConfig->removeComponentsByType(new GridFieldAddNewButton());
+        }
+
         $ticketLabel = _t('TicketExtension.Tickets', 'Tickets');
         $fields->addFieldsToTab(
             "Root.$ticketLabel", array(
-                new GridField('Tickets', $ticketLabel, $this->owner->Tickets(), $gridFieldConfig),
-                new NumericField('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
-                HtmlEditorField::create('SuccessMessage', 'Success message')->setRows(4),
-                HtmlEditorField::create('SuccessMessageMail', 'Mail message')->setRows(4)
+            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), $gridFieldConfig),
+            NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
+            HtmlEditorField::create('SuccessMessage', 'Success message')->setRows(4),
+            HtmlEditorField::create('SuccessMessageMail', 'Mail message')->setRows(4)
         ));
 
         if ($this->owner->Reservations()->exists()) {
             $reservationLabel = _t('TicketExtension.Reservations', 'Reservations');
             $fields->addFieldToTab(
                 "Root.$reservationLabel",
-                new GridField('Reservations', $reservationLabel, $this->owner->Reservations(), $gridFieldConfig)
+                GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), $gridFieldConfig)
             );
         }
 
@@ -69,7 +83,7 @@ class TicketExtension extends DataExtension
             $guestListLabel = _t('TicketExtension.GuestList', 'GuestList');
             $fields->addFieldToTab(
                 "Root.$guestListLabel",
-                new GridField('Attendees', $guestListLabel, $this->owner->Attendees(), $gridFieldConfig)
+                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), $gridFieldConfig)
             );
         }
 
@@ -134,5 +148,32 @@ class TicketExtension extends DataExtension
         } else {
             return SiteConfig::current_site_config()->dbObject('SuccessMessageMail');
         }
+    }
+
+    /**
+     * Check if the current event can have tickets
+     *
+     * @return bool
+     */
+    public function canCreateTickets()
+    {
+        $currentDate = $this->owner->getController()->CurrentDate();
+        if ($currentDate->exists()) {
+            return $currentDate->dbObject('StartDate')->InFuture();
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the calendar controller
+     *
+     * @return CalendarEvent_Controller
+     */
+    public function getController()
+    {
+        return $this->controller
+            ? $this->controller
+            : $this->controller = CalendarEvent_Controller::create($this->owner);
     }
 }
