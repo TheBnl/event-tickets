@@ -334,8 +334,6 @@ class Reservation extends DataObject
         $config = SiteConfig::current_site_config();
         $data = $this->Me();
         $data->CurrentDate = $this->Event()->getController()->CurrentDate();
-        //$calendarController = new CalendarEvent_Controller($this->Event());
-        //$data->CurrentDate = $calendarController->CurrentDate();
         $data->Logo = $config->TicketLogo();
         $this->extend('updateViewableData', $data);
         return $data;
