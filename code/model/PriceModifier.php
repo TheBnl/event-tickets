@@ -68,7 +68,7 @@ class PriceModifier extends DataObject implements PriceModifierInterface
      * Modify the given total
      * Implement this on your modifier
      *
-     * @param $total
+     * @param float $total
      */
     public function updateTotal(&$total) {}
 

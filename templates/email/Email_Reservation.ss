@@ -45,6 +45,40 @@
             $Total.NiceDecimalPoint
         </td>
     </tr>
+
+    <tr>
+        <td colspan="3">
+            <table class="email-reservation__order">
+                <tr>
+                    <th colspan="2">
+                        <h3><%t TicketEmail.Order 'Order' %></h3>
+                    </th>
+                </tr>
+                <tr>
+                    <td><%t TicketEmail.OrderNumber 'Order number' %></td>
+                    <td>$ReservationCode</td>
+                </tr>
+                <tr>
+                    <td><%t TicketEmail.Name 'Name' %></td>
+                    <td>$MainContact.Name</td>
+                </tr>
+                <tr>
+                    <td><%t TicketEmail.Email 'Email' %></td>
+                    <td>$MainContact.Email</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <% if $Comments %>
+    <tr class="email-reservation__order-comments">
+        <td colspan="3">
+            <h3><%t TicketEmail.Comments 'Comments' %></h3>
+            <p>$Comments</p>
+        </td>
+    </tr>
+    <% end_if %>
+
     <tr class="email-reservation__content">
         <td colspan="3">
             $Event.MailContent

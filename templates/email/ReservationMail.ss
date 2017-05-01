@@ -10,6 +10,11 @@
             background-color: #efefef;
         }
 
+        p, tr {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
         table {
             width: 100%;
             border: none;
@@ -54,6 +59,14 @@
 
         .email-reservation__content td {
             padding: 15px 0;
+        }
+
+        .email-reservation__order h3 {
+            margin: 0;
+        }
+
+        .email-reservation__order tr {
+            line-height: 2rem;
         }
 
         .attendee {

@@ -36,9 +36,7 @@ use ViewableData;
  * @property string Status
  * @property string Title
  * @property float  Total
- * @property string FirstName
- * @property string Surname
- * @property string Email
+ * @property string Email todo determine obsolete value
  * @property string Comments
  * @property string ReservationCode
  * @property string Gateway
