@@ -158,7 +158,7 @@ class TicketExtension extends DataExtension
     public function canCreateTickets()
     {
         $currentDate = $this->owner->getController()->CurrentDate();
-        if ($currentDate->exists()) {
+        if ($currentDate && $currentDate->exists()) {
             return $currentDate->dbObject('StartDate')->InFuture();
         }
 
