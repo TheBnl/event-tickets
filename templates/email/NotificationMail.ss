@@ -47,10 +47,6 @@
             padding: 15px 0;
         }
 
-        .email-reservation__order {}
-
-        .email-reservation__order-comments {}
-
         .attendee {
             background-color: #efefef;
             border-radius: 4px;

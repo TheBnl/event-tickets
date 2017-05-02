@@ -45,16 +45,16 @@ nl:
     PERMISSIONS_CAT: 'Event tickets'
     HANDLE_CHECK_IN: 'Geautoriseerd voor ticket controle'
   TicketEmail:
+    TERMS_CONDITIONS: 'Algemene voorwaarden'
     Title: 'Uw tickets'
     Total: 'Totaal'
     Agenda: 'Agenda'
     Print: 'Print'
     Share: 'Deel'
-    TERMS_CONDITIONS: 'Algemene voorwaarden'
-    Order: Reservering
-    OrderNumber: Reserveringsnummer
-    Name: Naam
-    Email: E-mail
+    Order: 'Reservering'
+    OrderNumber: 'Reserveringsnummer'
+    Name: 'Naam'
+    Email: 'E-mail'
   Reservation:
     CART: 'Winkelwagen'
     PENDING: 'Word verwerkt'
