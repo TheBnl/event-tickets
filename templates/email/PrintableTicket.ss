@@ -4,11 +4,17 @@
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" >
     <title>$TicketCode</title>
     <style type="text/css">
+        * {
+            box-sizing: border-box;
+        }
+
         html,
         body {
             width: 100%;
             font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+            font-size: 9pt;
             text-align: left;
+            margin: .5cm;
         }
 
         table {
@@ -16,6 +22,7 @@
             border: none;
             padding: 0;
             margin: 0;
+            border-spacing: 0;
         }
 
         table th {
@@ -23,78 +30,77 @@
         }
 
         table tr {}
-        table tr td {}
+        table tr td {
+            line-height: 1.4;
+            font-size: 1rem;
+        }
 
-        .email-reservation {
-            max-width: 650px;
+        p {
+            line-height: 1.4;
+            font-size: 1rem;
+        }
+
+        .print-reservation {
+            width: 100%;
             margin: auto;
-            background-color: #ffffff;
-            padding: 10px;
-            border-radius: 4px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-        }
+            page-break-after: always;}
+            .print-reservation:last-child {
+                page-break-after: avoid;}
+            .print-reservation__title img {
+                width: 512px;
+                margin: 1rem 0;}
+            .print-reservation__logos {
+                padding: 1rem;}
+                .print-reservation__logos img {
+                    float: left;
+                    margin: 1rem .5rem;}
 
-        .email-reservation__total td {
-            line-height: 3rem;
-            border-bottom: 1px solid #efefef;
-        }
+        .event {
+            margin-bottom: 2rem;
+            border: 2mm solid lightgrey;}
+            .event__ticket-code {
+                height: 0;
+                line-height: 0;
+                margin: 0;
+                font-size: .6rem;
+                position: relative;
+                top: -0.5rem;
+                width: 100%;
+                text-align: center;}
+            .event__ticket-qr {
+                width: 448px;}
+            .event__info {
+                border-left: 2mm solid lightgrey;
+                padding: 1rem;}
+            .event__location {
+                font-weight: bold;
+                margin: 0;}
+            .event__date {
+                margin: 0;}
 
-        .email-reservation__total-price {
-            padding-right: 10px;
-            font-weight: bold;
-        }
+        .order {
+            margin-bottom: 2rem;
+            border: 2mm solid lightgrey;
+            padding: 1rem;}
+            .order__key {
+                line-height: 1.4;}
+            .order__value {
+                padding: .1rem .5rem;
+                line-height: 1.4;
+                font-weight: bold;}
 
-        .email-reservation__content td {
-            padding: 15px 0;
-        }
-
-        .attendee {
-            background-color: #efefef;
-            border-radius: 4px;
-            margin: 15px 0;
-        }
-
-        .attendee__qr {
-            width: 256px;
-        }
-
-        .attendee__ticket-title,
-        .attendee__ticket-price {
-            vertical-align: bottom;
-        }
-
-        .attendee__name {
-            line-height: 1.2rem;
-        }
-
-        .attendee__links {
-            vertical-align: bottom;
-        }
-        .attendee__link {
-            margin-right: 10px;
-            padding-bottom: 5px;
-            font-weight: bold;
-            color: #000000;
-            text-decoration: none;
-        }
-        .attendee__link-icon {}
-        .attendee__link-label {
-            margin: 0 15px;
-        }
-
-        .attendee td {
-            padding: 7px 20px;
-        }
-
-        .email-reservation__modifier-value,
-        .email-reservation__total-price,
-        .attendee__ticket-price {
-            width: 300px;
-            text-align: right;
-        }
+        .text {
+            margin-bottom: 2rem;
+            padding: 0 1rem;}
+            .text__col {
+                padding: 0 .5rem;
+                width: 50%;
+                vertical-align: top;}
+            .text__col p, li {
+                font-size: .8rem;}
     </style>
 </head>
 <body>
-    <% include Email_Reservation %>
+    <% include Print_Reservation %>
 </body>
 </html>

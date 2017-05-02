@@ -3,7 +3,7 @@
     <tr class="email-reservation__title">
         <th colspan="3">
             <% if $Logo %>
-                <img src="$Logo.Base64" alt="$Logo.Title">
+                <img src="$Logo.AbsoluteURL" alt="$Logo.Title">
             <% else %>
                 <h1><%t TicketEmail.Title 'Your tickets' %></h1>
             <% end_if %>

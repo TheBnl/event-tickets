@@ -2,7 +2,7 @@
 <tbody>
 <tr>
     <td rowspan="3" class="attendee__qr">
-        <img src="$TicketQRCode.Base64" alt="$TicketQRCode.Title" width="256" height="256">
+        <img src="$TicketQRCode.AbsoluteURL" alt="$TicketQRCode.Title" width="256" height="256">
     </td>
     <td  class="attendee__ticket-title">
         $Ticket.Title
