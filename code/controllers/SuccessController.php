@@ -97,7 +97,11 @@ class SuccessController extends CheckoutStepController
      */
     public function sendNotification()
     {
-        if (empty($to = self::config()->get('ticket_mail_sender'))) {
+        if (empty($from = self::config()->get('ticket_mail_sender'))) {
+            $from = Config::inst()->get('Email', 'admin_email');
+        }
+
+        if (empty($to = self::config()->get('mail_reciever'))) {
             $to = Config::inst()->get('Email', 'admin_email');
         }
 
@@ -107,7 +111,7 @@ class SuccessController extends CheckoutStepController
             'New ticket order {order}',
             null, array('order' => $this->reservation->ReservationCode)
         ));
-        $email->setFrom($to);
+        $email->setFrom($from);
         $email->setTo($to);
         $email->setTemplate('NotificationMail');
         $email->populateTemplate($this->reservation->getViewableData());
