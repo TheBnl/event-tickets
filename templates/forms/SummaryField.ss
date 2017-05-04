@@ -24,7 +24,7 @@
             <% loop $TableFields %>
                 <td class="summary-table__body-col summary-table__body-col--{$Header}">$Value</td>
             <% end_loop %>
-            <td class="summary-table__body-col summary-table__body-col--price">$Ticket.PriceNice</td>
+            <td class="summary-table__body-col summary-table__body-col--price">$Ticket.Price.NiceDecimalPoint</td>
         </tr>
         <% end_loop %>
     </tbody>

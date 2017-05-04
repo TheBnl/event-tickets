@@ -33,9 +33,10 @@ class CurrencyExtension extends DataExtension
         $currencySymbol = $this->owner->config()->currency_symbol;
         $decimalPoint = $this->owner->config()->decimal_point;
         $thousandSeparator = $this->owner->config()->thousand_seperator;
-
         $val = $currencySymbol . number_format(abs($this->owner->value), 2, $decimalPoint, $thousandSeparator);
-        if ($this->owner->value < 0) {
+        if ((double)$this->owner->value === (double)0) {
+            return _t('CurrencyExtension.FREE', 'Free');
+        } elseif ((double)$this->owner->value < 0) {
             return "($val)";
         } else {
             return $val;

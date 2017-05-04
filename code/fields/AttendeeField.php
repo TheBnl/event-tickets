@@ -16,6 +16,7 @@ use FieldList;
 use FormField;
 use HiddenField;
 use LiteralField;
+use Member;
 
 /**
  * Class AttendeeField
@@ -38,20 +39,33 @@ class AttendeeField extends CompositeField
     {
         parent::__construct();
         $this->setTag('fieldset');
-        $this->setLegend("{$attendee->Ticket()->Title} t.w.v {$attendee->Ticket()->getPriceNice()}");
+        $this->setLegend(_t('AttendeeField.VALUED', '{title} valued {price}', null, array(
+            'title' => $attendee->Ticket()->Title,
+            'price' => $attendee->Ticket()->dbObject('Price')->NiceDecimalPoint())
+        ));
         if ($required) $this->addExtraClass('required');
 
         $children = FieldList::create();
         $savableFields = Attendee::config()->get('savable_fields');
         foreach ($savableFields as $field => $fieldClass) {
+            // Generate a unique field name
             $fieldName = "{$this->name}[{$attendee->ID}][$field]";
+
+            // Check if the field is required
             if (in_array($field, self::config()->get('required_fields')) && $required) {
                 $this->addRequiredField($fieldName);
             }
 
-            $children->add(
-                $fieldClass::create($fieldName, _t("AttendeesField.$field", $field))
-            );
+            // Create the field
+            $formField = $fieldClass::create($fieldName, _t("AttendeeField.$field", $field));
+
+            // Pre fill the form if a member is logged in
+            if ($main) {
+                $formField->setValue(Member::currentUser()->getField($field));
+            }
+
+            // Add the form
+            $children->add($formField);
         }
 
         // Set the main field

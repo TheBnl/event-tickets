@@ -25,6 +25,8 @@ nl:
     CODE_NOT_FOUND: 'Het ingevoerde ticketnummer is niet gevonden op het evenement'
     ALREADY_CHECKED_IN: 'Het ingevoerde ticketnummer is al ingecheckt'
     SUCCESS: 'Het ticket is valide. <strong>{name}</strong> heeft een <strong>{ticket}</strong> ticket met nummer {number}'
+  CurrencyExtension:
+    FREE: 'Gratis'
   SiteConfigExtension:
     SUCCESS_MESSAGE_HELP: 'Dit bericht word getoond op de succes pagina. Hij is per evenement te overschijven onder de "tickets" tab'
     MAIL_MESSAGE_HELP: 'Dit bericht word getoond op het ticket en in the mail. Hij is per evenement te overschijven onder de "tickets" tab'
@@ -66,11 +68,12 @@ nl:
     Ticket: 'Ticket'
     Title: 'Naam'
     Email: 'E-mail'
-  AttendeesField:
+  AttendeeField:
     FirstName: 'Voornaam'
     Surname: 'Achternaam'
     Email: 'Email'
     TicketReceiver: 'Stuur ticket per mail'
+    VALUED: '{title} t.w.v {price}'
   SuccessController:
     DOWNLOAD_TICKETS: 'Download uw tickets'
     BACK: 'Ga terug'

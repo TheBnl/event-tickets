@@ -10,7 +10,7 @@
     <% loop $Tickets %>
         <tr class="tickets-table__body<% if $Available %> tickets-table__body--available<% else %> tickets-table__body--unavailable<% end_if %>">
             <td class="tickets-table__body-col tickets-table__body--title">$Title</td>
-            <td class="tickets-table__body-col tickets-table__body--price">$PriceNice</td>
+            <td class="tickets-table__body-col tickets-table__body--price">$Price.NiceDecimalPoint</td>
             <td class="tickets-table__body-col tickets-table__body--amount">$AmountField</td>
         </tr>
     <% end_loop %>
