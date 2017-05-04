@@ -26,10 +26,22 @@ class SuccessController extends CheckoutStepController
     protected $reservation;
 
     /**
+     * The address to whom the ticket notifications are sent
+     * By default the admin email is used
+     *
      * @config
      * @var string
      */
     private static $mail_sender;
+
+    /**
+     * The address from where the ticket mails are sent
+     * By default the admin email is used
+     *
+     * @config
+     * @var string
+     */
+    private static $mail_receiver;
 
     public function init()
     {
@@ -68,7 +80,7 @@ class SuccessController extends CheckoutStepController
         }
 
         // Get the mail sender or fallback to the admin email
-        if (empty($from = self::config()->get('ticket_mail_sender'))) {
+        if (empty($from = self::config()->get('mail_sender'))) {
             $from = Config::inst()->get('Email', 'admin_email');
         }
 
@@ -97,17 +109,21 @@ class SuccessController extends CheckoutStepController
      */
     public function sendNotification()
     {
-        if (empty($to = self::config()->get('ticket_mail_sender'))) {
-            $to = Config::inst()->get('Email', 'admin_email');
+        if (empty($from = self::config()->get('mail_sender'))) {
+            $from = Config::inst()->get('Email', 'admin_email');
         }
 
+        if (empty($to = self::config()->get('mail_receiver'))) {
+            $to = Config::inst()->get('Email', 'admin_email');
+        }
+        
         $email = new Email();
         $email->setSubject(_t(
             'TicketEmail.Notification',
             'New ticket order {order}',
             null, array('order' => $this->reservation->ReservationCode)
         ));
-        $email->setFrom($to);
+        $email->setFrom($from);
         $email->setTo($to);
         $email->setTemplate('NotificationMail');
         $email->populateTemplate($this->reservation->getViewableData());
