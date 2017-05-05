@@ -60,8 +60,8 @@ class AttendeeField extends CompositeField
             $formField = $fieldClass::create($fieldName, _t("AttendeeField.$field", $field));
 
             // Pre fill the form if a member is logged in
-            if ($main) {
-                $formField->setValue(Member::currentUser()->getField($field));
+            if ($main && $member = Member::currentUser()) {
+                $formField->setValue($member->getField($field));
             }
 
             // Add the form
