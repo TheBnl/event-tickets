@@ -9,8 +9,8 @@
 namespace Broarm\EventTickets;
 
 use ArrayList;
+use BaconQrCode;
 use CalendarEvent;
-use CalendarEvent_Controller;
 use DataObject;
 use Director;
 use Dompdf\Dompdf;
@@ -24,7 +24,6 @@ use ReadonlyField;
 use SSViewer;
 use Tab;
 use TabSet;
-use BaconQrCode;
 use ViewableData;
 
 /**
@@ -43,6 +42,7 @@ use ViewableData;
  *
  * @property int       TicketID
  * @property int       TicketQRCodeID
+ * @property int       TicketFileID
  * @property int       ReservationID
  * @property int       EventID
  * @property int       MemberID
@@ -50,6 +50,7 @@ use ViewableData;
  * @method Reservation Reservation
  * @method Ticket Ticket
  * @method Image TicketQRCode
+ * @method File TicketFile
  * @method Member Member
  * @method CalendarEvent|TicketExtension Event
  */
@@ -94,7 +95,8 @@ class Attendee extends DataObject
         'Ticket' => 'Broarm\EventTickets\Ticket',
         'Event' => 'CalendarEvent',
         'Member' => 'Member',
-        'TicketQRCode' => 'Image'
+        'TicketQRCode' => 'Image',
+        'TicketFile' => 'File'
     );
 
     private static $summary_fields = array(
@@ -111,7 +113,8 @@ class Attendee extends DataObject
             ReadonlyField::create('Title', _t('Attendee.Name', 'Name')),
             ReadonlyField::create('Email', _t('Attendee.Email', 'Email')),
             ReadonlyField::create('TicketCode', _t('Attendee.Ticket', 'Ticket')),
-            ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice()),
+            ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'),
+                $this->dbObject('CheckedIn')->Nice()),
             $reservationFileField = ReadonlyField::create(
                 'ReservationFile',
                 _t('Attendee.Reservation', 'Reservation'),
@@ -123,6 +126,9 @@ class Attendee extends DataObject
         return $fields;
     }
 
+    /**
+     * Set the title and ticket code before writing
+     */
     public function onBeforeWrite()
     {
         // Set the title of the attendee
@@ -136,6 +142,9 @@ class Attendee extends DataObject
         parent::onBeforeWrite();
     }
 
+    /**
+     * Delete any stray files before deleting the object
+     */
     public function onBeforeDelete()
     {
         // If an attendee is deleted from the guest list remove it's qr code
@@ -144,9 +153,19 @@ class Attendee extends DataObject
             $this->TicketQRCode()->delete();
         }
 
+        // cleanup the ticket file
+        if ($this->TicketFile()->exists()) {
+            $this->TicketFile()->delete();
+        }
+
         parent::onBeforeDelete();
     }
 
+    /**
+     * Get the table fields for this attendee
+     *
+     * @return ArrayList
+     */
     public function getTableFields()
     {
         $fields = new ArrayList();
@@ -250,6 +269,49 @@ class Attendee extends DataObject
         }
 
         return $image;
+    }
+
+    /**
+     * Creates a printable ticket for the attendee
+     *
+     * @param Folder $folder
+     *
+     * @return File
+     */
+    public function createTicketFile(Folder $folder)
+    {
+        // Find or make a folder
+        $relativeFilePath = "/{$folder->Filename}{$this->TicketCode}.pdf";
+        $absoluteFilePath = Director::baseFolder() . $relativeFilePath;
+
+        if (!$file = File::get()->find('Filename', $relativeFilePath)) {
+            $file = File::create();
+            $file->ParentID = $folder->ID;
+            $file->OwnerID = (Member::currentUser()) ? Member::currentUser()->ID : 0;
+            $file->Title = $this->TicketCode;
+            $file->setFilename($relativeFilePath);
+            $file->write();
+        }
+
+        // Set the template and parse the data
+        $template = new SSViewer('PrintableTicket');
+        $html = $template->process($this->data());// getViewableData());
+
+        // Create a DomPDF instance
+        $domPDF = new Dompdf();
+        $domPDF->loadHtml($html);
+        $domPDF->setPaper('A4');
+        $domPDF->getOptions()->setDpi(150);
+        $domPDF->render();
+
+        // Save the pdf stream as a file
+        file_put_contents($absoluteFilePath, $domPDF->output());
+
+        // Attach the ticket file to the Attendee
+        $this->TicketFileID = $file->ID;
+        $this->write();
+
+        return $file;
     }
 
     public function canView($member = null)

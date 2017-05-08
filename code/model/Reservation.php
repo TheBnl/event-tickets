@@ -35,6 +35,7 @@ use ViewableData;
  *
  * @property string Status
  * @property string Title
+ * @property float  Subtotal
  * @property float  Total
  * @property string Email todo determine obsolete value
  * @property string Comments
@@ -42,10 +43,8 @@ use ViewableData;
  * @property string Gateway
  *
  * @property int    EventID
- * @property int    TicketFileID
  * @property int    MainContactID
  *
- * @method File TicketFile
  * @method CalendarEvent|TicketExtension Event
  * @method Attendee MainContact
  * @method HasManyList Payments
@@ -65,6 +64,7 @@ class Reservation extends DataObject
     private static $db = array(
         'Status' => 'Enum("CART,PENDING,PAID,CANCELED","CART")',
         'Title' => 'Varchar(255)',
+        'Subtotal' => 'Currency',
         'Total' => 'Currency',
         'Email' => 'Varchar(255)',
         'Gateway' => 'Varchar(255)',
@@ -74,7 +74,7 @@ class Reservation extends DataObject
 
     private static $has_one = array(
         'Event' => 'CalendarEvent',
-        'TicketFile' => 'File',
+        //'TicketFile' => 'File',
         'MainContact' => 'Broarm\EventTickets\Attendee'
     );
 
@@ -121,6 +121,15 @@ class Reservation extends DataObject
         return $fields;
     }
 
+    /**
+     * @deprecated
+     * @return mixed
+     */
+    public function TicketFile()
+    {
+        return $this->Attendees()->first()->TicketFile();
+    }
+
     public function onBeforeWrite()
     {
         // Set the title to the name of the reservation holder
@@ -145,9 +154,9 @@ class Reservation extends DataObject
         }
 
         // Make sure the ticket file is not downloadable
-        if ($this->TicketFile()->exists()) {
-            $this->TicketFile()->delete();
-        }
+        //if ($this->TicketFile()->exists()) {
+        //    $this->TicketFile()->delete();
+        //}
 
         // Remove the folder
         if ($this->fileFolder()->exists()) {
@@ -205,11 +214,11 @@ class Reservation extends DataObject
      */
     public function calculateTotal()
     {
-        $total = $this->Attendees()->leftJoin(
+        $total = $this->Subtotal = $this->Attendees()->leftJoin(
             'Broarm\EventTickets\Ticket',
             '`Broarm\EventTickets\Attendee`.`TicketID` = `Broarm\EventTickets\Ticket`.`ID`'
         )->sum('Price');
-        
+
         // Calculate any price modifications if added
         if ($this->PriceModifiers()->exists()) {
             foreach ($this->PriceModifiers() as $priceModifier) {
@@ -274,10 +283,8 @@ class Reservation extends DataObject
         /** @var Attendee $attendee */
         foreach ($this->Attendees() as $attendee) {
             $attendee->createQRCode($folder);
+            $attendee->createTicketFile($folder);
         }
-
-        // Create a pdf with the newly create QR codes
-        $this->createTicketFile($folder);
     }
 
     /**
@@ -286,7 +293,7 @@ class Reservation extends DataObject
      * @param Folder $folder
      *
      * @return File
-     */
+     * /
     private function createTicketFile(Folder $folder)
     {
         // Find or make a folder
@@ -321,14 +328,14 @@ class Reservation extends DataObject
         $this->write();
 
         return $file;
-    }
+    }*/
 
     /**
      * Get a viewable data object for this reservation
      * For use in the Email and print template
-     *
+     * @deprecated
      * @return ViewableData
-     */
+     * /
     public function getViewableData()
     {
         $config = SiteConfig::current_site_config();
@@ -337,7 +344,7 @@ class Reservation extends DataObject
         $data->Logo = $config->TicketLogo();
         $this->extend('updateViewableData', $data);
         return $data;
-    }
+    }*/
 
     public function canView($member = null)
     {

@@ -8,11 +8,9 @@
 
 namespace Broarm\EventTickets;
 
-use FieldGroup;
 use FieldList;
 use FormAction;
 use RequiredFields;
-use TextField;
 
 /**
  * Class ReservationForm
@@ -67,7 +65,8 @@ class ReservationForm extends FormStep
      *
      * @return Reservation
      */
-    public function getReservation() {
+    public function getReservation()
+    {
         return $this->reservation;
     }
 

@@ -151,6 +151,16 @@ class TicketExtension extends DataExtension
     }
 
     /**
+     * Get the Ticket logo
+     *
+     * @return \Image
+     */
+    public function getMailLogo()
+    {
+        return SiteConfig::current_site_config()->TicketLogo();
+    }
+
+    /**
      * Check if the current event can have tickets
      *
      * @return bool

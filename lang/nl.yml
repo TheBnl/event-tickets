@@ -46,6 +46,7 @@ nl:
   TicketControllerExtension:
     PERMISSIONS_CAT: 'Event tickets'
     HANDLE_CHECK_IN: 'Geautoriseerd voor ticket controle'
+
   TicketEmail:
     TERMS_CONDITIONS: 'Algemene voorwaarden'
     Title: 'Uw tickets'
@@ -57,6 +58,22 @@ nl:
     OrderNumber: 'Reserveringsnummer'
     Name: 'Naam'
     Email: 'E-mail'
+    FOOTER: 'Vragen? Email <a href="mailto:{email}">{email}</a> of bel <a href="tel:{phone}">{phone}</a>'
+
+  AttendeeMail:
+    TITLE: 'Uw ticket voor {event}'
+    CONTENT: 'Hallo {name}, Hier is uw toegangsbewijs voor <a href="{link}">{event}</a>.'
+  NotificationMail:
+    TITLE: 'Nieuwe reservering voor {event}'
+    CONTENT: 'Er is een nieuwe bestelling geplaatst door {name} voor {event}. Hieronder vind u de gegevens van de bestelling.'
+    ORDER: 'Order <strong>#{code}</strong>'
+  ReservationMail:
+    TITLE: 'Uw reservering bij {sitename}'
+    CONTENT: 'Bedankt voor uw bestelling voor <a href="{link}">{event}</a>. Uw tickets worden los verstuurd.'
+  MainContactMail:
+    TITLE: 'Uw tickets voor {event}'
+    CONTENT: 'Hier zijn uw tickets voor <a href="{link}">{event}</a>.'
+
   Reservation:
     CART: 'Winkelwagen'
     PENDING: 'Word verwerkt'
@@ -83,5 +100,6 @@ nl:
     EMAIL_RECEIVER: 'Email ontvanger'
     TICKET: 'Ticket'
     PRICE: 'Prijs'
+    SUBTOTAL: 'Subtotaal'
     TOTAL: 'Totaal'
     TICKET_RECEIVER_HELP: 'Verstuur tickets naar deze persoon'

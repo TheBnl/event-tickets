@@ -10,6 +10,7 @@ namespace Broarm\EventTickets;
 
 use Config;
 use Email;
+use SiteConfig;
 
 /**
  * Class SuccessController
@@ -58,6 +59,7 @@ class SuccessController extends CheckoutStepController
                 $this->reservation->createFiles();
                 if ($this->sendReservation()) {
                     $this->reservation->changeState('PAID');
+                    $this->sendTickets();
                     $this->sendNotification();
                     $this->extend('afterPaymentComplete', $this->reservation);
                     $this->reservation->write();
@@ -84,25 +86,77 @@ class SuccessController extends CheckoutStepController
             $from = Config::inst()->get('Email', 'admin_email');
         }
 
-        // Get the attendees for this event that are checked as receiver
-        $ticketReceivers = $this->reservation->Attendees()->filter('TicketReceiver', 1);
-        if ($ticketReceivers->exists()) {
-            $receivers = implode(',', $ticketReceivers->column('Email'));
-        } else {
-            $receivers = $this->reservation->MainContact()->Email;
-        }
-
         // Create the email with given template and reservation data
         $email = new Email();
-        $email->setSubject(_t('TicketEmail.Title', 'Your tickets'));
+        $email->setSubject(_t(
+            'ReservationMail.TITLE',
+            'Your order at {sitename}',
+            null,
+            array(
+                'sitename' => SiteConfig::current_site_config()->Title
+            )
+        ));
         $email->setFrom($from);
-        $email->setTo($receivers);
+        $email->setTo($this->reservation->MainContact()->Email);
         $email->setTemplate('ReservationMail');
-        $email->populateTemplate($this->reservation->getViewableData());
-        $this->extend('updateTicketMail', $email);
+        $email->populateTemplate($this->reservation);
+        $this->extend('updateReservationMail', $email);
         $email->send();
         return true;
     }
+
+    /**
+     * Send the reservation mail
+     */
+    public function sendTickets()
+    {
+        // Get the mail sender or fallback to the admin email
+        if (empty($from = self::config()->get('mail_sender'))) {
+            $from = Config::inst()->get('Email', 'admin_email');
+        }
+
+        // Send the tickets to the main contact
+        $email = new Email();
+        $email->setSubject(_t(
+            'MainContactMail.TITLE',
+            'Uw tickets voor {event}',
+            null,
+            array(
+                'event' => $this->reservation->Event()->Title
+            )
+        ));
+        $email->setFrom($from);
+        $email->setTo($this->reservation->MainContact()->Email);
+        $email->setTemplate('MainContactMail');
+        $email->populateTemplate($this->reservation);
+        $this->extend('updateMainContactMail', $email);
+        $email->send();
+
+
+        // Get the attendees for this event that are checked as receiver
+        $ticketReceivers = $this->reservation->Attendees()->filter('TicketReceiver', 1)->exclude('ID', $this->reservation->MainContactID);
+        if ($ticketReceivers->exists()) {
+            /** @var Attendee $ticketReceiver */
+            foreach ($ticketReceivers as $ticketReceiver) {
+                $email = new Email();
+                $email->setSubject(_t(
+                    'AttendeeMail.TITLE',
+                    'Your ticket for {event}',
+                    null,
+                    array(
+                        'event' => $this->reservation->Event()->Title
+                    )
+                ));
+                $email->setFrom($from);
+                $email->setTo($ticketReceiver->Email);
+                $email->setTemplate('AttendeeMail');
+                $email->populateTemplate($ticketReceiver);
+                $this->extend('updateTicketMail', $email);
+                $email->send();
+            }
+        }
+    }
+
 
     /**
      * Send a booking notification tot the ticket mail sender or the site admin
@@ -116,17 +170,18 @@ class SuccessController extends CheckoutStepController
         if (empty($to = self::config()->get('mail_receiver'))) {
             $to = Config::inst()->get('Email', 'admin_email');
         }
-        
+
         $email = new Email();
         $email->setSubject(_t(
-            'TicketEmail.Notification',
-            'New ticket order {order}',
-            null, array('order' => $this->reservation->ReservationCode)
+            'NotificationMail.TITLE',
+            'Nieuwe reservering voor {event}',
+            null, array('event' => $this->reservation->Event()->Title)
         ));
+
         $email->setFrom($from);
         $email->setTo($to);
         $email->setTemplate('NotificationMail');
-        $email->populateTemplate($this->reservation->getViewableData());
+        $email->populateTemplate($this->reservation);
         $this->extend('updateNotificationMail', $email);
         $email->send();
     }
@@ -138,6 +193,6 @@ class SuccessController extends CheckoutStepController
      */
     public function getDownloadLink()
     {
-        return $this->reservation->TicketFile()->Link();
+        return $this->reservation->Attendees()->first()->TicketFile()->Link();
     }
 }

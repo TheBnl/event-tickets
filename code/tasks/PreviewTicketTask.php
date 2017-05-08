@@ -9,7 +9,6 @@
 namespace Broarm\EventTickets;
 
 use BuildTask;
-use CalendarEvent_Controller;
 use Director;
 use Dompdf\Dompdf;
 use SSViewer;
@@ -29,7 +28,9 @@ class PreviewTicketTask extends BuildTask
     protected $previews = array(
         'PrintableTicket',
         'ReservationMail',
-        'NotificationMail'
+        'NotificationMail',
+        'AttendeeMail',
+        'MainContactMail'
     );
 
     /**
@@ -44,16 +45,20 @@ class PreviewTicketTask extends BuildTask
         if ($preview && in_array($preview, $this->previews)) {
             $reservation = Reservation::get()->filter('TicketFileID:not', 0)->last();
 
-            // Set the template and parse the data
-            $data = $reservation->getViewableData();
-
-            $template = new SSViewer($preview);
-            $html = $template->process($data);
 
             switch ($preview) {
+                case 'AttendeeMail':
+                case 'PrintableTicket':
+                    $data = $reservation->Attendees()->first();
+                    $template = new SSViewer($preview);
+                    $html = $template->process($data);
+                    echo $html->getValue();
+                    break;
                 // TODO: preview a real pdf
                 // TODO: preview in a iframe ?
                 default:
+                    $template = new SSViewer($preview);
+                    $html = $template->process($reservation);
                     \Requirements::block('app.css');
                     echo $html->getValue();
             }

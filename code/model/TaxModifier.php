@@ -62,7 +62,7 @@ class TaxModifier extends PriceModifier
      */
     public function getTableTitle()
     {
-        return _t(
+        $rate = _t(
             'TaxModifier.TABLE_TITLE',
             '{rate}% BTW',
             null,
@@ -70,6 +70,13 @@ class TaxModifier extends PriceModifier
                 'rate' => (float)self::config()->get('tax_rate')
             )
         );
+
+        if ((bool)self::config()->get('inclusive')) {
+            $inc = _t('TaxModifier.INCLUSIVE', '(Incl.)');
+            $rate .= " $inc";
+        }
+
+        return $rate;
     }
 
     /**

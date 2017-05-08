@@ -29,6 +29,11 @@
         <% end_loop %>
     </tbody>
     <tfoot class="summary-table__footer">
+        <tr class="summary-table__footer-row summary-table__footer-row--sub-total">
+            <td class="summary-table__footer-col summary-table__footer-col--total-label" colspan="{$Attendees.First.TableFields.Count}"><%t SummaryField.SUBTOTAL 'Subtotal' %></td>
+            <td class="summary-table__footer-col summary-table__footer-col--spacer"<% if $Editable %> colspan="2"<% end_if %>>&nbsp;</td>
+            <td class="summary-table__footer-col summary-table__footer-col--total-value">$Reservation.Subtotal.NiceDecimalPoint</td>
+        </tr>
         <% if $Reservation.PriceModifiers %>
             <% loop $Reservation.PriceModifiers %>
             <tr class="summary-table__footer-row summary-table__footer-row--modifier">
@@ -38,10 +43,10 @@
             </tr>
             <% end_loop %>
         <% end_if %>
-    <tr class="summary-table__footer-row summary-table__footer-row--total">
-        <td class="summary-table__footer-col summary-table__footer-col--total-label" colspan="{$Attendees.First.TableFields.Count}"><%t SummaryField.TOTAL 'Total' %></td>
-        <td class="summary-table__footer-col summary-table__footer-col--spacer"<% if $Editable %> colspan="2"<% end_if %>>&nbsp;</td>
-        <td class="summary-table__footer-col summary-table__footer-col--total-value">$Reservation.Total.NiceDecimalPoint</td>
-    </tr>
+        <tr class="summary-table__footer-row summary-table__footer-row--total">
+            <td class="summary-table__footer-col summary-table__footer-col--total-label" colspan="{$Attendees.First.TableFields.Count}"><%t SummaryField.TOTAL 'Total' %></td>
+            <td class="summary-table__footer-col summary-table__footer-col--spacer"<% if $Editable %> colspan="2"<% end_if %>>&nbsp;</td>
+            <td class="summary-table__footer-col summary-table__footer-col--total-value">$Reservation.Total.NiceDecimalPoint</td>
+        </tr>
     </tfoot>
 </table>
