@@ -45,11 +45,11 @@ use ViewableData;
  * @property int    EventID
  * @property int    MainContactID
  *
- * @method CalendarEvent|TicketExtension Event
- * @method Attendee MainContact
- * @method HasManyList Payments
- * @method HasManyList Attendees
- * @method ManyManyList PriceModifiers
+ * @method CalendarEvent|TicketExtension Event()
+ * @method Attendee MainContact()
+ * @method HasManyList Payments()
+ * @method HasManyList Attendees()
+ * @method ManyManyList PriceModifiers()
  */
 class Reservation extends DataObject
 {
