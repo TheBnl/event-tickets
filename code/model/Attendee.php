@@ -24,6 +24,7 @@ use ReadonlyField;
 use SSViewer;
 use Tab;
 use TabSet;
+use TextField;
 use ViewableData;
 
 /**
@@ -110,18 +111,22 @@ class Attendee extends DataObject
     {
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));
         $fields->addFieldsToTab('Root.Main', array(
-            ReadonlyField::create('Title', _t('Attendee.Name', 'Name')),
+            ReadonlyField::create('FirstName', _t('Attendee.FirstName', 'First name')),
+            ReadonlyField::create('Surname', _t('Attendee.Surname', 'Surname')),
             ReadonlyField::create('Email', _t('Attendee.Email', 'Email')),
             ReadonlyField::create('TicketCode', _t('Attendee.Ticket', 'Ticket')),
-            ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'),
-                $this->dbObject('CheckedIn')->Nice()),
-            $reservationFileField = ReadonlyField::create(
+            ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
+        ));
+
+        if ($this->TicketFile()->exists()) {
+            $fields->addFieldToTab('Root.Main', $reservationFileField = ReadonlyField::create(
                 'ReservationFile',
                 _t('Attendee.Reservation', 'Reservation'),
-                "<a class='readonly' href='{$this->Reservation()->TicketFile()->Link()}' target='_blank'>Download reservation PDF</a>"
-            )
-        ));
-        $reservationFileField->dontEscape = true;
+                "<a class='readonly' href='{$this->TicketFile()->Link()}' target='_blank'>Download reservation PDF</a>"
+            ));
+            $reservationFileField->dontEscape = true;
+        }
+
         $this->extend('updateCMSFields', $fields);
         return $fields;
     }

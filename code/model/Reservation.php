@@ -107,27 +107,12 @@ class Reservation extends DataObject
             ReadonlyField::create('Gateway', _t('Reservation.Gateway', 'Gateway')),
             ReadonlyField::create('Total', _t('Reservation.Total', 'Total')),
             ReadonlyField::create('Comments', _t('Reservation.Comments', 'Comments')),
-            $reservationFileField = ReadonlyField::create(
-                'ReservationFile',
-                _t('Attendee.Reservation', 'Reservation'),
-                "<a class='readonly' href='{$this->TicketFile()->Link()}' target='_blank'>Download reservation PDF</a>"
-            ),
             GridField::create('Attendees', 'Attendees', $this->Attendees(), $gridFieldConfig),
             GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig)
         ));
-        $reservationFileField->dontEscape = true;
         $fields->addFieldsToTab('Root.Main', array());
         $this->extend('updateCMSFields', $fields);
         return $fields;
-    }
-
-    /**
-     * @deprecated
-     * @return mixed
-     */
-    public function TicketFile()
-    {
-        return $this->Attendees()->first()->TicketFile();
     }
 
     public function onBeforeWrite()
@@ -279,72 +264,13 @@ class Reservation extends DataObject
      */
     public function createFiles()
     {
-        $folder = $folder = $this->fileFolder();
+        $folder = $this->fileFolder();
         /** @var Attendee $attendee */
         foreach ($this->Attendees() as $attendee) {
             $attendee->createQRCode($folder);
             $attendee->createTicketFile($folder);
         }
     }
-
-    /**
-     * Create a Printable ticket file
-     *
-     * @param Folder $folder
-     *
-     * @return File
-     * /
-    private function createTicketFile(Folder $folder)
-    {
-        // Find or make a folder
-        $relativeFilePath = "/{$folder->Filename}{$this->ReservationCode}.pdf";
-        $absoluteFilePath = Director::baseFolder() . $relativeFilePath;
-
-        if (!$file = File::get()->find('Filename', $relativeFilePath)) {
-            $file = File::create();
-            $file->ParentID = $folder->ID;
-            $file->OwnerID = (Member::currentUser()) ? Member::currentUser()->ID : 0;
-            $file->Title = $this->ReservationCode;
-            $file->setFilename($relativeFilePath);
-            $file->write();
-        }
-
-        // Set the template and parse the data
-        $template = new SSViewer('PrintableTicket');
-        $html = $template->process($this->getViewableData());
-
-        // Create a DomPDF instance
-        $domPDF = new Dompdf();
-        $domPDF->loadHtml($html);
-        $domPDF->setPaper('A4');
-        $domPDF->getOptions()->setDpi(250);
-        $domPDF->render();
-
-        // Save the pdf stream as a file
-        file_put_contents($absoluteFilePath, $domPDF->output());
-
-        // Attach the ticket file to the Attendee
-        $this->TicketFileID = $file->ID;
-        $this->write();
-
-        return $file;
-    }*/
-
-    /**
-     * Get a viewable data object for this reservation
-     * For use in the Email and print template
-     * @deprecated
-     * @return ViewableData
-     * /
-    public function getViewableData()
-    {
-        $config = SiteConfig::current_site_config();
-        $data = $this->Me();
-        $data->CurrentDate = $this->Event()->getController()->CurrentDate();
-        $data->Logo = $config->TicketLogo();
-        $this->extend('updateViewableData', $data);
-        return $data;
-    }*/
 
     public function canView($member = null)
     {
