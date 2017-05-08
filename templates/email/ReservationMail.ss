@@ -22,7 +22,7 @@
                                     <td class="content-block title-block" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;vertical-align: top;font-size: 14px;padding: 0 0 20px;text-align: center;">
                                         <% if $Event.MailLogo %>
                                             <a href="$BaseURL" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;color: #348eda;text-decoration: underline;">
-                                                <img src="$Event.MailLogo.Base64" alt="$Event.MailLogo.Title" width="256" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;max-width: 100%;">
+                                                <img src="$Event.MailLogo.SetWidth(256).AbsoluteLink" alt="$Event.MailLogo.Title" width="256" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;max-width: 100%;">
                                             </a>
                                         <% else %>
                                             <h1 style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, &quot;Lucida Grande&quot;, sans-serif;box-sizing: border-box;color: #000;line-height: 1.2em;font-weight: 500;font-size: 32px;"><a href="$BaseURL" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;color: #348eda;text-decoration: underline;"><%t ReservationMail.TITLE 'Your order at {sitename}' sitename=$SiteConfig.Title %></a></h1>
