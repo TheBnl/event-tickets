@@ -65,7 +65,9 @@ class Ticket extends DataObject
         'AvailableSummary' => 'Available'
     );
 
-    private static $translate = array();
+    private static $translate = array(
+        'Title'
+    );
 
     public function getCMSFields()
     {

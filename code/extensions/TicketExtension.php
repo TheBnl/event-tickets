@@ -54,6 +54,11 @@ class TicketExtension extends DataExtension
         'WaitingList' => 'Broarm\EventTickets\WaitingListRegistration.Event'
     );
 
+    private static $translate = array(
+        'SuccessMessage',
+        'SuccessMessageMail'
+    );
+
     public function updateCMSFields(FieldList $fields)
     {
         $gridFieldConfig = GridFieldConfig_RecordEditor::create();
@@ -96,8 +101,6 @@ class TicketExtension extends DataExtension
                 GridField::create('WaitingList', $guestListLabel, $this->owner->WaitingList(), $gridFieldConfig)
             );
         }
-
-        return $fields;
     }
 
     /**
