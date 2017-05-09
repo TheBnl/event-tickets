@@ -32,6 +32,8 @@ nl:
     MAIL_MESSAGE_HELP: 'Dit bericht word getoond op het ticket en in the mail. Hij is per evenement te overschijven onder de "tickets" tab'
   TicketForm:
     MAKE_RESERVATION: 'Reserveer tickets'
+    WAITINGLIST_INTRO: 'Het evenement is uitverkocht. U kunt zich hieronder inschrijven om op de hoogte te worden gehouden wanneer er plaatsen vrijkomen.'
+    WAITINGLIST_SUCCESS: 'Bedankt voor uw inschrijving, wij houden u op de hoogte zodra er een plekken beschikbaar komen.'
   TicketsField:
     TICKETS: 'Tickets'
     PRICE: 'Prijs'

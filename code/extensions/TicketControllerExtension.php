@@ -22,6 +22,7 @@ class TicketControllerExtension extends Extension
 {
     private static $allowed_actions = array(
         'TicketForm',
+        'WaitingListRegistrationForm',
         'checkin'
     );
 
@@ -32,10 +33,24 @@ class TicketControllerExtension extends Extension
      */
     public function TicketForm()
     {
-        if ($this->owner->Tickets()->count()) {
+        if ($this->owner->Tickets()->count() && $this->owner->getAvailability() > 0) {
             $ticketForm = new TicketForm($this->owner, 'TicketForm', $this->owner->Tickets(), $this->owner->dataRecord);
             $ticketForm->setNextStep(CheckoutSteps::start());
             return $ticketForm;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * show the waiting list form when the event is sold out
+     *
+     * @return WaitingListRegistrationForm
+     */
+    public function WaitingListRegistrationForm()
+    {
+        if ($this->owner->Tickets()->count()) {
+            return new WaitingListRegistrationForm($this->owner, 'WaitingListRegistrationForm');
         } else {
             return null;
         }
@@ -49,5 +64,15 @@ class TicketControllerExtension extends Extension
     public function checkIn()
     {
         return new CheckInController($this->owner->dataRecord);
+    }
+
+    /**
+     * Checks the waiting list var
+     *
+     * @return mixed
+     */
+    public function getWaitingListSuccess()
+    {
+        return $this->owner->getRequest()->getVar('waitinglist');
     }
 }

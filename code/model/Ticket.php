@@ -104,17 +104,6 @@ class Ticket extends DataObject
     }
 
     /**
-     * Get the formatted price
-     * @deprecated Use the "Price.NiceDecimalPoint" method instead
-     *
-     * @return string
-     * /
-    public function getPriceNice()
-    {
-        return $this->dbObject('Price')->NiceDecimalPoint();
-    }*/
-
-    /**
      * Get the available form date if it is set,
      * otherwise get it from the parent
      *

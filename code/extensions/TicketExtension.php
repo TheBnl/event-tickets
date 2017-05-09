@@ -32,6 +32,7 @@ use SiteConfig;
  * @method \HasManyList Tickets
  * @method \HasManyList Reservations
  * @method \HasManyList Attendees
+ * @method \HasManyList WaitingList
  */
 class TicketExtension extends DataExtension
 {
@@ -49,7 +50,8 @@ class TicketExtension extends DataExtension
     private static $has_many = array(
         'Tickets' => 'Broarm\EventTickets\Ticket.Event',
         'Reservations' => 'Broarm\EventTickets\Reservation.Event',
-        'Attendees' => 'Broarm\EventTickets\Attendee.Event'
+        'Attendees' => 'Broarm\EventTickets\Attendee.Event',
+        'WaitingList' => 'Broarm\EventTickets\WaitingListRegistration.Event'
     );
 
     public function updateCMSFields(FieldList $fields)
@@ -67,8 +69,8 @@ class TicketExtension extends DataExtension
             "Root.$ticketLabel", array(
             GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), $gridFieldConfig),
             NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
-            HtmlEditorField::create('SuccessMessage', 'Success message')->setRows(4),
-            HtmlEditorField::create('SuccessMessageMail', 'Mail message')->setRows(4)
+            HtmlEditorField::create('SuccessMessage', _t('TicketExtension.SuccessMessage', 'Success message'))->setRows(4),
+            HtmlEditorField::create('SuccessMessageMail', _t('TicketExtension.MailMessage', 'Mail message'))->setRows(4)
         ));
 
         if ($this->owner->Reservations()->exists()) {
@@ -84,6 +86,14 @@ class TicketExtension extends DataExtension
             $fields->addFieldToTab(
                 "Root.$guestListLabel",
                 GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), $gridFieldConfig)
+            );
+        }
+
+        if ($this->owner->WaitingList()->exists()) {
+            $guestListLabel = _t('TicketExtension.WaitingList', 'WaitingList');
+            $fields->addFieldToTab(
+                "Root.$guestListLabel",
+                GridField::create('WaitingList', $guestListLabel, $this->owner->WaitingList(), $gridFieldConfig)
             );
         }
 
