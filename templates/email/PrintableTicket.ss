@@ -42,12 +42,9 @@
 
         .print-reservation {
             width: 100%;
-            margin: auto;
-            page-break-after: always;}
-            .print-reservation:last-child {
-                page-break-after: avoid;}
+            margin: auto;}
             .print-reservation__title img {
-                width: 512px;
+                width: 300px;
                 margin: 1rem 0;}
             .print-reservation__logos {
                 padding: 1rem;}
@@ -68,7 +65,7 @@
                 width: 100%;
                 text-align: center;}
             .event__ticket-qr {
-                width: 448px;}
+                width: 256px;}
             .event__info {
                 border-left: 2mm solid lightgrey;
                 padding: 1rem;}
@@ -94,7 +91,6 @@
             padding: 0 1rem;}
             .text__col {
                 padding: 0 .5rem;
-                width: 50%;
                 vertical-align: top;}
             .text__col p, li {
                 font-size: .8rem;}

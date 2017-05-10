@@ -79,7 +79,7 @@ class PaymentProcessor extends Object
             'email' => $reservation->MainContact()->Email,
             'description' => $reservation->ReservationCode
         ));
-        
+
         parent::__construct();
     }
 

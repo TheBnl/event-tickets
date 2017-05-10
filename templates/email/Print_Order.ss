@@ -3,8 +3,8 @@
     <tr>
         <td class="order__key"><%t TicketPrint.NAME 'Name' %></td>
         <td class="order__value">$Name</td>
-        <td class="order__key"><%t TicketPrint.ENTRY 'Entry' %></td>
-        <td class="order__value">$CurrentDate.StartTime.Nice24</td>
+        <td class="order__key"><%t TicketPrint.START 'Start' %></td>
+        <td class="order__value">$Event.Controller.CurrentDate.StartTime.Nice24</td>
     </tr>
     <tr>
         <td class="order__key"><%t TicketPrint.TYPE 'Ticket type' %></td>
