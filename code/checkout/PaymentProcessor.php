@@ -61,8 +61,7 @@ class PaymentProcessor extends Object
         'shippingState' => null,
         'shippingCountry' => null,
         'shippingPhone' => null,
-        // fixme: dependent on configured gateway. add trough extension .. ?
-        'description' => 'test'
+        'description' => null
     );
 
     /**
@@ -73,6 +72,14 @@ class PaymentProcessor extends Object
     public function __construct(Reservation $reservation)
     {
         $this->reservation = $reservation;
+        $this->setGatewayData(array(
+            'transactionId' => $reservation->Status,
+            'firstName' => $reservation->MainContact()->FirstName,
+            'lastName' => $reservation->MainContact()->Surname,
+            'email' => $reservation->MainContact()->Email,
+            'description' => $reservation->ReservationCode
+        ));
+        
         parent::__construct();
     }
 
@@ -136,7 +143,7 @@ class PaymentProcessor extends Object
      */
     public function setGatewayData($data = array())
     {
-        array_merge($data, $this->gatewayData);
+        $this->gatewayData = array_merge($this->gatewayData, $data);
     }
 
     /**

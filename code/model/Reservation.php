@@ -74,7 +74,6 @@ class Reservation extends DataObject
 
     private static $has_one = array(
         'Event' => 'CalendarEvent',
-        //'TicketFile' => 'File',
         'MainContact' => 'Broarm\EventTickets\Attendee'
     );
 
