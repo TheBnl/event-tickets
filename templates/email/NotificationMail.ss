@@ -59,10 +59,12 @@
                                                             <td class="alignright" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;vertical-align: top;font-size: 14px;text-align: right;padding: 5px 0;border-top: 2px solid #333;border-bottom: 2px solid #333;font-weight: 700;">$Subtotal.NiceDecimalPoint</td>
                                                         </tr>
                                                         <% loop $PriceModifiers %>
+                                                        <% if $TableValue != 0 %>
                                                             <tr style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;">
                                                                 <td colspan="2" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;vertical-align: top;font-size: 14px;padding: 5px 0;border-top: #eee 1px solid;">$TableTitle</td>
                                                                 <td class="alignright" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;vertical-align: top;font-size: 14px;text-align: right;padding: 5px 0;border-top: #eee 1px solid;">$TableValue.NiceDecimalPoint</td>
                                                             </tr>
+                                                        <% end_if %>
                                                         <% end_loop %>
                                                         <tr class="total" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;">
                                                             <td width="80%" colspan="2" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;vertical-align: top;font-size: 14px;padding: 5px 0;border-top: 2px solid #333;border-bottom: 2px solid #333;font-weight: 700;"><%t SummaryField.TOTAL 'Total' %></td>
