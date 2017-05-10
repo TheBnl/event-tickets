@@ -59,7 +59,7 @@ class Reservation extends DataObject
      *
      * @var string
      */
-    private static $delete_after = '+1 week';
+    private static $delete_after = '+1 day';
 
     private static $db = array(
         'Status' => 'Enum("CART,PENDING,PAID,CANCELED","CART")',
