@@ -16,6 +16,14 @@ use TextField;
 
 class CheckInForm extends Form
 {
+    /**
+     * Allow people to check out
+     *
+     * @config
+     * @var bool
+     */
+    private static $allow_checkout = false;
+
     public function __construct($controller, $name = 'CheckInForm')
     {
         $fields = FieldList::create(
@@ -79,7 +87,7 @@ class CheckInForm extends Form
         }
 
         // Check if the ticket is already used
-        if ($attendee->CheckedIn) {
+        if ($attendee->CheckedIn && !(bool)self::config()->get('allow_checkout')) {
             $form->addErrorMessage('TicketCode', _t(
                 'CheckInForm.ALREADY_CHECKED_IN',
                 'This ticket is already checked in'
@@ -88,17 +96,31 @@ class CheckInForm extends Form
             $controller->redirect("{$controller->Link()}?success=0");
             return false;
         } else {
-            $attendee->CheckedIn = true;
+            if ((bool)$attendee->CheckedIn && (bool)self::config()->get('allow_checkout')) {
+                $attendee->CheckedIn = false;
+                $message = 'CHECK_OUT_SUCCESS';
+                $messageType = 'notice';
+            } else {
+                $attendee->CheckedIn = true;
+                $message = 'SUCCESS';
+                $messageType = 'good';
+            }
+
             $attendee->write();
+            $messages = array(
+                'SUCCESS' => 'The ticket is valid. {name} has a {ticket} ticket with number {number}',
+                'CHECK_OUT_SUCCESS' => 'The ticket with number {number} is checked out.'
+            );
+
             $form->sessionMessage(_t(
-                'CheckInForm.SUCCESS',
-                'The ticket is valid. {name} has a {ticket} ticket with number {number}',
+                "CheckInForm.$message",
+                $messages[$message],
                 null, array(
                     'name' => $attendee->getName(),
                     'ticket' => $attendee->Ticket()->Title,
                     'number' => $attendee->TicketCode
                 )
-            ), 'good', false);
+            ), $messageType, false);
             $controller->redirect("{$controller->Link()}?success=1");
             return true;
         }
