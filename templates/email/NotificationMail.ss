@@ -31,7 +31,7 @@
                                 </tr>
                                 <tr style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;">
                                     <td class="content-block lead-block" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;vertical-align: top;font-size: 14px;padding: 20px;">
-                                        <h2 class="aligncenter" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, &quot;Lucida Grande&quot;, sans-serif;box-sizing: border-box;color: #000;line-height: 1.2em;font-weight: 400;font-size: 24px;text-align: center;"><%t NotificationMail.CONTENT 'A order is placed by {name} for {event}. Below you can find the order details.' name=$MainContent.Name event=$Event.Title %></h2>
+                                        <h2 class="aligncenter" style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, &quot;Lucida Grande&quot;, sans-serif;box-sizing: border-box;color: #000;line-height: 1.2em;font-weight: 400;font-size: 24px;text-align: center;"><%t NotificationMail.CONTENT 'A order is placed by {name} for {event}. Below you can find the order details.' name=$MainContact.Name event=$Event.Title %></h2>
                                     </td>
                                 </tr>
                                 <tr style="margin: 0;font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;box-sizing: border-box;">
