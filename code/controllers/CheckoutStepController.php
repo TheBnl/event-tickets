@@ -74,6 +74,16 @@ abstract class CheckoutStepController extends Page_Controller
     }
 
     /**
+     * Get a link to the next step
+     *
+     * @return string
+     */
+    public function getNextStepLink()
+    {
+        return $this->Link(CheckoutSteps::nextStep($this->step));
+    }
+
+    /**
      * Get the checkout steps
      *
      * @return \ArrayList
