@@ -19,6 +19,7 @@ use File;
 use Folder;
 use Image;
 use LiteralField;
+use ManyManyList;
 use Member;
 use ReadonlyField;
 use SSViewer;
@@ -48,12 +49,13 @@ use ViewableData;
  * @property int       EventID
  * @property int       MemberID
  *
- * @method Reservation Reservation
- * @method Ticket Ticket
- * @method Image TicketQRCode
- * @method File TicketFile
- * @method Member Member
- * @method CalendarEvent|TicketExtension Event
+ * @method Reservation Reservation()
+ * @method Ticket Ticket()
+ * @method Image TicketQRCode()
+ * @method File TicketFile()
+ * @method Member Member()
+ * @method CalendarEvent|TicketExtension Event()
+ * @method ManyManyList Fields()
  */
 class Attendee extends DataObject
 {
@@ -66,7 +68,7 @@ class Attendee extends DataObject
      */
     private static $qr_as_link = false;
 
-    private static $savable_fields = array(
+    private static $default_fields = array(
         'FirstName' => 'TextField',
         'Surname' => 'TextField',
         'Email' => 'EmailField',
@@ -79,9 +81,6 @@ class Attendee extends DataObject
 
     private static $db = array(
         'Title' => 'Varchar(255)',
-        'FirstName' => 'Varchar(255)',
-        'Surname' => 'Varchar(255)',
-        'Email' => 'Varchar(255)',
         'TicketReceiver' => 'Boolean',
         'TicketCode' => 'Varchar(255)',
         'CheckedIn' => 'Boolean'
@@ -98,6 +97,16 @@ class Attendee extends DataObject
         'Member' => 'Member',
         'TicketQRCode' => 'Image',
         'TicketFile' => 'File'
+    );
+
+    private static $many_many = array(
+        'Fields' => 'Broarm\EventTickets\AttendeeExtraField'
+    );
+
+    private static $many_many_extraFields = array(
+        'Fields' => array(
+            'Value' => 'Varchar(255)'
+        )
     );
 
     private static $summary_fields = array(
@@ -118,6 +127,13 @@ class Attendee extends DataObject
             ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
         ));
 
+        foreach ($this->Fields() as $field) {
+            $fields->addFieldToTab(
+                'Root.Main',
+                ReadonlyField::create("{$field->FieldName}_Preview", $field->Title, $field->Value)
+            );
+        }
+
         if ($this->TicketFile()->exists()) {
             $fields->addFieldToTab('Root.Main', $reservationFileField = ReadonlyField::create(
                 'ReservationFile',
@@ -129,6 +145,64 @@ class Attendee extends DataObject
 
         $this->extend('updateCMSFields', $fields);
         return $fields;
+    }
+
+    /**
+     * Utility method for fetching the default field, FirstName, value
+     *
+     * @return string
+     */
+    public function getFirstName()
+    {
+        if ($firstName = $this->Fields()->find('FieldName', 'FirstName')) {
+            return (string)$firstName->getField('Value');
+        }
+
+        return null;
+    }
+
+    /**
+     * Utility method for fetching the default field, Surname, value
+     *
+     * @return string
+     */
+    public function getSurname()
+    {
+        if ($surname = $this->Fields()->find('FieldName', 'Surname')) {
+            return (string)$surname->getField('Value');
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the combined first and last nave for dispay on the ticket and attendee list
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        if (!empty($this->getFirstName())) {
+            return trim("{$this->getFirstName()} {$this->getSurname()}");
+        } elseif ($this->Reservation()->MainContact()->exists() && $mainContact = $this->Reservation()->MainContact()) {
+            return _t('Attendee.GUEST_OF', 'Guest of {name}', null, array('name' => $mainContact->getName()));
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Utility method for fetching the default field, Email, value
+     *
+     * @return string
+     */
+    public function getEmail()
+    {
+        if ($email = $this->Fields()->find('FieldName', 'Email')) {
+            return (string)$email->getField('Value');
+        }
+
+        return null;
     }
 
     /**
@@ -177,7 +251,7 @@ class Attendee extends DataObject
         foreach (self::config()->get('table_fields') as $field) {
             $data = new ViewableData();
             $data->Header = _t("Attendee.$field", $field);
-            $data->Value = $this->getField($field);
+            $data->Value = $this->$field;
             $fields->add($data);
         }
         return $fields;
@@ -192,22 +266,6 @@ class Attendee extends DataObject
     {
         $name = explode('\\', parent::singular_name());
         return trim(end($name));
-    }
-
-    /**
-     * Get the combined first and last nave for dispay on the ticket and attendee list
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        if (!empty($this->FirstName)) {
-            return trim("$this->FirstName $this->Surname");
-        } elseif ($this->Reservation()->MainContact()->exists() && $mainContact = $this->Reservation()->MainContact()) {
-            return _t('Attendee.GUEST_OF', 'Guest of {name}', null, array('name' => $mainContact->getName()));
-        } else {
-            return null;
-        }
     }
 
     /**

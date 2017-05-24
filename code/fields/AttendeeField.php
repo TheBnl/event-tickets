@@ -25,12 +25,6 @@ use Member;
  */
 class AttendeeField extends CompositeField
 {
-    private static $required_fields = array(
-        'FirstName',
-        'Surname',
-        'Email'
-    );
-
     protected $name = 'Attendee';
 
     protected $requiredFields = array();
@@ -43,29 +37,28 @@ class AttendeeField extends CompositeField
             'title' => $attendee->Ticket()->Title,
             'price' => $attendee->Ticket()->dbObject('Price')->NiceDecimalPoint())
         ));
-        if ($required) $this->addExtraClass('required');
 
         $children = FieldList::create();
-        $savableFields = Attendee::config()->get('savable_fields');
-        foreach ($savableFields as $field => $fieldClass) {
+        $savableFields = $attendee->Event()->Fields();
+
+        /** @var AttendeeExtraField $field */
+        foreach ($savableFields as $field) {
             // Generate a unique field name
-            $fieldName = "{$this->name}[{$attendee->ID}][$field]";
+            $fieldName = "{$this->name}[{$attendee->ID}][$field->ID]";
 
             // Check if the field is required
-            if (in_array($field, self::config()->get('required_fields')) && $required) {
+            if ($field->Required && $required) {
                 $this->addRequiredField($fieldName);
             }
 
-            // Create the field
-            /** @var FormField $formField */
-            $formField = $fieldClass::create(
-                $fieldName,
-                _t("AttendeeField.$field", $field)
-            )->setValue($attendee->getField($field));
+            // Create the field an fill with attendee data
+            $hasField = $attendee->Fields()->find('ID', $field->ID);
+            $value = $hasField ? $hasField->getField('Value') : null;
+            $formField = $field->createField($fieldName, $value);
 
-            // Pre fill the form if a member is logged in
+            // Pre fill the field if a member is logged in
             if ($main && empty($formField->value) && $member = Member::currentUser()) {
-                $formField->setValue($member->getField($field));
+                $formField->setValue($member->getField($field->FieldName));
             }
 
             // Add the form

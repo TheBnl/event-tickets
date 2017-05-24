@@ -82,12 +82,18 @@ class ReservationForm extends FormStep
     {
         $reservation = $form->getReservation();
         foreach ($data['Attendee'] as $attendeeID => $attendeeData) {
+            /** @var Attendee $attendee */
             $attendee = Attendee::get()->byID($attendeeID);
 
             // populate the attendees
             foreach ($attendeeData as $field => $value) {
-                $attendee->setField($field, $value);
+                if (is_int($field)) {
+                    $attendee->Fields()->add($field, array('Value' => $value));
+                } else {
+                    $attendee->setField($field, $value);
+                }
             }
+            
             $attendee->write();
 
             // Set the main contact
@@ -95,12 +101,12 @@ class ReservationForm extends FormStep
                 $reservation->setMainContact($attendeeID);
             }
         }
-
+        
         // add the tax modifier
         $reservation->PriceModifiers()->add(TaxModifier::findOrMake($reservation));
         $reservation->calculateTotal();
         $reservation->write();
-
+        
         $this->extend('beforeNextStep', $data, $form);
         return $this->nextStep();
     }

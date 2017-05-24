@@ -16,6 +16,7 @@
     "silverstripe/cms": "~3.1",
     "silverstripe/event-calendar": "*",
     "silverstripe/silverstripe-omnipay": "*",
+    "silverstripe-australia/gridfieldextensions": "*",
     "omnipay/manual": "*",
     "bacon/bacon-qr-code": "*",
     "dompdf/dompdf": "*",

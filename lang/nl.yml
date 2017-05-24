@@ -90,7 +90,7 @@ nl:
   AttendeeField:
     FirstName: 'Voornaam'
     Surname: 'Achternaam'
-    Email: 'Email'
+    Email: 'E-mail'
     TicketReceiver: 'Stuur ticket per mail'
     VALUED: '{title} t.w.v {price}'
   SuccessController:

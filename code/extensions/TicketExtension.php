@@ -29,10 +29,11 @@ use SiteConfig;
  * @property string                         SuccessMessage
  * @property string                         SuccessMessageMail
  *
- * @method \HasManyList Tickets
- * @method \HasManyList Reservations
- * @method \HasManyList Attendees
- * @method \HasManyList WaitingList
+ * @method \HasManyList Tickets()
+ * @method \HasManyList Reservations()
+ * @method \HasManyList Attendees()
+ * @method \HasManyList WaitingList()
+ * @method \HasManyList Fields()
  */
 class TicketExtension extends DataExtension
 {
@@ -51,7 +52,8 @@ class TicketExtension extends DataExtension
         'Tickets' => 'Broarm\EventTickets\Ticket.Event',
         'Reservations' => 'Broarm\EventTickets\Reservation.Event',
         'Attendees' => 'Broarm\EventTickets\Attendee.Event',
-        'WaitingList' => 'Broarm\EventTickets\WaitingListRegistration.Event'
+        'WaitingList' => 'Broarm\EventTickets\WaitingListRegistration.Event',
+        'Fields' => 'Broarm\EventTickets\AttendeeExtraField.Event'
     );
 
     private static $translate = array(
@@ -74,7 +76,8 @@ class TicketExtension extends DataExtension
             "Root.$ticketLabel", array(
             GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), $gridFieldConfig),
             NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
-            HtmlEditorField::create('SuccessMessage', _t('TicketExtension.SuccessMessage', 'Success message'))->setRows(4),
+            HtmlEditorField::create('SuccessMessage',
+                _t('TicketExtension.SuccessMessage', 'Success message'))->setRows(4),
             HtmlEditorField::create('SuccessMessageMail', _t('TicketExtension.MailMessage', 'Mail message'))->setRows(4)
         ));
 
@@ -95,11 +98,42 @@ class TicketExtension extends DataExtension
         }
 
         if ($this->owner->WaitingList()->exists()) {
-            $guestListLabel = _t('TicketExtension.WaitingList', 'WaitingList');
+            $waitingListLabel = _t('TicketExtension.WaitingList', 'WaitingList');
             $fields->addFieldToTab(
-                "Root.$guestListLabel",
-                GridField::create('WaitingList', $guestListLabel, $this->owner->WaitingList(), $gridFieldConfig)
+                "Root.$waitingListLabel",
+                GridField::create('WaitingList', $waitingListLabel, $this->owner->WaitingList(), $gridFieldConfig)
             );
+        }
+
+
+        $extraFieldsLabel = _t('TicketExtension.ExtraFields', 'Attendee fields');
+        $fields->addFieldToTab(
+            "Root.$extraFieldsLabel",
+            GridField::create('WaitingList', $extraFieldsLabel, $this->owner->Fields(),
+                GridFieldConfig_Fields::create())
+        );
+
+    }
+
+    public function onBeforeWrite()
+    {
+        $this->createDefaultFieldsBlob();
+        //parent::onAfterWrite();
+    }
+
+    public function createDefaultFieldsBlob()
+    {
+        $fields = Attendee::config()->get('default_fields');
+        if (!$this->owner->Fields()->exists()) {
+            foreach ($fields as $fieldName => $fieldType) {
+                $field = AttendeeExtraField::create();
+                $field->Title = _t("AttendeeField.$fieldName", $fieldName);
+                $field->FieldName = $fieldName;
+                $field->FieldType = $fieldType;
+                $field->Required = true;
+                $field->Editable = false;
+                $this->owner->Fields()->add($field);
+            }
         }
     }
 

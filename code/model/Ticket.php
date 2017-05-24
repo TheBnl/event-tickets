@@ -99,6 +99,11 @@ class Ticket extends DataObject
         return $fields;
     }
 
+    /**
+     * Returns the singular name without the namespaces
+     *
+     * @return string
+     */
     public function singular_name()
     {
         $name = explode('\\', parent::singular_name());
