@@ -26,6 +26,8 @@ use SiteConfig;
  *
  * @property TicketExtension|\CalendarEvent $owner
  * @property int                            Capacity
+ * @property int                            OrderMin
+ * @property int                            OrderMax
  * @property string                         SuccessMessage
  * @property string                         SuccessMessageMail
  *
@@ -44,6 +46,8 @@ class TicketExtension extends DataExtension
 
     private static $db = array(
         'Capacity' => 'Int',
+        'OrderMin' => 'Int',
+        'OrderMax' => 'Int',
         'SuccessMessage' => 'HTMLText',
         'SuccessMessageMail' => 'HTMLText'
     );
@@ -54,6 +58,12 @@ class TicketExtension extends DataExtension
         'Attendees' => 'Broarm\EventTickets\Attendee.Event',
         'WaitingList' => 'Broarm\EventTickets\WaitingListRegistration.Event',
         'Fields' => 'Broarm\EventTickets\AttendeeExtraField.Event'
+    );
+
+    private static $defaults = array(
+        'Capacity' => 50,
+        'OrderMin' => 1,
+        'OrderMax' => 5
     );
 
     private static $translate = array(
@@ -76,6 +86,8 @@ class TicketExtension extends DataExtension
             "Root.$ticketLabel", array(
             GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), $gridFieldConfig),
             NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
+            NumericField::create('OrderMin', _t('TicketExtension.OrderMin', 'Minimum amount of tickets required per reservation')),
+            NumericField::create('OrderMax', _t('TicketExtension.OrderMax', 'Maximum amount of tickets allowed per reservation')),
             HtmlEditorField::create('SuccessMessage',
                 _t('TicketExtension.SuccessMessage', 'Success message'))->setRows(4),
             HtmlEditorField::create('SuccessMessageMail', _t('TicketExtension.MailMessage', 'Mail message'))->setRows(4)

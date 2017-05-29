@@ -192,7 +192,7 @@ class AttendeeExtraField extends DataObject
 
     public function canDelete($member = null)
     {
-        return true;//$this->Editable;
+        return $this->Editable;
     }
 
     public function canCreate($member = null)

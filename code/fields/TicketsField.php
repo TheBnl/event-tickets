@@ -11,6 +11,7 @@ namespace Broarm\EventTickets;
 use ArrayList;
 use DataList;
 use DBField;
+use DropdownField;
 use FormField;
 use NumericField;
 use Validator;
@@ -65,12 +66,25 @@ class TicketsField extends FormField
         foreach ($this->getTickets() as $ticket) {
             /** @var Ticket $ticket */
             $fieldName = $this->name . "[{$ticket->ID}][Amount]";
-            $ticket->AmountField = NumericField::create($fieldName, 'Amount', 0)
-                ->setAttribute('min', '0')
-                ->setAttribute('max', $ticket->Event()->getAvailability());
+            $range = range($ticket->Event()->OrderMin, $ticket->Event()->OrderMax);
+
+            $ticket->AmountField = DropdownField::create(
+                $fieldName,
+                'Amount',
+                array_combine($range, $range),
+                $ticket->Event()->OrderMin
+            );
+
+            $availability = $ticket->Event()->getAvailability();
+            if ($availability < $ticket->Event()->OrderMax) {
+                $disabled = range($availability + 1, $ticket->Event()->OrderMax);
+                $ticket->AmountField->setDisabledItems(array_combine($disabled, $disabled));
+            }
+
             if (!$ticket->getAvailable()) {
                 $ticket->AmountField->setDisabled(true);
             }
+
             $tickets->push($ticket);
         }
         return $tickets;
