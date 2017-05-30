@@ -127,13 +127,19 @@ class TicketExtension extends DataExtension
 
     }
 
-    public function onBeforeWrite()
+    /**
+     * Trigger actions after write
+     */
+    public function onAfterWrite()
     {
-        $this->createDefaultFieldsBlob();
-        //parent::onAfterWrite();
+        $this->createDefaultFields();
+        parent::onAfterWrite();
     }
 
-    public function createDefaultFieldsBlob()
+    /**
+     * Creates and sets up the default fields
+     */
+    public function createDefaultFields()
     {
         $fields = Attendee::config()->get('default_fields');
         if (!$this->owner->Fields()->exists()) {
@@ -141,9 +147,17 @@ class TicketExtension extends DataExtension
                 $field = AttendeeExtraField::create();
                 $field->Title = _t("AttendeeField.$fieldName", $fieldName);
                 $field->FieldName = $fieldName;
-                $field->FieldType = $fieldType;
                 $field->Required = true;
                 $field->Editable = false;
+
+                if (is_array($fieldType)) {
+                    foreach ($fieldType as $property => $value) {
+                        $field->setField($property, $value);
+                    }
+                } else {
+                    $field->FieldType = $fieldType;
+                }
+
                 $this->owner->Fields()->add($field);
             }
         }

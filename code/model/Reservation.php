@@ -93,7 +93,9 @@ class Reservation extends DataObject
     private static $summary_fields = array(
         'Title' => 'Customer',
         'Total.Nice' => 'Total',
-        'State' => 'Status'
+        'State' => 'Status',
+        'Gateway' => 'Payment method',
+        'Created.Nice' => 'Date'
     );
 
     public function getCMSFields()
