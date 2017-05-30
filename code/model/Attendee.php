@@ -112,7 +112,8 @@ class Attendee extends DataObject
     private static $summary_fields = array(
         'Title' => 'Name',
         'Email' => 'Email',
-        'TicketCode' => 'Ticket',
+        'Ticket.Title' => 'Ticket',
+        'TicketCode' => 'Ticket #',
         'CheckedInSummary' => 'Checked in',
     );
 
@@ -121,9 +122,6 @@ class Attendee extends DataObject
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));
 
         $fields->addFieldsToTab('Root.Main', array(
-            //ReadonlyField::create('FirstName', _t('Attendee.FirstName', 'First name')),
-            //ReadonlyField::create('Surname', _t('Attendee.Surname', 'Surname')),
-            //ReadonlyField::create('Email', _t('Attendee.Email', 'Email')),
             ReadonlyField::create('TicketCode', _t('Attendee.Ticket', 'Ticket')),
             ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
         ));

@@ -14,6 +14,8 @@ use FieldList;
 use GridField;
 use GridFieldAddNewButton;
 use GridFieldConfig_RecordEditor;
+use GridFieldDataColumns;
+use GridFieldSortableHeader;
 use HtmlEditorField;
 use LiteralField;
 use NumericField;
@@ -74,6 +76,8 @@ class TicketExtension extends DataExtension
     public function updateCMSFields(FieldList $fields)
     {
         $gridFieldConfig = GridFieldConfig_RecordEditor::create();
+        /** @var GridFieldSortableHeader $sortableHeader */
+        $sortableHeader = $gridFieldConfig->getComponentByType(new GridFieldSortableHeader());
 
         // If the event dates are in the past remove ability to create new tickets, reservations and attendees.
         // This is done here instead of in the canCreate method because of the lack of context there.
@@ -95,11 +99,19 @@ class TicketExtension extends DataExtension
 
         if ($this->owner->Reservations()->exists()) {
             $reservationLabel = _t('TicketExtension.Reservations', 'Reservations');
+            $sortableHeader->setFieldSorting(array(
+                'Total.Nice' => 'Total',
+                'State' => 'Status',
+                'GatewayNice' => 'Gateway',
+                'Created.Nice' => 'Created'
+            ));
+
             $fields->addFieldToTab(
                 "Root.$reservationLabel",
                 GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), $gridFieldConfig)
             );
         }
+
 
         if ($this->owner->Attendees()->exists()) {
             $guestListLabel = _t('TicketExtension.GuestList', 'GuestList');
@@ -117,14 +129,12 @@ class TicketExtension extends DataExtension
             );
         }
 
-
         $extraFieldsLabel = _t('TicketExtension.ExtraFields', 'Attendee fields');
         $fields->addFieldToTab(
             "Root.$extraFieldsLabel",
             GridField::create('WaitingList', $extraFieldsLabel, $this->owner->Fields(),
                 GridFieldConfig_Fields::create())
         );
-
     }
 
     /**

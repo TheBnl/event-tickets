@@ -22,6 +22,7 @@ use HasManyList;
 use ManyManyList;
 use Member;
 use ReadonlyField;
+use SilverStripe\Omnipay\GatewayInfo;
 use SiteConfig;
 use SSViewer;
 use Tab;
@@ -91,10 +92,11 @@ class Reservation extends DataObject
     );
 
     private static $summary_fields = array(
+        'ReservationCode' => 'Reservation',
         'Title' => 'Customer',
         'Total.Nice' => 'Total',
         'State' => 'Status',
-        'Gateway' => 'Payment method',
+        'GatewayNice' => 'Payment method',
         'Created.Nice' => 'Date'
     );
 
@@ -105,7 +107,7 @@ class Reservation extends DataObject
         $fields->addFieldsToTab('Root.Main', array(
             ReadonlyField::create('ReservationCode', _t('Reservation.Code', 'Code')),
             ReadonlyField::create('Title', _t('Reservation.MainContact', 'Main contact')),
-            ReadonlyField::create('Gateway', _t('Reservation.Gateway', 'Gateway')),
+            ReadonlyField::create('GateWayNice', _t('Reservation.Gateway', 'Gateway')),
             ReadonlyField::create('Total', _t('Reservation.Total', 'Total')),
             ReadonlyField::create('Comments', _t('Reservation.Comments', 'Comments')),
             GridField::create('Attendees', 'Attendees', $this->Attendees(), $gridFieldConfig),
@@ -139,11 +141,6 @@ class Reservation extends DataObject
             }
         }
 
-        // Make sure the ticket file is not downloadable
-        //if ($this->TicketFile()->exists()) {
-        //    $this->TicketFile()->delete();
-        //}
-
         // Remove the folder
         if ($this->fileFolder()->exists()) {
             $this->fileFolder()->delete();
@@ -152,10 +149,24 @@ class Reservation extends DataObject
         parent::onBeforeDelete();
     }
 
+    /**
+     * Gets a nice unnamespaced name
+     *
+     * @return string
+     */
     public function singular_name()
     {
         $name = explode('\\', parent::singular_name());
         return trim(end($name));
+    }
+
+    /**
+     * Returns the nice gateway title
+     *
+     * @return string
+     */
+    public function getGatewayNice() {
+        return GatewayInfo::niceTitle($this->Gateway);
     }
 
     /**

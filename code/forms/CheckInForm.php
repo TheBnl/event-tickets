@@ -59,7 +59,7 @@ class CheckInForm extends Form
                 'Please submit a ticket code'
             ), 'error');
 
-            $controller->redirect("{$controller->Link()}?success=-3");
+            $controller->redirect($controller->Link());
             return false;
         }
 
@@ -70,7 +70,7 @@ class CheckInForm extends Form
                 'This event has no registered attendees'
             ), 'error');
 
-            $controller->redirect("{$controller->Link()}?success=-2");
+            $controller->redirect($controller->Link());
             return false;
         }
 
@@ -82,7 +82,7 @@ class CheckInForm extends Form
                 'The given ticket is not found on this event'
             ), 'error');
 
-            $controller->redirect("{$controller->Link()}?success=-1");
+            $controller->redirect($controller->Link());
             return false;
         }
 
@@ -93,7 +93,7 @@ class CheckInForm extends Form
                 'This ticket is already checked in'
             ), 'error');
 
-            $controller->redirect("{$controller->Link()}?success=0");
+            $controller->redirect($controller->Link());
             return false;
         } else {
             if ((bool)$attendee->CheckedIn && (bool)self::config()->get('allow_checkout')) {
@@ -121,7 +121,7 @@ class CheckInForm extends Form
                     'number' => $attendee->TicketCode
                 )
             ), $messageType, false);
-            $controller->redirect("{$controller->Link()}?success=1");
+            $controller->redirect($controller->Link());
             return true;
         }
     }
