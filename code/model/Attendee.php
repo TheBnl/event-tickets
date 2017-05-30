@@ -181,9 +181,10 @@ class Attendee extends DataObject
      */
     public function getName()
     {
-        if (!empty($this->getFirstName())) {
+        $mainContact = $this->Reservation()->MainContact();
+        if (!empty($this->getSurname())) {
             return trim("{$this->getFirstName()} {$this->getSurname()}");
-        } elseif ($this->Reservation()->MainContact()->exists() && $mainContact = $this->Reservation()->MainContact()) {
+        } elseif ($mainContact->exists() && !empty($mainContact->getSurname())) {
             return _t('Attendee.GUEST_OF', 'Guest of {name}', null, array('name' => $mainContact->getName()));
         } else {
             return null;
