@@ -81,6 +81,7 @@ class PaymentProcessor extends Object
         ));
 
         parent::__construct();
+        $this->extend('updatePaymentProcessor');
     }
 
     /**
@@ -154,5 +155,15 @@ class PaymentProcessor extends Object
     public function getGateWayData()
     {
         return $this->gatewayData;
+    }
+
+    /**
+     * Get the reservation
+     *
+     * @return Reservation
+     */
+    public function getReservation()
+    {
+        return $this->reservation;
     }
 }
