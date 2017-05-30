@@ -15,6 +15,7 @@ use GridField;
 use GridFieldAddNewButton;
 use GridFieldConfig_RecordEditor;
 use GridFieldDataColumns;
+use GridFieldExportButton;
 use GridFieldSortableHeader;
 use HtmlEditorField;
 use LiteralField;
@@ -75,30 +76,29 @@ class TicketExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
-        $gridFieldConfig = GridFieldConfig_RecordEditor::create();
-        /** @var GridFieldSortableHeader $sortableHeader */
-        $sortableHeader = $gridFieldConfig->getComponentByType(new GridFieldSortableHeader());
-
+        $ticketsGridFieldConfig = GridFieldConfig_RecordEditor::create();
         // If the event dates are in the past remove ability to create new tickets, reservations and attendees.
         // This is done here instead of in the canCreate method because of the lack of context there.
         if (!$this->canCreateTickets()) {
-            $gridFieldConfig->removeComponentsByType(new GridFieldAddNewButton());
+            $ticketsGridFieldConfig->removeComponentsByType(new GridFieldAddNewButton());
         }
 
         $ticketLabel = _t('TicketExtension.Tickets', 'Tickets');
         $fields->addFieldsToTab(
             "Root.$ticketLabel", array(
-            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), $gridFieldConfig),
+            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), $ticketsGridFieldConfig),
             NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
             NumericField::create('OrderMin', _t('TicketExtension.OrderMin', 'Minimum amount of tickets required per reservation')),
             NumericField::create('OrderMax', _t('TicketExtension.OrderMax', 'Maximum amount of tickets allowed per reservation')),
-            HtmlEditorField::create('SuccessMessage',
-                _t('TicketExtension.SuccessMessage', 'Success message'))->setRows(4),
+            HtmlEditorField::create('SuccessMessage', _t('TicketExtension.SuccessMessage', 'Success message'))->setRows(4),
             HtmlEditorField::create('SuccessMessageMail', _t('TicketExtension.MailMessage', 'Mail message'))->setRows(4)
         ));
 
         if ($this->owner->Reservations()->exists()) {
             $reservationLabel = _t('TicketExtension.Reservations', 'Reservations');
+            $reservationsGridFieldConfig = GridFieldConfig_RecordEditor::create();
+            /** @var GridFieldSortableHeader $sortableHeader */
+            $sortableHeader = $reservationsGridFieldConfig->getComponentByType(new GridFieldSortableHeader());
             $sortableHeader->setFieldSorting(array(
                 'Total.Nice' => 'Total',
                 'State' => 'Status',
@@ -108,16 +108,15 @@ class TicketExtension extends DataExtension
 
             $fields->addFieldToTab(
                 "Root.$reservationLabel",
-                GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), $gridFieldConfig)
+                GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), $reservationsGridFieldConfig)
             );
         }
-
 
         if ($this->owner->Attendees()->exists()) {
             $guestListLabel = _t('TicketExtension.GuestList', 'GuestList');
             $fields->addFieldToTab(
                 "Root.$guestListLabel",
-                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), $gridFieldConfig)
+                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), GridFieldConfig_RecordEditor::create())
             );
         }
 
@@ -125,16 +124,17 @@ class TicketExtension extends DataExtension
             $waitingListLabel = _t('TicketExtension.WaitingList', 'WaitingList');
             $fields->addFieldToTab(
                 "Root.$waitingListLabel",
-                GridField::create('WaitingList', $waitingListLabel, $this->owner->WaitingList(), $gridFieldConfig)
+                GridField::create('WaitingList', $waitingListLabel, $this->owner->WaitingList(), GridFieldConfig_RecordEditor::create())
             );
         }
 
         $extraFieldsLabel = _t('TicketExtension.ExtraFields', 'Attendee fields');
         $fields->addFieldToTab(
             "Root.$extraFieldsLabel",
-            GridField::create('WaitingList', $extraFieldsLabel, $this->owner->Fields(),
-                GridFieldConfig_Fields::create())
+            GridField::create('WaitingList', $extraFieldsLabel, $this->owner->Fields(), GridFieldConfig_Fields::create())
         );
+
+        $this->owner->extend('updateTicketExtensionFields', $fields);
     }
 
     /**
