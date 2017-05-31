@@ -76,7 +76,7 @@ class CheckInForm extends Form
 
         // Check if the ticket is found on the current event
         /** @var Attendee $attendee */
-        if (!$attendee = $controller->Attendees()->find('TicketCode', $data['TicketCode'])) {
+        if (!$attendee = $controller->getGuestList()->find('TicketCode', $data['TicketCode'])) {
             $form->addErrorMessage('TicketCode', _t(
                 'CheckInForm.CODE_NOT_FOUND',
                 'The given ticket is not found on this event'

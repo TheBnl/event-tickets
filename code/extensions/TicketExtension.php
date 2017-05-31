@@ -17,6 +17,7 @@ use GridFieldConfig_RecordEditor;
 use GridFieldDataColumns;
 use GridFieldExportButton;
 use GridFieldSortableHeader;
+use HasManyList;
 use HtmlEditorField;
 use LiteralField;
 use NumericField;
@@ -193,6 +194,19 @@ class TicketExtension extends DataExtension
     public function getAvailability()
     {
         return $this->owner->Capacity - $this->owner->Attendees()->count();
+    }
+
+    /**
+     * Get only the attendees who are certain to attend
+     * Fixme: Using callback filter instead of join, because join gives ambiguous error on 'EventID'
+     *
+     * @return \ArrayList
+     */
+    public function getGuestList()
+    {
+        return $this->owner->Attendees()->filterByCallback(function(Attendee $attendee, HasManyList $list) {
+            return $attendee->Reservation()->Status === 'PAID';
+        });
     }
 
     /**

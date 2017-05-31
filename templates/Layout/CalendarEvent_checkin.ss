@@ -15,7 +15,7 @@
             </tr>
             </thead>
             <tbody class="guest-list-table__body">
-                <% loop $Attendees %>
+                <% loop $GuestList %>
                 <tr>
                     <td class="guest-list-table__body-col">$Pos</td>
                     <td class="guest-list-table__body-col">$Name</td>
