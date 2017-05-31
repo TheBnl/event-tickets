@@ -38,7 +38,7 @@ class SiteConfigExtension extends DataExtension
 
     private static $defaults = array(
         'SuccessMessage' => "<p>Thanks for your order!<br/>The requested tickets are sent to you by mail.</p>",
-        'SuccessMessageMail' => "<p>Here are your tickets!<br/>You can scan the QR code at the ticket check, this is possible from your screen. If you prefer a paper ticket you can use the pint button to download your PDF.</p>"
+        'SuccessMessageMail' => "<p>This is your ticket.<br/>You can scan the QR code at the ticket check.</p>"
     );
 
     public function updateCMSFields(FieldList $fields)
@@ -53,8 +53,8 @@ class SiteConfigExtension extends DataExtension
         $mail = new HtmlEditorField('SuccessMessageMail', 'Mail message');
         $mail->setRows(4);
         $mail->setDescription(_t(
-            'SiteConfigExtension.MAIL_MESSAGE_HELP',
-            'This message is used on ticket and in the mail. The text is overwriteble for a specific event under the "Tickets" tab'
+            'SiteConfigExtension.TICKET_MESSAGE_HELP',
+            'This message is used on ticket. You can reference the therms and agreements here or explain the scan process'
         ));
 
         $uploadField = UploadField::create('TicketLogo', 'TicketLogo');

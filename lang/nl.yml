@@ -29,7 +29,7 @@ nl:
     FREE: 'Gratis'
   SiteConfigExtension:
     SUCCESS_MESSAGE_HELP: 'Dit bericht word getoond op de succes pagina. Hij is per evenement te overschijven onder de "tickets" tab'
-    MAIL_MESSAGE_HELP: 'Dit bericht word getoond op het ticket en in the mail. Hij is per evenement te overschijven onder de "tickets" tab'
+    MAIL_MESSAGE_HELP: 'Dit bericht word getoond op het ticket. Hij is per evenement te overschijven onder de "tickets" tab'
   TicketForm:
     MAKE_RESERVATION: 'Reserveer tickets'
     WAITINGLIST_INTRO: 'Het evenement is uitverkocht. U kunt zich hieronder inschrijven om op de hoogte te worden gehouden wanneer er plaatsen vrijkomen.'
@@ -37,7 +37,7 @@ nl:
   TicketsField:
     TICKETS: 'Tickets'
     PRICE: 'Prijs'
-    AMOUNT: 'Hoeveelheid'
+    AMOUNT: 'Aantal'
     EMPTY: 'Tickets'
     VALIDATION_TO_MUCH: 'Er zijn {ticketCount} tickets over'
     VALIDATION_EMPTY: 'Selecteer minstens één ticket'
