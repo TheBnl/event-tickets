@@ -69,9 +69,15 @@ class Attendee extends DataObject
     private static $qr_as_link = false;
 
     private static $default_fields = array(
-        'FirstName' => 'TextField',
-        'Surname' => 'TextField',
-        'Email' => 'EmailField',
+        'FirstName' => array(
+            'FieldType' => 'TextField'
+        ),
+        'Surname' => array(
+            'FieldType' => 'TextField'
+        ),
+        'Email' => array(
+            'FieldType' => 'TextField'
+        )
     );
 
     private static $table_fields = array(
