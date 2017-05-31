@@ -20,6 +20,14 @@ abstract class CheckoutStepController extends Page_Controller
 {
     protected $step = null;
 
+    /**
+     * @var Reservation|null
+     */
+    protected $reservation = null;
+
+    /**
+     * Init the controller and check if the current step is allowed
+     */
     public function init()
     {
         // If the step is not a registered step exit
@@ -37,6 +45,7 @@ abstract class CheckoutStepController extends Page_Controller
             ReservationSession::end();
             $this->redirect($this->Link('/'));
         } else {
+            $this->reservation = ReservationSession::get();
             parent::init();
         }
     }
@@ -71,6 +80,15 @@ abstract class CheckoutStepController extends Page_Controller
         }
 
         return $this->dataRecord->RelativeLink($action);
+    }
+
+    /**
+     * Get the current reservation
+     *
+     * @return Reservation
+     */
+    public function getReservation() {
+        return $this->reservation;
     }
 
     /**

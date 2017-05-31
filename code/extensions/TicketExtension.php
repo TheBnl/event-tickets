@@ -96,19 +96,9 @@ class TicketExtension extends DataExtension
 
         if ($this->owner->Reservations()->exists()) {
             $reservationLabel = _t('TicketExtension.Reservations', 'Reservations');
-            $reservationsGridFieldConfig = GridFieldConfig_RecordEditor::create();
-            /** @var GridFieldSortableHeader $sortableHeader */
-            $sortableHeader = $reservationsGridFieldConfig->getComponentByType(new GridFieldSortableHeader());
-            $sortableHeader->setFieldSorting(array(
-                'Total.Nice' => 'Total',
-                'State' => 'Status',
-                'GatewayNice' => 'Gateway',
-                'Created.Nice' => 'Created'
-            ));
-
             $fields->addFieldToTab(
                 "Root.$reservationLabel",
-                GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), $reservationsGridFieldConfig)
+                GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), GridFieldConfig_RecordEditor::create())
             );
         }
 

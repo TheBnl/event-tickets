@@ -20,6 +20,7 @@
     "omnipay/manual": "*",
     "bacon/bacon-qr-code": "*",
     "dompdf/dompdf": "*",
+    "unclecheese/betterbuttons": "*",
     "jonom/silverstripe-share-care": "*"
   },
   "extra": {

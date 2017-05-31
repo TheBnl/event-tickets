@@ -49,7 +49,6 @@ nl:
   TicketControllerExtension:
     PERMISSIONS_CAT: 'Event tickets'
     HANDLE_CHECK_IN: 'Geautoriseerd voor ticket controle'
-
   TicketEmail:
     TERMS_CONDITIONS: 'Algemene voorwaarden'
     Title: 'Uw tickets'
@@ -62,7 +61,6 @@ nl:
     Name: 'Naam'
     Email: 'E-mail'
     FOOTER: 'Vragen? Email <a href="mailto:{email}">{email}</a> of bel <a href="tel:{phone}">{phone}</a>'
-
   AttendeeMail:
     TITLE: 'Uw ticket voor {event}'
     CONTENT: 'Hallo {name}, Hier is uw toegangsbewijs voor <a href="{link}">{event}</a>.'
@@ -76,12 +74,12 @@ nl:
   MainContactMail:
     TITLE: 'Uw tickets voor {event}'
     CONTENT: 'Hier zijn uw tickets voor <a href="{link}">{event}</a>.'
-
   Reservation:
     CART: 'Winkelwagen'
     PENDING: 'Word verwerkt'
     PAID: 'Betaald'
-    CANCELED: 'Afgezegd'
+    CANCELED: 'Geannuleerd'
+    RESEND: 'Verstuur reservering'
   ReservationForm:
     PAYMENT: 'Ga verder met betalen'
   Attendee:

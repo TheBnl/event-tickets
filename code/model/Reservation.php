@@ -8,26 +8,23 @@
 
 namespace Broarm\EventTickets;
 
+use BetterButtonCustomAction;
 use CalendarEvent;
-use CalendarEvent_Controller;
+use Config;
 use DataObject;
-use Director;
-use Dompdf\Dompdf;
+use DropdownField;
+use Email;
 use FieldList;
-use File;
 use Folder;
 use GridField;
 use GridFieldConfig_RecordViewer;
 use HasManyList;
 use ManyManyList;
-use Member;
 use ReadonlyField;
 use SilverStripe\Omnipay\GatewayInfo;
 use SiteConfig;
-use SSViewer;
 use Tab;
 use TabSet;
-use ViewableData;
 
 /**
  * Class Reservation
@@ -38,7 +35,6 @@ use ViewableData;
  * @property string Title
  * @property float  Subtotal
  * @property float  Total
- * @property string Email todo determine obsolete value
  * @property string Comments
  * @property string ReservationCode
  * @property string Gateway
@@ -62,12 +58,29 @@ class Reservation extends DataObject
      */
     private static $delete_after = '+1 day';
 
+    /**
+     * The address to whom the ticket notifications are sent
+     * By default the admin email is used
+     *
+     * @config
+     * @var string
+     */
+    private static $mail_sender;
+
+    /**
+     * The address from where the ticket mails are sent
+     * By default the admin email is used
+     *
+     * @config
+     * @var string
+     */
+    private static $mail_receiver;
+
     private static $db = array(
         'Status' => 'Enum("CART,PENDING,PAID,CANCELED","CART")',
         'Title' => 'Varchar(255)',
         'Subtotal' => 'Currency',
         'Total' => 'Currency',
-        'Email' => 'Varchar(255)',
         'Gateway' => 'Varchar(255)',
         'Comments' => 'Text',
         'ReservationCode' => 'Varchar(255)'
@@ -100,12 +113,23 @@ class Reservation extends DataObject
         'Created.Nice' => 'Date'
     );
 
+    /**
+     * Actions usable on the cms detail view
+     *
+     * @var array
+     */
+    private static $better_buttons_actions = array(
+        'send'
+    );
+
     public function getCMSFields()
     {
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));
         $gridFieldConfig = GridFieldConfig_RecordViewer::create();
         $fields->addFieldsToTab('Root.Main', array(
             ReadonlyField::create('ReservationCode', _t('Reservation.Code', 'Code')),
+            ReadonlyField::create('Created', _t('Reservation.Created', 'Date')),
+            DropdownField::create('Status', _t('Reservation.Status', 'Status'), $this->getStates()),
             ReadonlyField::create('Title', _t('Reservation.MainContact', 'Main contact')),
             ReadonlyField::create('GateWayNice', _t('Reservation.Gateway', 'Gateway')),
             ReadonlyField::create('Total', _t('Reservation.Total', 'Total')),
@@ -118,6 +142,23 @@ class Reservation extends DataObject
         return $fields;
     }
 
+    /**
+     * Add utility actions to the reservation details view
+     *
+     * @return FieldList
+     */
+    public function getBetterButtonsActions()
+    {
+        /** @var FieldList $fields */
+        $fields = parent::getBetterButtonsActions();
+        $fields->push(BetterButtonCustomAction::create('send', _t('Reservation.RESEND', 'Resend the reservation')));
+
+        return $fields;
+    }
+
+    /**
+     * Generate a reservation code if it does not yet exists
+     */
     public function onBeforeWrite()
     {
         // Set the title to the name of the reservation holder
@@ -131,6 +172,9 @@ class Reservation extends DataObject
         parent::onBeforeWrite();
     }
 
+    /**
+     * After deleting a reservation, delete the attendees and files
+     */
     public function onBeforeDelete()
     {
         // If a reservation is deleted remove the names from the guest list
@@ -165,7 +209,8 @@ class Reservation extends DataObject
      *
      * @return string
      */
-    public function getGatewayNice() {
+    public function getGatewayNice()
+    {
         return GatewayInfo::niceTitle($this->Gateway);
     }
 
@@ -197,11 +242,24 @@ class Reservation extends DataObject
 
     /**
      * Return the translated state
+     *
      * @return string
      */
     public function getState()
     {
         return _t("Reservation.{$this->Status}", $this->Status);
+    }
+
+    /**
+     * Get a the translated map of available states
+     *
+     * @return array
+     */
+    private function getStates()
+    {
+        return array_map(function ($state) {
+            return _t("Reservation.$state", $state);
+        }, $this->dbObject('Status')->enumValues());
     }
 
     /**
@@ -228,16 +286,21 @@ class Reservation extends DataObject
 
     /**
      * Safely change to a state
+     * todo check if state direction matches
      *
      * @param $state
+     *
+     * @return boolean
      */
     public function changeState($state)
     {
         $availableStates = $this->dbObject('Status')->enumValues();
         if (in_array($state, $availableStates)) {
             $this->Status = $state;
+            return true;
         } else {
             user_error(_t('Reservation.STATE_CHANGE_ERROR', 'Selected state is not available'));
+            return false;
         }
     }
 
@@ -246,7 +309,8 @@ class Reservation extends DataObject
      *
      * @param $id
      */
-    public function setMainContact($id) {
+    public function setMainContact($id)
+    {
         $this->MainContactID = $id;
         $this->write();
     }
@@ -282,6 +346,136 @@ class Reservation extends DataObject
             $attendee->createQRCode($folder);
             $attendee->createTicketFile($folder);
         }
+    }
+
+    /**
+     * Send the reservation mail
+     */
+    public function sendReservation()
+    {
+        // Get the mail sender or fallback to the admin email
+        if (empty($from = self::config()->get('mail_sender'))) {
+            $from = Config::inst()->get('Email', 'admin_email');
+        }
+
+        // Create the email with given template and reservation data
+        $email = new Email();
+        $email->setSubject(_t(
+            'ReservationMail.TITLE',
+            'Your order at {sitename}',
+            null,
+            array(
+                'sitename' => SiteConfig::current_site_config()->Title
+            )
+        ));
+        $email->setFrom($from);
+        $email->setTo($this->MainContact()->Email);
+        $email->setTemplate('ReservationMail');
+        $email->populateTemplate($this);
+        $this->extend('updateReservationMail', $email);
+        $email->send();
+    }
+
+    /**
+     * Send the reserved tickets
+     */
+    public function sendTickets()
+    {
+        // Get the mail sender or fallback to the admin email
+        if (empty($from = self::config()->get('mail_sender'))) {
+            $from = Config::inst()->get('Email', 'admin_email');
+        }
+
+        // Send the tickets to the main contact
+        $email = new Email();
+        $email->setSubject(_t(
+            'MainContactMail.TITLE',
+            'Uw tickets voor {event}',
+            null,
+            array(
+                'event' => $this->Event()->Title
+            )
+        ));
+        $email->setFrom($from);
+        $email->setTo($this->MainContact()->Email);
+        $email->setTemplate('MainContactMail');
+        $email->populateTemplate($this);
+        $this->extend('updateMainContactMail', $email);
+        $email->send();
+
+
+        // Get the attendees for this event that are checked as receiver
+        $ticketReceivers = $this->Attendees()->filter('TicketReceiver', 1)->exclude('ID', $this->MainContactID);
+        if ($ticketReceivers->exists()) {
+            /** @var Attendee $ticketReceiver */
+            foreach ($ticketReceivers as $ticketReceiver) {
+                $email = new Email();
+                $email->setSubject(_t(
+                    'AttendeeMail.TITLE',
+                    'Your ticket for {event}',
+                    null,
+                    array(
+                        'event' => $this->Event()->Title
+                    )
+                ));
+                $email->setFrom($from);
+                $email->setTo($ticketReceiver->Email);
+                $email->setTemplate('AttendeeMail');
+                $email->populateTemplate($ticketReceiver);
+                $this->extend('updateTicketMail', $email);
+                $email->send();
+            }
+        }
+    }
+
+
+    /**
+     * Send a booking notification to the ticket mail sender or the site admin
+     */
+    public function sendNotification()
+    {
+        if (empty($from = self::config()->get('mail_sender'))) {
+            $from = Config::inst()->get('Email', 'admin_email');
+        }
+
+        if (empty($to = self::config()->get('mail_receiver'))) {
+            $to = Config::inst()->get('Email', 'admin_email');
+        }
+
+        $email = new Email();
+        $email->setSubject(_t(
+            'NotificationMail.TITLE',
+            'Nieuwe reservering voor {event}',
+            null, array('event' => $this->Event()->Title)
+        ));
+
+        $email->setFrom($from);
+        $email->setTo($to);
+        $email->setTemplate('NotificationMail');
+        $email->populateTemplate($this);
+        $this->extend('updateNotificationMail', $email);
+        $email->send();
+    }
+
+    /**
+     * Create the files and send the reservation, notification and tickets
+     */
+    public function send()
+    {
+        $this->createFiles();
+        $this->sendReservation();
+        $this->sendNotification();
+        $this->sendTickets();
+    }
+
+    /**
+     * Get the download link
+     *
+     * @return string
+     */
+    public function getDownloadLink()
+    {
+        return $this->reservation->Attendees()->first()->TicketFile()->Link();
     }
 
     public function canView($member = null)
