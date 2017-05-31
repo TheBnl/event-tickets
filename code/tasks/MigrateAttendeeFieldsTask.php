@@ -75,12 +75,16 @@ class MigrateAttendeeFieldsTask extends BuildTask
                         array('ID' => $attendee->ID)
                     );
 
-                    $value = $q->execute()->value();
-                    $attendee->Fields()->add($field, array(
-                        'Value' => $value
-                    ));
-
-                    echo "[$event->ID][$attendee->ID] Set '$field->FieldName' with '{$value}' \n";
+                    try {
+                        $value = $q->execute()->value();
+                        $attendee->Fields()->add($field, array(
+                            'Value' => $value
+                        ));
+                        echo "[$event->ID][$attendee->ID] Set '$field->FieldName' with '{$value}' \n";
+                    } catch (\Exception $e) {
+                        // fails silent
+                        echo "[$event->ID][$attendee->ID] Failed, '$field->FieldName' does not exist \n";
+                    }
                 }
             }
             echo "[$event->ID] Finished migrating event \n\n";
