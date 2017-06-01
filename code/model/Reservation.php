@@ -56,7 +56,7 @@ class Reservation extends DataObject
      *
      * @var string
      */
-    private static $delete_after = '+1 day';
+    private static $delete_after = '+1 hour';
 
     /**
      * The address to whom the ticket notifications are sent
