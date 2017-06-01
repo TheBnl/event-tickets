@@ -63,7 +63,7 @@ class TicketsField extends FormField
     private function getEditableTickets()
     {
         $tickets = ArrayList::create();
-        foreach ($this->getTickets() as $i => $ticket) {
+        foreach ($this->getTickets() as $ticket) {
             /** @var Ticket $ticket */
             $fieldName = $this->name . "[{$ticket->ID}][Amount]";
             $range = range($ticket->Event()->OrderMin, $ticket->Event()->OrderMax);
@@ -73,7 +73,7 @@ class TicketsField extends FormField
                 ->setEmptyString(_t('TicketsField.EMPTY', 'Tickets'));
 
             // Set the first to hold the minimum
-            if ($i === 0) {
+            if ($this->getTickets()->count() === 1) {
                 $ticket->AmountField->setValue($ticket->Event()->OrderMin);
             }
 
