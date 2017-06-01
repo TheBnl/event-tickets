@@ -147,6 +147,49 @@ class AttendeeExtraField extends DataObject
     }
 
     /**
+     * Get the value casted based on chosen field type
+     *
+     * @return mixed|string
+     */
+    public function getValue()
+    {
+        switch ($this->FieldType) {
+            case 'OptionsetField':
+                return $this->Options()->byID($this->getField('Value'))->Title;
+            case 'CheckboxField':
+                return (bool)$this->getField('Value') ? _t('Boolean.YESANSWER', 'Yes') : _t('Boolean.NOANSWER', 'No');
+            default:
+                return $this->getField('Value');
+        }
+    }
+
+    /**
+     * Create a field from given configuration
+     *
+     * @param $fieldName
+     * @param $fieldConfig
+     *
+     * @return AttendeeExtraField|DataObject
+     */
+    public static function createFromConfig($fieldName, $fieldConfig) {
+        $field = AttendeeExtraField::create();
+        $field->Title = _t("AttendeeField.$fieldName", $fieldName);
+        $field->FieldName = $fieldName;
+        $field->Required = true;
+        $field->Editable = false;
+
+        if (is_array($fieldConfig)) {
+            foreach ($fieldConfig as $property => $value) {
+                $field->setField($property, $value);
+            }
+        } else {
+            $field->FieldType = $fieldConfig;
+        }
+
+        return $field;
+    }
+
+    /**
      * Create the configured field
      *
      * @param $fieldName

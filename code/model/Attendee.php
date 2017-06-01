@@ -133,22 +133,9 @@ class Attendee extends DataObject
         ));
 
         foreach ($this->Fields() as $field) {
-            switch ($field->FieldType) {
-                case 'OptionsetField':
-                    $value = $field->Options()->byID($field->Value)->Title;
-                    break;
-                case 'CheckboxField':
-                    // fixme
-                    $value = (int)$field->value ? _t('Boolean.YESANSWER', 'Yes') : _t('Boolean.NOANSWER', 'No');
-                    break;
-                default:
-                    $value = $field->Value;
-                    break;
-            }
-
             $fields->addFieldToTab(
                 'Root.Main',
-                ReadonlyField::create("{$field->FieldName}_Preview", $field->Title, $value)
+                ReadonlyField::create("{$field->FieldName}_Preview", $field->Title, $field->getValue())
             );
         }
 

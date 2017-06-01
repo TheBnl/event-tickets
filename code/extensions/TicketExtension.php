@@ -77,17 +77,10 @@ class TicketExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
-        $ticketsGridFieldConfig = GridFieldConfig_RecordEditor::create();
-        // If the event dates are in the past remove ability to create new tickets, reservations and attendees.
-        // This is done here instead of in the canCreate method because of the lack of context there.
-        if (!$this->canCreateTickets()) {
-            $ticketsGridFieldConfig->removeComponentsByType(new GridFieldAddNewButton());
-        }
-
         $ticketLabel = _t('TicketExtension.Tickets', 'Tickets');
         $fields->addFieldsToTab(
             "Root.$ticketLabel", array(
-            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), $ticketsGridFieldConfig),
+            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), $ticketsGridFieldConfig = GridFieldConfig_RecordEditor::create()),
             NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
             NumericField::create('OrderMin', _t('TicketExtension.OrderMin', 'Minimum amount of tickets required per reservation')),
             NumericField::create('OrderMax', _t('TicketExtension.OrderMax', 'Maximum amount of tickets allowed per reservation')),
@@ -95,6 +88,13 @@ class TicketExtension extends DataExtension
             HtmlEditorField::create('SuccessMessageMail', _t('TicketExtension.MailMessage', 'Mail message'))->setRows(4)
         ));
 
+        // If the event dates are in the past remove ability to create new tickets, reservations and attendees.
+        // This is done here instead of in the canCreate method because of the lack of context there.
+        if (!$this->canCreateTickets()) {
+            $ticketsGridFieldConfig->removeComponentsByType(new GridFieldAddNewButton());
+        }
+
+        // Create Reservations tab
         if ($this->owner->Reservations()->exists()) {
             $reservationLabel = _t('TicketExtension.Reservations', 'Reservations');
             $fields->addFieldToTab(
@@ -103,14 +103,17 @@ class TicketExtension extends DataExtension
             );
         }
 
+        // Create Attendees tab
         if ($this->owner->Attendees()->exists()) {
             $guestListLabel = _t('TicketExtension.GuestList', 'GuestList');
             $fields->addFieldToTab(
                 "Root.$guestListLabel",
-                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), GridFieldConfig_RecordEditor::create())
+                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), $attendeesGridFieldConfig = GridFieldConfig_RecordEditor::create())
             );
+            $attendeesGridFieldConfig->addComponent(new GuestListExportButton($this->owner, 'Footer'));
         }
 
+        // Create WaitingList tab
         if ($this->owner->WaitingList()->exists()) {
             $waitingListLabel = _t('TicketExtension.WaitingList', 'WaitingList');
             $fields->addFieldToTab(
@@ -119,6 +122,7 @@ class TicketExtension extends DataExtension
             );
         }
 
+        // Create Fields tab
         $extraFieldsLabel = _t('TicketExtension.ExtraFields', 'Attendee fields');
         $fields->addFieldToTab(
             "Root.$extraFieldsLabel",
@@ -144,21 +148,8 @@ class TicketExtension extends DataExtension
     {
         $fields = Attendee::config()->get('default_fields');
         if (!$this->owner->Fields()->exists()) {
-            foreach ($fields as $fieldName => $fieldType) {
-                $field = AttendeeExtraField::create();
-                $field->Title = _t("AttendeeField.$fieldName", $fieldName);
-                $field->FieldName = $fieldName;
-                $field->Required = true;
-                $field->Editable = false;
-
-                if (is_array($fieldType)) {
-                    foreach ($fieldType as $property => $value) {
-                        $field->setField($property, $value);
-                    }
-                } else {
-                    $field->FieldType = $fieldType;
-                }
-
+            foreach ($fields as $fieldName => $fieldConfig) {
+                $field = AttendeeExtraField::createFromConfig($fieldName, $fieldConfig);
                 $this->owner->Fields()->add($field);
             }
         }
