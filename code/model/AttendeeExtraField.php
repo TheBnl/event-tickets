@@ -220,6 +220,7 @@ class AttendeeExtraField extends DataObject
             }
         }
 
+        $this->extend('updateField', $field);
         return $field;
     }
 
