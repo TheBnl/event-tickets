@@ -25,6 +25,7 @@ nl:
     CODE_NOT_FOUND: 'Het ingevoerde ticketnummer is niet gevonden op het evenement'
     ALREADY_CHECKED_IN: 'Het ingevoerde ticketnummer is al ingecheckt'
     SUCCESS: 'Het ticket is valide. <strong>{name}</strong> heeft een <strong>{ticket}</strong> ticket met nummer {number}'
+    CHECK_OUT_SUCCESS: 'Het ticket met nummer {number} is uitgecheckt.'
   CurrencyExtension:
     FREE: 'Gratis'
   SiteConfigExtension:
