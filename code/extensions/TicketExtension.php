@@ -184,7 +184,7 @@ class TicketExtension extends DataExtension
      */
     public function getAvailability()
     {
-        return $this->owner->Capacity - $this->owner->Attendees()->count();
+        return $this->owner->Capacity - $this->owner->getGuestList()->count();
     }
 
     /**
