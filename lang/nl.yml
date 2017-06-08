@@ -67,7 +67,7 @@ nl:
     CONTENT: 'Hallo {name}, Hier is uw toegangsbewijs voor <a href="{link}">{event}</a>.'
   NotificationMail:
     TITLE: 'Nieuwe reservering voor {event}'
-    CONTENT: 'Er is een nieuwe bestelling geplaatst door {name} voor {event}. Hieronder vind u de gegevens van de bestelling.'
+    CONTENT: 'Er is een nieuwe bestelling geplaatst door {name} voor {event}. Hieronder vindt u de gegevens van de bestelling.'
     ORDER: 'Order <strong>#{code}</strong>'
   ReservationMail:
     TITLE: 'Uw reservering bij {sitename}'
