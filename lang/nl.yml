@@ -20,12 +20,13 @@ nl:
   CheckInForm:
     TICKET_CODE: 'ticketnummer'
     CheckIn: 'Inchecken'
-    NO_CODE: 'Voer een ticketnummer in'
-    NO_ATTENDEES: 'Er zijn geen geregistreerde gasten'
-    CODE_NOT_FOUND: 'Het ingevoerde ticketnummer is niet gevonden op het evenement'
-    ALREADY_CHECKED_IN: 'Het ingevoerde ticketnummer is al ingecheckt'
-    SUCCESS: 'Het ticket is valide. <strong>{name}</strong> heeft een <strong>{ticket}</strong> ticket met nummer {number}'
-    CHECK_OUT_SUCCESS: 'Het ticket met nummer {number} is uitgecheckt.'
+  CheckInValidator:
+    MESSAGE_NO_CODE: 'Voer een ticketnummer in'
+    MESSAGE_CODE_NOT_FOUND: 'Het ingevoerde ticketnummer is niet gevonden.'
+    MESSAGE_TICKET_CANCELLED: 'Het ingevoerde ticketnummer is van een geannuleerde bestelling'
+    MESSAGE_ALREADY_CHECKED_IN: 'Het ingevoerde ticketnummer is al ingecheckt.'
+    MESSAGE_CHECK_OUT_SUCCESS: 'Het ticket is succesvol uitgecheckt.'
+    MESSAGE_CHECK_IN_SUCCESS: 'Het ticket is succesvol ingecheckt.'
   CurrencyExtension:
     FREE: 'Gratis'
   SiteConfigExtension:

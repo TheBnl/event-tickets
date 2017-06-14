@@ -19,9 +19,9 @@ use UploadField;
  *
  * @package Broarm\EventTickets
  *
- * @property SiteConfigExtension|\SiteConfig $owner
- * @property string SuccessMessage
- * @property string SuccessMessageMail
+ * @property TicketScannerExtension|\SiteConfig $owner
+ * @property string                             SuccessMessage
+ * @property string                             SuccessMessageMail
  *
  * @method \Image TicketLogo
  */

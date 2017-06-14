@@ -16,14 +16,6 @@ use TextField;
 
 class CheckInForm extends Form
 {
-    /**
-     * Allow people to check out
-     *
-     * @config
-     * @var bool
-     */
-    private static $allow_checkout = false;
-
     public function __construct($controller, $name = 'CheckInForm')
     {
         $fields = FieldList::create(
@@ -51,79 +43,25 @@ class CheckInForm extends Form
     {
         /** @var CheckInController $controller */
         $controller = $form->getController();
-
-        // Check if the ticket code is set
-        if (!isset($data['TicketCode'])) {
-            $form->addErrorMessage('TicketCode', _t(
-                'CheckInForm.NO_CODE',
-                'Please submit a ticket code'
-            ), 'error');
-
-            $controller->redirect($controller->Link());
-            return false;
+        $validator = CheckInValidator::create();
+        $result = $validator->validate($data['TicketCode']);
+        switch ($result['Code']) {
+            default:
+                $form->sessionMessage($result['Message'], strtolower($result['Type']), false);
+                $controller->redirect($controller->Link());
+                return false;
+            case CheckInValidator::MESSAGE_CHECK_OUT_SUCCESS:
+                $validator->getAttendee()->CheckedIn = false;
+                break;
+            case CheckInValidator::MESSAGE_CHECK_IN_SUCCESS:
+                $validator->getAttendee()->CheckedIn = true;
+                break;
         }
 
-        // Check if the event has registered attendees
-        if (!$controller->Attendees()->exists()) {
-            $form->addErrorMessage('TicketCode', _t(
-                'CheckInForm.NO_ATTENDEES',
-                'This event has no registered attendees'
-            ), 'error');
-
-            $controller->redirect($controller->Link());
-            return false;
-        }
-
-        // Check if the ticket is found on the current event
-        /** @var Attendee $attendee */
-        if (!$attendee = $controller->getGuestList()->find('TicketCode', $data['TicketCode'])) {
-            $form->addErrorMessage('TicketCode', _t(
-                'CheckInForm.CODE_NOT_FOUND',
-                'The given ticket is not found on this event'
-            ), 'error');
-
-            $controller->redirect($controller->Link());
-            return false;
-        }
-
-        // Check if the ticket is already used
-        if ($attendee->CheckedIn && !(bool)self::config()->get('allow_checkout')) {
-            $form->addErrorMessage('TicketCode', _t(
-                'CheckInForm.ALREADY_CHECKED_IN',
-                'This ticket is already checked in'
-            ), 'error');
-
-            $controller->redirect($controller->Link());
-            return false;
-        } else {
-            if ((bool)$attendee->CheckedIn && (bool)self::config()->get('allow_checkout')) {
-                $attendee->CheckedIn = false;
-                $message = 'CHECK_OUT_SUCCESS';
-                $messageType = 'notice';
-            } else {
-                $attendee->CheckedIn = true;
-                $message = 'SUCCESS';
-                $messageType = 'good';
-            }
-
-            $attendee->write();
-            $messages = array(
-                'SUCCESS' => 'The ticket is valid. {name} has a {ticket} ticket with number {number}',
-                'CHECK_OUT_SUCCESS' => 'The ticket with number {number} is checked out.'
-            );
-
-            $form->sessionMessage(_t(
-                "CheckInForm.$message",
-                $messages[$message],
-                null, array(
-                    'name' => $attendee->getName(),
-                    'ticket' => $attendee->Ticket()->Title,
-                    'number' => $attendee->TicketCode
-                )
-            ), $messageType, false);
-            $controller->redirect($controller->Link());
-            return true;
-        }
+        $validator->getAttendee()->write();
+        $form->sessionMessage($result['Message'], strtolower($result['Type']), false);
+        $controller->redirect($controller->Link());
+        return true;
     }
 
 }
