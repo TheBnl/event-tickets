@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.1.4](https://github.com/TheBnl/event-tickets/tree/1.1.4) (2017-05-31)
+[Full Changelog](https://github.com/TheBnl/event-tickets/compare/1.1.3...1.1.4)
+
+## [1.1.3](https://github.com/TheBnl/event-tickets/tree/1.1.3) (2017-05-30)
+[Full Changelog](https://github.com/TheBnl/event-tickets/compare/1.1.2...1.1.3)
+
+## [1.1.2](https://github.com/TheBnl/event-tickets/tree/1.1.2) (2017-05-24)
+[Full Changelog](https://github.com/TheBnl/event-tickets/compare/1.1.1...1.1.2)
+
+## [1.1.1](https://github.com/TheBnl/event-tickets/tree/1.1.1) (2017-05-10)
+[Full Changelog](https://github.com/TheBnl/event-tickets/compare/1.1.0...1.1.1)
+
 ## [1.1.0](https://github.com/TheBnl/event-tickets/tree/1.1.0) (2017-05-09)
 [Full Changelog](https://github.com/TheBnl/event-tickets/compare/1.0.0...1.1.0)
 
