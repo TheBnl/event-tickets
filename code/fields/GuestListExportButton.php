@@ -75,8 +75,7 @@ class GuestListExportButton extends GridFieldExportButton
         $fileData = '';
 
         $headers = array();
-
-
+        
         // determine the CSV headers. If a field is callable (e.g. anonymous function) then use the
         // source name as the header instead
         // todo add connected extra fields headers

@@ -80,19 +80,13 @@ class TicketExtension extends DataExtension
         $ticketLabel = _t('TicketExtension.Tickets', 'Tickets');
         $fields->addFieldsToTab(
             "Root.$ticketLabel", array(
-            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), $ticketsGridFieldConfig = GridFieldConfig_RecordEditor::create()),
+            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), TicketsGridField::create($this->canCreateTickets())),
             NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
             NumericField::create('OrderMin', _t('TicketExtension.OrderMin', 'Minimum amount of tickets required per reservation')),
             NumericField::create('OrderMax', _t('TicketExtension.OrderMax', 'Maximum amount of tickets allowed per reservation')),
             HtmlEditorField::create('SuccessMessage', _t('TicketExtension.SuccessMessage', 'Success message'))->setRows(4),
             HtmlEditorField::create('SuccessMessageMail', _t('TicketExtension.MailMessage', 'Mail message'))->setRows(4)
         ));
-
-        // If the event dates are in the past remove ability to create new tickets, reservations and attendees.
-        // This is done here instead of in the canCreate method because of the lack of context there.
-        if (!$this->canCreateTickets()) {
-            $ticketsGridFieldConfig->removeComponentsByType(new GridFieldAddNewButton());
-        }
 
         // Create Reservations tab
         if ($this->owner->Reservations()->exists()) {
@@ -108,9 +102,8 @@ class TicketExtension extends DataExtension
             $guestListLabel = _t('TicketExtension.GuestList', 'GuestList');
             $fields->addFieldToTab(
                 "Root.$guestListLabel",
-                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), $attendeesGridFieldConfig = GridFieldConfig_RecordEditor::create())
+                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), GuestListGridField::create($this->owner))
             );
-            $attendeesGridFieldConfig->addComponent(new GuestListExportButton($this->owner, 'Footer'));
         }
 
         // Create WaitingList tab

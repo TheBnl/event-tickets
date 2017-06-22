@@ -117,10 +117,9 @@ class Attendee extends DataObject
 
     private static $summary_fields = array(
         'Title' => 'Name',
-        'Email' => 'Email',
         'Ticket.Title' => 'Ticket',
         'TicketCode' => 'Ticket #',
-        'CheckedInSummary' => 'Checked in',
+        'CheckedIn.Nice' => 'Checked in',
     );
 
     public function getCMSFields()
@@ -272,21 +271,6 @@ class Attendee extends DataObject
     {
         $name = explode('\\', parent::singular_name());
         return trim(end($name));
-    }
-
-    /**
-     * Return the checked in state for use in grid fields
-     *
-     * @return LiteralField
-     */
-    public function getCheckedInSummary()
-    {
-        $checkedInNice = $this->dbObject('CheckedIn')->Nice();
-        $checkedIn = $this->CheckedIn
-            ? "<span style='color: #3adb76;'>$checkedInNice</span>"
-            : "<span style='color: #cc4b37;'>$checkedInNice</span>";
-
-        return new LiteralField('CheckedIn', $checkedIn);
     }
 
     /**
