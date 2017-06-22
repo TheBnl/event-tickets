@@ -6,12 +6,12 @@ use GridFieldAddNewButton;
 use GridFieldConfig_RecordEditor;
 
 /**
- * Class TicketsGridField
+ * Class TicketsGridFieldConfig
  *
  * @author Bram de Leeuw
  * @package Broarm\EventTickets
  */
-class TicketsGridField extends GridFieldConfig_RecordEditor
+class TicketsGridFieldConfig extends GridFieldConfig_RecordEditor
 {
     public function __construct($editable = true, $itemsPerPage = null)
     {

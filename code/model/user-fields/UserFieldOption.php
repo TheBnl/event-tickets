@@ -20,9 +20,9 @@ use TextField;
  *
  * @property string Title
  * @property boolean Default
- * @method AttendeeExtraField Field
+ * @method UserField Field
  */
-class AttendeeExtraFieldOption extends DataObject
+class UserFieldOption extends DataObject
 {
     private static $db = array(
         'Title' => 'Varchar(255)',
@@ -33,7 +33,7 @@ class AttendeeExtraFieldOption extends DataObject
     private static $default_sort = 'Sort ASC';
 
     private static $has_one = array(
-        'Field' => 'Broarm\EventTickets\AttendeeExtraField'
+        'Field' => 'Broarm\EventTickets\UserField'
     );
 
     private static $summary_fields = array(

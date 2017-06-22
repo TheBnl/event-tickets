@@ -1,6 +1,6 @@
 <?php
 /**
- * GridFieldConfig_Fields.php
+ * UserFieldsGridFieldConfig.php
  *
  * @author Bram de Leeuw
  * Date: 24/05/17
@@ -8,11 +8,10 @@
 
 namespace Broarm\EventTickets;
 
-use GridFieldAddNewButton;
+use GridFieldAddNewInlineButton;
 use GridFieldConfig;
-use GridFieldDataColumns;
 use GridFieldDeleteAction;
-use GridFieldDetailForm;
+use GridFieldEditableColumns;
 use GridFieldEditButton;
 use GridFieldFooter;
 use GridFieldOrderableRows;
@@ -20,24 +19,18 @@ use GridFieldTitleHeader;
 use GridFieldToolbarHeader;
 
 /**
- * Class GridFieldConfig_Editable
+ * Class UserOptionSetFieldGridFieldConfig
  */
-class GridFieldConfig_Fields extends GridFieldConfig
+class UserOptionSetFieldGridFieldConfig extends GridFieldConfig
 {
-
-    /**
-     * GridFieldConfig_Editable constructor.
-     */
     public function __construct()
     {
         parent::__construct();
         $this->addComponent(new GridFieldToolbarHeader());
         $this->addComponent(new GridFieldTitleHeader());
-        $this->addComponent(new GridFieldDetailForm());
         $this->addComponent(new GridFieldOrderableRows());
-        $this->addComponent(new GridFieldAddNewButton("toolbar-header-right"));
-        $this->addComponent(new GridFieldDataColumns());
-        $this->addComponent(new GridFieldEditButton());
+        $this->addComponent(new GridFieldAddNewInlineButton("toolbar-header-right"));
+        $this->addComponent(new GridFieldEditableColumns());
         $this->addComponent(new GridFieldDeleteAction());
         $this->addComponent(new GridFieldFooter());
     }

@@ -18,13 +18,16 @@ use SQLSelect;
  * Class CleanCartTask
  * Cleanup discarded tasks
  *
+ * @deprecated after version 1.1.5 the custom fields where moved to UserFields.
  * @package Broarm\EventTickets
  */
 class MigrateAttendeeFieldsTask extends BuildTask
 {
     protected $title = 'Migrate attendee fields task';
 
-    protected $description = 'Moves the attendee fields from the model to relations. This enables the custom fields feature';
+    protected $description = 'Moves the attendee fields from the model to relations. This enables the custom fields feature from version 1.1.5';
+
+    protected $enabled = false;
 
     /**
      * @param \SS_HTTPRequest $request
@@ -67,7 +70,7 @@ class MigrateAttendeeFieldsTask extends BuildTask
         if ($event->Attendees()->exists()) {
             /** @var Attendee $attendee */
             foreach ($event->Attendees() as $attendee) {
-                /** @var AttendeeExtraField $field */
+                /** @var UserField $field */
                 foreach ($event->Fields() as $field) {
                     $q = SQLSelect::create(
                         $field->FieldName,

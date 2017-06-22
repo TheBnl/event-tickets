@@ -70,13 +70,22 @@ class Attendee extends DataObject
 
     private static $default_fields = array(
         'FirstName' => array(
-            'FieldType' => 'TextField'
+            'Title' => 'First name',
+            'FieldType' => 'UserTextField',
+            'Required' => true,
+            'Editable' => false
         ),
         'Surname' => array(
-            'FieldType' => 'TextField'
+            'Title' => 'Surname',
+            'FieldType' => 'UserTextField',
+            'Required' => true,
+            'Editable' => false
         ),
         'Email' => array(
-            'FieldType' => 'TextField'
+            'Title' => 'Email',
+            'FieldType' => 'UserEmailField',
+            'Required' => true,
+            'Editable' => false
         )
     );
 
@@ -106,7 +115,7 @@ class Attendee extends DataObject
     );
 
     private static $many_many = array(
-        'Fields' => 'Broarm\EventTickets\AttendeeExtraField'
+        'Fields' => 'Broarm\EventTickets\UserField'
     );
 
     private static $many_many_extraFields = array(
@@ -134,7 +143,7 @@ class Attendee extends DataObject
         foreach ($this->Fields() as $field) {
             $fields->addFieldToTab(
                 'Root.Main',
-                ReadonlyField::create("{$field->FieldName}_Preview", $field->Title, $field->getValue())
+                ReadonlyField::create("{$field->Name}_Preview", $field->Title, $field->getValue())
             );
         }
 
@@ -158,7 +167,7 @@ class Attendee extends DataObject
      */
     public function getFirstName()
     {
-        if ($firstName = $this->Fields()->find('FieldName', 'FirstName')) {
+        if ($firstName = $this->Fields()->find('Name', 'FirstName')) {
             return (string)$firstName->getField('Value');
         }
 
@@ -172,7 +181,7 @@ class Attendee extends DataObject
      */
     public function getSurname()
     {
-        if ($surname = $this->Fields()->find('FieldName', 'Surname')) {
+        if ($surname = $this->Fields()->find('Name', 'Surname')) {
             return (string)$surname->getField('Value');
         }
 
@@ -180,7 +189,7 @@ class Attendee extends DataObject
     }
 
     /**
-     * Get the combined first and last nave for dispay on the ticket and attendee list
+     * Get the combined first and last nave for display on the ticket and attendee list
      *
      * @return string
      */
@@ -203,7 +212,7 @@ class Attendee extends DataObject
      */
     public function getEmail()
     {
-        if ($email = $this->Fields()->find('FieldName', 'Email')) {
+        if ($email = $this->Fields()->find('Name', 'Email')) {
             return (string)$email->getField('Value');
         }
 

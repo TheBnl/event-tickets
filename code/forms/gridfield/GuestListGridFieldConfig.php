@@ -6,12 +6,12 @@ use CalendarEvent;
 use GridFieldConfig_RecordEditor;
 
 /**
- * Class GuestListGridField
+ * Class GuestListGridFieldConfig
  *
  * @author Bram de Leeuw
  * @package Broarm\EventTickets
  */
-class GuestListGridField extends GridFieldConfig_RecordEditor
+class GuestListGridFieldConfig extends GridFieldConfig_RecordEditor
 {
     public function __construct(CalendarEvent $event, $itemsPerPage = null)
     {

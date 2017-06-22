@@ -41,11 +41,11 @@ class AttendeeField extends CompositeField
         $children = FieldList::create();
         $savableFields = $attendee->Event()->Fields();
 
-        /** @var AttendeeExtraField $field */
+        /** @var UserField $field */
         foreach ($savableFields as $field) {
             // Generate a unique field name
             $fieldName = "{$this->name}[{$attendee->ID}][$field->ID]";
-
+            
             // Check if the field is required
             if ($field->Required && $required) {
                 $this->addRequiredField($fieldName);
@@ -58,7 +58,7 @@ class AttendeeField extends CompositeField
 
             // Pre fill the field if a member is logged in
             if ($main && empty($formField->value) && $member = Member::currentUser()) {
-                $formField->setValue($member->getField($field->FieldName));
+                $formField->setValue($member->getField($field->Name));
             }
 
             // Add the form

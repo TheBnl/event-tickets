@@ -61,7 +61,7 @@ class TicketExtension extends DataExtension
         'Reservations' => 'Broarm\EventTickets\Reservation.Event',
         'Attendees' => 'Broarm\EventTickets\Attendee.Event',
         'WaitingList' => 'Broarm\EventTickets\WaitingListRegistration.Event',
-        'Fields' => 'Broarm\EventTickets\AttendeeExtraField.Event'
+        'Fields' => 'Broarm\EventTickets\UserField.Event'
     );
 
     private static $defaults = array(
@@ -80,7 +80,7 @@ class TicketExtension extends DataExtension
         $ticketLabel = _t('TicketExtension.Tickets', 'Tickets');
         $fields->addFieldsToTab(
             "Root.$ticketLabel", array(
-            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), TicketsGridField::create($this->canCreateTickets())),
+            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), TicketsGridFieldConfig::create($this->canCreateTickets())),
             NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
             NumericField::create('OrderMin', _t('TicketExtension.OrderMin', 'Minimum amount of tickets required per reservation')),
             NumericField::create('OrderMax', _t('TicketExtension.OrderMax', 'Maximum amount of tickets allowed per reservation')),
@@ -102,7 +102,7 @@ class TicketExtension extends DataExtension
             $guestListLabel = _t('TicketExtension.GuestList', 'GuestList');
             $fields->addFieldToTab(
                 "Root.$guestListLabel",
-                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), GuestListGridField::create($this->owner))
+                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), GuestListGridFieldConfig::create($this->owner))
             );
         }
 
@@ -119,7 +119,7 @@ class TicketExtension extends DataExtension
         $extraFieldsLabel = _t('TicketExtension.ExtraFields', 'Attendee fields');
         $fields->addFieldToTab(
             "Root.$extraFieldsLabel",
-            GridField::create('WaitingList', $extraFieldsLabel, $this->owner->Fields(), GridFieldConfig_Fields::create())
+            GridField::create('WaitingList', $extraFieldsLabel, $this->owner->Fields(), UserFieldsGridFieldConfig::create())
         );
 
         $this->owner->extend('updateTicketExtensionFields', $fields);
@@ -141,8 +141,8 @@ class TicketExtension extends DataExtension
     {
         $fields = Attendee::config()->get('default_fields');
         if (!$this->owner->Fields()->exists()) {
-            foreach ($fields as $fieldName => $fieldConfig) {
-                $field = AttendeeExtraField::createFromConfig($fieldName, $fieldConfig);
+            foreach ($fields as $fieldName => $config) {
+                $field = UserField::createDefaultField($fieldName, $config);
                 $this->owner->Fields()->add($field);
             }
         }
