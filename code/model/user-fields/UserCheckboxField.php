@@ -9,17 +9,9 @@
 class UserCheckboxField extends Broarm\EventTickets\UserField
 {
     /**
-     * Create a default text field
-     *
-     * @param string $fieldName
-     * @param null   $defaultValue
-     *
-     * @return CheckboxField
+     * @var CheckboxField
      */
-    public function createField($fieldName, $defaultValue = null)
-    {
-        return CheckboxField::create($fieldName, $this->Title, $defaultValue);
-    }
+    protected $fieldType = 'CheckboxField';
 
     /**
      * Get the value in a readable manner

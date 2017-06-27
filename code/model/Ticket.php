@@ -8,6 +8,7 @@
 
 namespace Broarm\EventTickets;
 
+use CalendarDateTime;
 use CalendarEvent;
 use CalendarEvent_Controller;
 use DataObject;
@@ -16,6 +17,7 @@ use DateField;
 use FieldList;
 use LiteralField;
 use NumericField;
+use SS_Datetime;
 use Tab;
 use TabSet;
 use TextField;
@@ -42,6 +44,14 @@ class Ticket extends DataObject
      * @var string
      */
     private static $sale_start_threshold = '-1 week';
+
+    /**
+     * The default sale end date
+     * This defaults to the event start date time '-12 hours'
+     *
+     * @var string
+     */
+    private static $sale_end_threshold = '-12 hours';
 
     private static $db = array(
         'Title' => 'Varchar(255)',
@@ -141,7 +151,10 @@ class Ticket extends DataObject
         if ($this->AvailableTillDate) {
             return $this->dbObject('AvailableTillDate');
         } elseif ($startDate = $this->getEventStartDate()) {
-            return $startDate;
+            $till = strtotime(self::config()->get('sale_end_threshold'), strtotime($startDate->Nice()));
+            $date = SS_Datetime::create();
+            $date->setValue(date('Y-m-d H:i:s', $till));
+            return $date;
         }
 
         return null;
@@ -210,8 +223,13 @@ class Ticket extends DataObject
      */
     private function getEventStartDate()
     {
-        if ($this->Event()->getController()->CurrentDate()->exists()) {
-            return $this->Event()->getController()->CurrentDate()->obj('StartDate');
+        $currentDate = $this->Event()->getController()->CurrentDate();
+        if ($currentDate->exists()) {
+            $date = $currentDate->obj('StartDate')->Format('Y-m-d');
+            $time = $currentDate->obj('StartTime')->Format('H:i:s');
+            $dateTime = SS_Datetime::create();
+            $dateTime->setValue("$date $time");
+            return $dateTime;
         } else {
             return null;
         }

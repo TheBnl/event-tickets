@@ -9,15 +9,7 @@
 class UserEmailField extends Broarm\EventTickets\UserField
 {
     /**
-     * Create a default text field
-     *
-     * @param string $fieldName
-     * @param null   $defaultValue
-     *
-     * @return EmailField
+     * @var FormField
      */
-    public function createField($fieldName, $defaultValue = null)
-    {
-        return EmailField::create($fieldName, $this->Title, $defaultValue);
-    }
+    protected $fieldType = 'EmailField';
 }

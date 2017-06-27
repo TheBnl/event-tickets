@@ -11,6 +11,11 @@
  */
 class UserDateField extends Broarm\EventTickets\UserField
 {
+    /**
+     * @var DateField
+     */
+    protected $fieldType = 'DateField';
+
     private static $db = array(
         'MinDate' => 'Date',
         'MaxDate' => 'Date'
@@ -33,11 +38,12 @@ class UserDateField extends Broarm\EventTickets\UserField
      * @param string $fieldName
      * @param null   $defaultValue
      *
-     * @return TextField
+     * @return DateField
      */
     public function createField($fieldName, $defaultValue = null)
     {
-        $dateField = DateField::create($fieldName, $this->Title, $defaultValue);
+        /** @var DateField $dateField */
+        $dateField = parent::createField($fieldName, $defaultValue);
 
         if ($this->MinDate) {
             $dateField->setConfig('min', $this->dbObject('MinDate')->Format('Y-m-d'));

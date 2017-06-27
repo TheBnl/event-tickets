@@ -34,6 +34,11 @@ use TextField;
 class UserField extends DataObject
 {
     /**
+     * @var FormField
+     */
+    protected $fieldType = 'FormField';
+
+    /**
      * Field name to be used in the AttendeeField (Composite field)
      *
      * @see AttendeeField::__construct()
@@ -67,7 +72,7 @@ class UserField extends DataObject
     );
 
     private static $summary_fields = array(
-        'ClassName' => 'FieldType',
+        'singular_name' => 'FieldType',
         'Title' => 'Title',
         'Required.Nice' => 'Required'
     );
@@ -158,7 +163,10 @@ class UserField extends DataObject
      */
     public function createField($fieldName, $defaultValue = null)
     {
-        return null;
+        $fieldType = $this->fieldType;
+        $field = $fieldType::create($fieldName, $this->Title, $defaultValue);
+        $this->extend('updateCreateField', $field);
+        return $field;
     }
 
     /**
@@ -169,7 +177,7 @@ class UserField extends DataObject
     public function singular_name()
     {
         $name = explode('\\', parent::singular_name());
-        return trim(end($name));
+        return trim(str_replace('User', '', end($name)));
     }
 
     public function canView($member = null)

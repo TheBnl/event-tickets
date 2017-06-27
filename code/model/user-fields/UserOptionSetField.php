@@ -11,6 +11,11 @@ use Broarm\EventTickets\UserOptionSetFieldGridFieldConfig;
  */
 class UserOptionSetField extends Broarm\EventTickets\UserField
 {
+    /**
+     * @var OptionsetField
+     */
+    protected $fieldType = 'OptionsetField';
+
     private static $has_many = array(
         'Options' => 'Broarm\EventTickets\UserFieldOption'
     );
@@ -38,7 +43,11 @@ class UserOptionSetField extends Broarm\EventTickets\UserField
      */
     public function createField($fieldName, $defaultValue = null)
     {
-        return OptionsetField::create($fieldName, $this->Title, $this->Options()->map()->toArray(), $defaultValue);
+        /** @var OptionsetField $field */
+        $field = parent::createField($fieldName, $defaultValue);
+        $field->setSource($this->Options()->map()->toArray());
+        $field->setValue($defaultValue);
+        return $field;
     }
 
     /**
