@@ -224,7 +224,7 @@ class Ticket extends DataObject
     private function getEventStartDate()
     {
         $currentDate = $this->Event()->getController()->CurrentDate();
-        if ($currentDate->exists()) {
+        if ($currentDate && $currentDate->exists()) {
             $date = $currentDate->obj('StartDate')->Format('Y-m-d');
             $time = $currentDate->obj('StartTime')->Format('H:i:s');
             $dateTime = SS_Datetime::create();
