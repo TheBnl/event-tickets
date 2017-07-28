@@ -12,6 +12,7 @@ use FieldList;
 use FormAction;
 use GatewayErrorMessage;
 use Payment;
+use RequiredFields;
 use SilverStripe\Omnipay\GatewayInfo;
 use TextareaField;
 
@@ -32,14 +33,19 @@ class SummaryForm extends FormStep
         $fields = FieldList::create(
             SummaryField::create('Summary', '', $this->reservation = $reservation, true),
             TextareaField::create('Comments', _t('SummaryForm.COMMENTS', 'Comments')),
-            PaymentGatewayField::create()
+            PaymentGatewayField::create(),
+            TermsAndConditionsField::create('AgreeToTermsAndConditions')
         );
 
         $actions = FieldList::create(
             FormAction::create('makePayment', _t('ReservationForm.PAYMENT', 'Continue to payment'))
         );
 
-        parent::__construct($controller, $name, $fields, $actions);
+        $validator = RequiredFields::create(array(
+            'AgreeToTermsAndConditions'
+        ));
+
+        parent::__construct($controller, $name, $fields, $actions, $validator);
 
         // check if there is an error message and show it
         if ($error = $this->getPaymentErrorMessage()) {
@@ -71,10 +77,11 @@ class SummaryForm extends FormStep
             }
         }
 
+        $form->saveInto($form->reservation);
         // If comments are added
-        if (isset($data['Comments'])) {
-            $form->reservation->Comments = $data['Comments'];
-        }
+        //if (isset($data['Comments'])) {
+        //    $form->reservation->Comments = $data['Comments'];
+        //}
 
         // Hook trough where optional extra field data can be saved on the reservation
         $this->extend('updateReservationBeforePayment', $form->reservation, $data, $form);

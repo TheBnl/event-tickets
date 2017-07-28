@@ -10,6 +10,7 @@ namespace Broarm\EventTickets;
 
 use BetterButtonCustomAction;
 use CalendarEvent;
+use CheckboxField;
 use Config;
 use DataObject;
 use DropdownField;
@@ -83,6 +84,7 @@ class Reservation extends DataObject
         'Total' => 'Currency',
         'Gateway' => 'Varchar(255)',
         'Comments' => 'Text',
+        'AgreeToTermsAndConditions' => 'Boolean',
         'ReservationCode' => 'Varchar(255)'
     );
 
@@ -134,6 +136,7 @@ class Reservation extends DataObject
             ReadonlyField::create('GateWayNice', _t('Reservation.Gateway', 'Gateway')),
             ReadonlyField::create('Total', _t('Reservation.Total', 'Total')),
             ReadonlyField::create('Comments', _t('Reservation.Comments', 'Comments')),
+            CheckboxField::create('AgreeToTermsAndConditions', _t('Reservation.AgreeToTermsAndConditions', 'Agreed to terms and conditions'))->performReadonlyTransformation(),
             GridField::create('Attendees', 'Attendees', $this->Attendees(), $gridFieldConfig),
             GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig)
         ));

@@ -12,6 +12,7 @@ use DataExtension;
 use FieldList;
 use HtmlEditorField;
 use SiteConfig;
+use TreeDropdownField;
 use UploadField;
 
 /**
@@ -24,6 +25,7 @@ use UploadField;
  * @property string                             SuccessMessageMail
  *
  * @method \Image TicketLogo
+ * @method \Page TermsPage
  */
 class SiteConfigExtension extends DataExtension
 {
@@ -33,7 +35,8 @@ class SiteConfigExtension extends DataExtension
     );
 
     private static $has_one = array(
-        'TicketLogo' => 'Image'
+        'TicketLogo' => 'Image',
+        'TermsPage' => 'SiteTree'
     );
 
     private static $defaults = array(
@@ -43,6 +46,8 @@ class SiteConfigExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
+        $termsPage = new TreeDropdownField('TermsPageID', 'Terms and conditions to mention on checkout', 'SiteTree');
+
         $success = new HtmlEditorField('SuccessMessage', 'Success message');
         $success->setRows(4);
         $success->setDescription(_t(
@@ -63,6 +68,7 @@ class SiteConfigExtension extends DataExtension
         $uploadField->getValidator()->setAllowedExtensions(array('png', 'gif', 'jpg'));
 
         $fields->addFieldsToTab('Root.Tickets', array(
+            $termsPage,
             $success,
             $mail,
             $uploadField

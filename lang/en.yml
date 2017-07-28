@@ -82,6 +82,7 @@ en:
     PAID: 'Paid'
     CANCELED: 'Cancelled'
     RESEND: 'Send reservation'
+    AgreeToTermsAndConditions: 'Agreed to terms and conditions'
   ReservationForm:
     PAYMENT: 'Continue to payment'
   Attendee:
@@ -106,3 +107,6 @@ en:
     SUBTOTAL: 'Subtotal'
     TOTAL: 'Total'
     TICKET_RECEIVER_HELP: 'Send tickets to this person'
+  TermsAndConditionsField:
+    TERMS_CONDITIONS: 'I agree to the terms and conditions stated on the <a href="{link}" target="new" title="Read the shop terms and conditions for this site">{title}</a> page'
+    AGREE_TO_TERMS: 'You must agree to the terms and conditions'

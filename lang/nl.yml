@@ -83,6 +83,7 @@ nl:
     PAID: 'Betaald'
     CANCELED: 'Geannuleerd'
     RESEND: 'Verstuur reservering'
+    AgreeToTermsAndConditions: 'Akkoord met de algemene voorwaarden'
   ReservationForm:
     PAYMENT: 'Ga verder met betalen'
   Attendee:
@@ -107,3 +108,6 @@ nl:
     SUBTOTAL: 'Subtotaal'
     TOTAL: 'Totaal'
     TICKET_RECEIVER_HELP: 'Verstuur tickets naar deze persoon'
+  TermsAndConditionsField:
+    TERMS_CONDITIONS: 'Ik ga akkoord met de voorwaarden die vermeld staan op de <a href="{link}" target="new" title="Lees de algemene voorwaarden">{title}</a> pagina'
+    AGREE_TO_TERMS: 'U moet met de algemene voorwaarden akkoord gaan'
