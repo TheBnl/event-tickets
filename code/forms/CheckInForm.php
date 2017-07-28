@@ -51,14 +51,13 @@ class CheckInForm extends Form
                 $controller->redirect($controller->Link());
                 return false;
             case CheckInValidator::MESSAGE_CHECK_OUT_SUCCESS:
-                $validator->getAttendee()->CheckedIn = false;
+                $validator->getAttendee()->checkOut();
                 break;
             case CheckInValidator::MESSAGE_CHECK_IN_SUCCESS:
-                $validator->getAttendee()->CheckedIn = true;
+                $validator->getAttendee()->checkIn();
                 break;
         }
 
-        $validator->getAttendee()->write();
         $form->sessionMessage($result['Message'], strtolower($result['Type']), false);
         $controller->redirect($controller->Link());
         return true;

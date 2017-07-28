@@ -376,6 +376,22 @@ class Attendee extends DataObject
         return $file;
     }
 
+    /**
+     * Check the attendee out
+     */
+    public function checkIn() {
+        $this->CheckedIn = true;
+        $this->write();
+    }
+
+    /**
+     * Check the attendee in
+     */
+    public function checkOut() {
+        $this->CheckedIn = false;
+        $this->write();
+    }
+
     public function canView($member = null)
     {
         return $this->Reservation()->canView($member);
