@@ -20,6 +20,7 @@ nl:
   CheckInForm:
     TICKET_CODE: 'ticketnummer'
     CheckIn: 'Inchecken'
+    CheckOut: 'Uitchecken'
   CheckInValidator:
     MESSAGE_NO_CODE: 'Voer een ticketnummer in'
     MESSAGE_CODE_NOT_FOUND: 'Het ingevoerde ticketnummer is niet gevonden.'

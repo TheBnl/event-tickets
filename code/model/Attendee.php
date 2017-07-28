@@ -377,6 +377,16 @@ class Attendee extends DataObject
     }
 
     /**
+     * Get the checkin link
+     *
+     * @return string
+     */
+    public function getCheckInLink()
+    {
+        return $this->Event()->Link("checkin/{$this->TicketCode}");
+    }
+    
+    /**
      * Check the attendee out
      */
     public function checkIn() {

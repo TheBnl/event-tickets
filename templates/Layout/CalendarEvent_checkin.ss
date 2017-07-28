@@ -11,7 +11,7 @@
                 <th class="guest-list-table__header-col"><%t CheckIn.NAME_HEADER 'Name' %></th>
                 <th class="guest-list-table__header-col"><%t CheckIn.TICKET_HEADER 'Ticket' %></th>
                 <th class="guest-list-table__header-col"><%t CheckIn.TICKET_NUMBER_HEADER 'Ticket number' %></th>
-                <th class="guest-list-table__header-col"><%t CheckIn.CHECKED_IN_HEADER 'Checked in' %> $CheckedInCount</th>
+                <th class="guest-list-table__header-col" colspan="2"><%t CheckIn.CHECKED_IN_HEADER 'Checked in' %> $CheckedInCount</th>
             </tr>
             </thead>
             <tbody class="guest-list-table__body">
@@ -22,6 +22,11 @@
                     <td class="guest-list-table__body-col">$Ticket.Title</td>
                     <td class="guest-list-table__body-col">$TicketCode</td>
                     <td class="guest-list-table__body-col">$CheckedIn.Nice</td>
+                    <td class="guest-list-table__body-col">
+                        <a href="$CheckInLink" class="small button">
+                            <% if $CheckedIn %><%t CheckInForm.CheckOut 'Check out' %><% else %><%t CheckInForm.CheckIn 'Check in' %><% end_if %>
+                        </a>
+                    </td>
                 </tr>
                 <% end_loop %>
             </tbody>

@@ -23,7 +23,7 @@ class CheckInForm extends Form
         );
 
         $actions = FieldList::create(
-            FormAction::create('doCheckIn', _t('CheckInForm.CHECK_IN', 'Check in'))
+            FormAction::create('doCheckIn', _t('CheckInForm.CheckIn', 'Check in'))
         );
 
         $required = new RequiredFields(array('TicketCode'));
