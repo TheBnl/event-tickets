@@ -312,7 +312,7 @@ class Attendee extends DataObject
             $renderer->setWidth(256);
             $writer = new BaconQrCode\Writer($renderer);
             if (self::config()->get('qr_as_link')) {
-                $writer->writeFile($this->Event()->AbsoluteLink("checkin/$this->TicketCode"), $absoluteFilePath);
+                $writer->writeFile($this->getCheckInLink(), $absoluteFilePath);
             } else {
                 $writer->writeFile($this->TicketCode, $absoluteFilePath);
             }
@@ -383,7 +383,7 @@ class Attendee extends DataObject
      */
     public function getCheckInLink()
     {
-        return $this->Event()->Link("checkin/{$this->TicketCode}");
+        return $this->Event()->AbsoluteLink("checkin/{$this->TicketCode}");
     }
     
     /**
