@@ -72,6 +72,7 @@ class MigrateUserFieldsTask extends BuildTask
             $field = $class::create();
         }
 
+        $field->ClassName = self::mapFieldType($attendeeField->FieldType, $attendeeField->FieldName);
         $field->ID = $attendeeField->ID;
         $field->Name = $attendeeField->FieldName;
         $field->Title = $attendeeField->Title;
@@ -139,6 +140,7 @@ class MigrateUserFieldsTask extends BuildTask
         } else {
             return $types[$type];
         }
+
     }
 
     /**

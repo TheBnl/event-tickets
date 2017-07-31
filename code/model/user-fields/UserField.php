@@ -165,6 +165,7 @@ class UserField extends DataObject
     {
         $fieldType = $this->fieldType;
         $field = $fieldType::create($fieldName, $this->Title, $defaultValue);
+        $field->addExtraClass($this->ExtraClass);
         $this->extend('updateCreateField', $field);
         return $field;
     }
