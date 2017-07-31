@@ -1,10 +1,10 @@
 nl:
   Ticket:
-    TITLE_LABEL: 'Titel voor op de tiket'
-    PRICE_LABEL: 'Tiket prijs'
-    SALE_START_LABEL: 'Tiket verkoop begint vanaf'
+    TITLE_LABEL: 'Titel voor op het ticket'
+    PRICE_LABEL: 'Ticket prijs'
+    SALE_START_LABEL: 'Ticket verkoop begint vanaf'
     SALE_START_DESCRIPTION: 'Wanneer er geen datum is opgegeven word de volgende verkoopdatum gebruikt: {date}'
-    SALE_END_LABEL: 'Tiket verkoop eindigt op'
+    SALE_END_LABEL: 'Ticket verkoop eindigt op'
     SALE_END_DESCRIPTION: 'Wanneer er geen datum is opgegeven word de startdatum van het evenement gebruikt: {date}'
     AVAILABLE: 'Beschikbaar'
     UNAVAILABLE: 'Niet te koop'
