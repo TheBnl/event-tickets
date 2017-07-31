@@ -18,14 +18,12 @@ use FieldList;
 use File;
 use Folder;
 use Image;
-use LiteralField;
 use ManyManyList;
 use Member;
 use ReadonlyField;
 use SSViewer;
 use Tab;
 use TabSet;
-use TextField;
 use ViewableData;
 
 /**
@@ -137,7 +135,8 @@ class Attendee extends DataObject
 
         $fields->addFieldsToTab('Root.Main', array(
             ReadonlyField::create('TicketCode', _t('Attendee.Ticket', 'Ticket')),
-            ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
+            ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'),
+                $this->dbObject('CheckedIn')->Nice())
         ));
 
         foreach ($this->Fields() as $field) {
@@ -385,21 +384,30 @@ class Attendee extends DataObject
     {
         return $this->Event()->AbsoluteLink("checkin/{$this->TicketCode}");
     }
-    
+
     /**
      * Check the attendee out
      */
-    public function checkIn() {
+    public function checkIn()
+    {
         $this->CheckedIn = true;
         $this->write();
+    }
+
+    public function canCheckOut()
+    {
+        return CheckInValidator::config()->get('allow_checkout');
     }
 
     /**
      * Check the attendee in
      */
-    public function checkOut() {
-        $this->CheckedIn = false;
-        $this->write();
+    public function checkOut()
+    {
+        if ($this->canCheckOut()) {
+            $this->CheckedIn = false;
+            $this->write();
+        }
     }
 
     public function canView($member = null)

@@ -24,7 +24,11 @@
                     <td class="guest-list-table__body-col">$CheckedIn.Nice</td>
                     <td class="guest-list-table__body-col">
                         <a href="$CheckInLink" class="small button">
-                            <% if $CheckedIn %><%t CheckInForm.CheckOut 'Check out' %><% else %><%t CheckInForm.CheckIn 'Check in' %><% end_if %>
+                            <% if $CheckedIn && $canCheckOut %>
+                                <%t CheckInForm.CheckOut 'Check out' %>
+                            <% else %>
+                                <%t CheckInForm.CheckIn 'Check in' %>
+                            <% end_if %>
                         </a>
                     </td>
                 </tr>
