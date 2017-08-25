@@ -189,8 +189,8 @@ class Reservation extends DataObject
         }
 
         // Remove the folder
-        if ($this->fileFolder()->exists()) {
-            $this->fileFolder()->delete();
+        if (($folder = Folder::get()->find('Name', $this->ReservationCode)) && $folder->exists() && $folder->isEmpty()) {
+            $folder->delete();
         }
 
         parent::onBeforeDelete();
