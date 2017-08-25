@@ -43,13 +43,13 @@ class PreviewTicketTask extends BuildTask
         $url = Director::absoluteURL("dev/{$params['Action']}/{$params['TaskName']}", true);
 
         if ($preview && in_array($preview, $this->previews)) {
-            $reservation = Reservation::get()->filter('TicketFileID:not', 0)->last();
-
+            //$reservation = Reservation::get()->filter('ReservationCode:not', 'NULL')->last();
+            $attendee = Attendee::get()->filter('TicketFileID:not', 0)->last();
 
             switch ($preview) {
                 case 'AttendeeMail':
                 case 'PrintableTicket':
-                    $data = $reservation->Attendees()->first();
+                    $data = $attendee;
                     $template = new SSViewer($preview);
                     $html = $template->process($data);
                     echo $html->getValue();
@@ -58,7 +58,7 @@ class PreviewTicketTask extends BuildTask
                 // TODO: preview in a iframe ?
                 default:
                     $template = new SSViewer($preview);
-                    $html = $template->process($reservation);
+                    $html = $template->process($attendee->Reservation());
                     \Requirements::block('app.css');
                     echo $html->getValue();
             }
