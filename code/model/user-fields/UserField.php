@@ -72,9 +72,9 @@ class UserField extends DataObject
     );
 
     private static $summary_fields = array(
-        'singular_name' => 'FieldType',
+        'singular_name' => 'Type of field',
         'Title' => 'Title',
-        'Required.Nice' => 'Required'
+        'RequiredNice' => 'Required field'
     );
 
     private static $translate = array(
@@ -86,7 +86,7 @@ class UserField extends DataObject
     {
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));
         $fields->addFieldsToTab('Root.Main', array(
-            ReadonlyField::create('FieldType', 'Field type', $this->ClassName),
+            ReadonlyField::create('PreviewFieldType', 'Field type', $this->ClassName),
             ReadonlyField::create('Name', _t('AttendeeExtraField.Name', 'Name for this field')),
             TextField::create('Title', _t('AttendeeExtraField.Title', 'Field label or question')),
             TextField::create('ExtraClass', _t('AttendeeExtraField.ExtraClass', 'Add an extra class to the field')),
@@ -115,6 +115,19 @@ class UserField extends DataObject
         }
 
         parent::onBeforeWrite();
+    }
+
+    /**
+     * Show if the field is required in a nice format
+     *
+     * BUGFIX Using the shorthand Required.Nice in the summary_fields
+     * made the fields, that were required (true), be set to (false)
+     *
+     * @return mixed
+     */
+    public function getRequiredNice()
+    {
+        return $this->dbObject('Required')->Nice();
     }
 
     /**

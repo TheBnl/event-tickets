@@ -119,7 +119,7 @@ class TicketExtension extends DataExtension
         $extraFieldsLabel = _t('TicketExtension.ExtraFields', 'Attendee fields');
         $fields->addFieldToTab(
             "Root.$extraFieldsLabel",
-            GridField::create('WaitingList', $extraFieldsLabel, $this->owner->Fields(), UserFieldsGridFieldConfig::create())
+            GridField::create('ExtraFields', $extraFieldsLabel, $this->owner->Fields(), UserFieldsGridFieldConfig::create())
         );
 
         $this->owner->extend('updateTicketExtensionFields', $fields);
