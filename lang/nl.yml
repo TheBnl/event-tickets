@@ -8,6 +8,8 @@ nl:
     SALE_END_DESCRIPTION: 'Wanneer er geen datum is opgegeven word de startdatum van het evenement gebruikt: {date}'
     AVAILABLE: 'Beschikbaar'
     UNAVAILABLE: 'Niet te koop'
+    OrderMin: 'Minimum te bestellen amount of tickets from this type'
+    OrderMax: 'Maximum allowed amount of tickets from this type'
   CheckoutSteps:
     TICKETS_FOR: 'Tickets voor {event}'
     HAVE_FUN_AT: 'Veel plezier bij {event}'

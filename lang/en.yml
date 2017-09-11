@@ -8,6 +8,8 @@ en:
     SALE_END_DESCRIPTION: 'When no date is given the start date of the event will be used: {date}'
     AVAILABLE: 'Available'
     UNAVAILABLE: 'Not for sale'
+    OrderMin: 'Minimum allowed amount of tickets from this type'
+    OrderMax: 'Maximum allowed amount of tickets from this type'
   CheckoutSteps:
     TICKETS_FOR: 'Tickets for {event}'
     HAVE_FUN_AT: 'Have fun at {event}'

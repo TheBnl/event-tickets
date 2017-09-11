@@ -12,11 +12,7 @@ use CalendarEvent_Controller;
 use DataExtension;
 use FieldList;
 use GridField;
-use GridFieldAddNewButton;
 use GridFieldConfig_RecordEditor;
-use GridFieldDataColumns;
-use GridFieldExportButton;
-use GridFieldSortableHeader;
 use HasManyList;
 use HtmlEditorField;
 use LiteralField;
@@ -65,9 +61,7 @@ class TicketExtension extends DataExtension
     );
 
     private static $defaults = array(
-        'Capacity' => 50,
-        'OrderMin' => 1,
-        'OrderMax' => 5
+        'Capacity' => 50
     );
 
     private static $translate = array(
@@ -82,8 +76,6 @@ class TicketExtension extends DataExtension
             "Root.$ticketLabel", array(
             GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), TicketsGridFieldConfig::create($this->canCreateTickets())),
             NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
-            NumericField::create('OrderMin', _t('TicketExtension.OrderMin', 'Minimum amount of tickets required per reservation')),
-            NumericField::create('OrderMax', _t('TicketExtension.OrderMax', 'Maximum amount of tickets allowed per reservation')),
             HtmlEditorField::create('SuccessMessage', _t('TicketExtension.SuccessMessage', 'Success message'))->setRows(4),
             HtmlEditorField::create('SuccessMessageMail', _t('TicketExtension.MailMessage', 'Mail message'))->setRows(4)
         ));

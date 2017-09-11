@@ -66,7 +66,7 @@ class TicketsField extends FormField
         foreach ($this->getTickets() as $ticket) {
             /** @var Ticket $ticket */
             $fieldName = $this->name . "[{$ticket->ID}][Amount]";
-            $range = range($ticket->Event()->OrderMin, $ticket->Event()->OrderMax);
+            $range = range($ticket->OrderMin, $ticket->OrderMax);
 
             $ticket->AmountField = DropdownField::create($fieldName, 'Amount', array_combine($range, $range))
                 ->setHasEmptyDefault(true)
@@ -74,12 +74,12 @@ class TicketsField extends FormField
 
             // Set the first to hold the minimum
             if ($this->getTickets()->count() === 1) {
-                $ticket->AmountField->setValue($ticket->Event()->OrderMin);
+                $ticket->AmountField->setValue($ticket->OrderMin);
             }
 
             $availability = $ticket->Event()->getAvailability();
-            if ($availability < $ticket->Event()->OrderMax) {
-                $disabled = range($availability + 1, $ticket->Event()->OrderMax);
+            if ($availability < $ticket->OrderMax) {
+                $disabled = range($availability + 1, $ticket->OrderMax);
                 $ticket->AmountField->setDisabledItems(array_combine($disabled, $disabled));
             }
 

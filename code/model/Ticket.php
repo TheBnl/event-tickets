@@ -29,6 +29,8 @@ use TextField;
  *
  * @property string       Title
  * @property float        Price
+ * @property int          OrderMin
+ * @property int          OrderMax
  * @property string       AvailableFromDate
  * @property string       AvailableTillDate
  * @property NumericField AmountField the amount field is set on the TicketForm
@@ -58,6 +60,8 @@ class Ticket extends DataObject
         'Price' => 'Currency',
         'AvailableFromDate' => 'Date',
         'AvailableTillDate' => 'Date',
+        'OrderMin' => 'Int',
+        'OrderMax' => 'Int',
         'Sort' => 'Int'
     );
 
@@ -65,6 +69,11 @@ class Ticket extends DataObject
 
     private static $has_one = array(
         'Event' => 'CalendarEvent'
+    );
+
+    private static $defaults = array(
+        'OrderMin' => 1,
+        'OrderMax' => 5
     );
 
     private static $summary_fields = array(
@@ -88,7 +97,9 @@ class Ticket extends DataObject
             NumericField::create('Price', _t('Ticket.PRICE_LABEL', 'Ticket price')),
             $saleStart = DateField::create('AvailableFromDate',
                 _t('Ticket.SALE_START_LABEL', 'Ticket sale starts from')),
-            $saleEnd = DateField::create('AvailableTillDate', _t('Ticket.SALE_END_LABEL', 'Ticket sale ends on'))
+            $saleEnd = DateField::create('AvailableTillDate', _t('Ticket.SALE_END_LABEL', 'Ticket sale ends on')),
+            NumericField::create('OrderMin', _t('Ticket.OrderMin', 'Minimum allowed amount of tickets from this type')),
+            NumericField::create('OrderMax', _t('Ticket.OrderMax', 'Maximum allowed amount of tickets from this type'))
         ));
 
         $saleStart->setConfig('showcalendar', true);

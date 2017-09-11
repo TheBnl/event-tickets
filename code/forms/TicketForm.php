@@ -35,7 +35,6 @@ class TicketForm extends FormStep
     public function __construct($controller, $name, DataList $tickets = null, CalendarEvent $event = null)
     {
         $this->event = $event;
-        
         $fields = FieldList::create(
             TicketsField::create('Tickets', '', $this->tickets = $tickets)
         );
