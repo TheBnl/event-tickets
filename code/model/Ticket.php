@@ -165,7 +165,7 @@ class Ticket extends DataObject
      *
      * @return bool
      */
-    private function validateDate()
+    public function validateDate()
     {
         if ($this->getAvailableFrom() && $this->getAvailableTill()) {
             if ($this->getAvailableFrom()->InPast() && $this->getAvailableTill()->InFuture()) {
