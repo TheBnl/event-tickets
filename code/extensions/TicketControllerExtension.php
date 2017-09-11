@@ -49,7 +49,7 @@ class TicketControllerExtension extends Extension
      */
     public function WaitingListRegistrationForm()
     {
-        if ($this->owner->Tickets()->count()) {
+        if ($this->owner->Tickets()->count() && !$this->owner->getEventExpired()) {
             return new WaitingListRegistrationForm($this->owner, 'WaitingListRegistrationForm');
         } else {
             return null;

@@ -173,6 +173,21 @@ class TicketExtension extends DataExtension
     }
 
     /**
+     * Check if the event is expired, either by unavailable tickets or because the date has passed
+     *
+     * @return bool
+     */
+    public function getEventExpired()
+    {
+        $expired = true;
+        /** @var Ticket $ticket */
+        foreach ($this->owner->Tickets() as $ticket) {
+            $expired = (!$ticket->validateDate() && $expired);
+        }
+        return $expired;
+    }
+
+    /**
      * Get only the attendees who are certain to attend
      * Fixme: Using callback filter instead of join, because join gives ambiguous error on 'EventID'
      *
