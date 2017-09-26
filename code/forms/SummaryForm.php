@@ -37,7 +37,7 @@ class SummaryForm extends FormStep
             TermsAndConditionsField::create('AgreeToTermsAndConditions')
         );
 
-        $paymentLabel = $reservation->Total === 0
+        $paymentLabel = $reservation->Total == 0
             ? _t('ReservationForm.RESERVE', 'Reserve tickets')
             : _t('ReservationForm.PAYMENT', 'Continue to payment');
 
