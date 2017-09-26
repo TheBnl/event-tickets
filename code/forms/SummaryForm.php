@@ -37,8 +37,12 @@ class SummaryForm extends FormStep
             TermsAndConditionsField::create('AgreeToTermsAndConditions')
         );
 
+        $paymentLabel = $reservation->Total === 0
+            ? _t('ReservationForm.RESERVE', 'Reserve tickets')
+            : _t('ReservationForm.PAYMENT', 'Continue to payment');
+
         $actions = FieldList::create(
-            FormAction::create('makePayment', _t('ReservationForm.PAYMENT', 'Continue to payment'))
+            FormAction::create('makePayment', $paymentLabel)
         );
 
         $validator = RequiredFields::create(array(

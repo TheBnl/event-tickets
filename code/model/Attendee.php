@@ -160,6 +160,16 @@ class Attendee extends DataObject
     }
 
     /**
+     * todo Extend the get field property to lookup data from the User field set
+     *
+     * @param string $field
+     *
+     * @return mixed|string
+     * /
+    public function getField($field)
+    {} //*/
+
+    /**
      * Utility method for fetching the default field, FirstName, value
      *
      * @return string

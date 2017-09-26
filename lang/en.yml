@@ -87,6 +87,7 @@ en:
     AgreeToTermsAndConditions: 'Agreed to terms and conditions'
   ReservationForm:
     PAYMENT: 'Continue to payment'
+    RESERVE: 'Reserve tickets'
   Attendee:
     Ticket: 'Ticket'
     Title: 'Name'
