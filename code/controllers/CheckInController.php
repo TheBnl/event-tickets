@@ -69,7 +69,7 @@ class CheckInController extends Page_Controller implements PermissionProvider
      */
     public function getCheckedInCount()
     {
-        $attendees = $this->Attendees();
+        $attendees = $this->getGuestList();
         $checkedIn = $attendees->filter('CheckedIn', true)->count();
         return "($checkedIn/{$attendees->count()})";
     }
