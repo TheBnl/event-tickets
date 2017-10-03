@@ -173,13 +173,17 @@ class Ticket extends DataObject
 
     /**
      * Validate if the start and end date are in the past and the future
+     * todo check start time and treshhold
      *
      * @return bool
      */
     public function validateDate()
     {
         if ($this->getAvailableFrom() && $this->getAvailableTill()) {
-            if ($this->getAvailableFrom()->InPast() && $this->getAvailableTill()->InFuture()) {
+            if (
+                $this->getAvailableFrom()->InPast() &&
+                ($this->getAvailableTill()->InFuture() || $this->getAvailableTill()->IsToday())
+            ) {
                 return true;
             }
         }
