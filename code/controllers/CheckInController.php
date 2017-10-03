@@ -36,7 +36,7 @@ class CheckInController extends Page_Controller implements PermissionProvider
     {
         $params = $this->getURLParams();
         $success = $this->getRequest()->getVar('success');
-        
+
         // Check if the current user has permissions to check in guest
         if (!Permission::check('HANDLE_CHECK_IN')) {
             Security::permissionFailure();

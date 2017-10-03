@@ -62,5 +62,4 @@ class CheckInForm extends Form
         $controller->redirect($controller->Link());
         return true;
     }
-
 }
