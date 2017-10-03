@@ -14,6 +14,7 @@ use CalendarEvent_Controller;
 use DataObject;
 use Date;
 use DateField;
+use DatetimeField;
 use FieldList;
 use LiteralField;
 use NumericField;
@@ -58,8 +59,8 @@ class Ticket extends DataObject
     private static $db = array(
         'Title' => 'Varchar(255)',
         'Price' => 'Currency',
-        'AvailableFromDate' => 'Date',
-        'AvailableTillDate' => 'Date',
+        'AvailableFromDate' => 'SS_DateTime',
+        'AvailableTillDate' => 'SS_DateTime',
         'OrderMin' => 'Int',
         'OrderMax' => 'Int',
         'Sort' => 'Int'
@@ -95,25 +96,25 @@ class Ticket extends DataObject
         $fields->addFieldsToTab('Root.Main', array(
             TextField::create('Title', _t('Ticket.TITLE_LABEL', 'Title for the ticket')),
             NumericField::create('Price', _t('Ticket.PRICE_LABEL', 'Ticket price')),
-            $saleStart = DateField::create('AvailableFromDate',
+            $saleStart = DatetimeField::create('AvailableFromDate',
                 _t('Ticket.SALE_START_LABEL', 'Ticket sale starts from')),
-            $saleEnd = DateField::create('AvailableTillDate', _t('Ticket.SALE_END_LABEL', 'Ticket sale ends on')),
+            $saleEnd = DatetimeField::create('AvailableTillDate', _t('Ticket.SALE_END_LABEL', 'Ticket sale ends on')),
             NumericField::create('OrderMin', _t('Ticket.OrderMin', 'Minimum allowed amount of tickets from this type')),
             NumericField::create('OrderMax', _t('Ticket.OrderMax', 'Maximum allowed amount of tickets from this type'))
         ));
 
-        $saleStart->setConfig('showcalendar', true);
+        $saleStart->getDateField()->setConfig('showcalendar', true);
         $saleStart->setDescription(_t(
             'Ticket.SALE_START_DESCRIPTION',
             'If no date is given the following date will be used: {date}', null,
             array('date' => $this->getAvailableFrom()->Nice())
         ));
 
-        $saleEnd->setConfig('showcalendar', true);
+        $saleEnd->getDateField()->setConfig('showcalendar', true);
         $saleEnd->setDescription(_t(
             'Ticket.SALE_END_DESCRIPTION',
             'If no date is given the event start date will be used: {date}', null,
-            array('date' => $this->getAvailableTill()->Nice())
+            array('date' => $this->getEventStartDate()->Nice())
         ));
 
         $this->extend('updateCMSFields', $fields);
@@ -179,13 +180,13 @@ class Ticket extends DataObject
      */
     public function validateDate()
     {
-        if ($this->getAvailableFrom() && $this->getAvailableTill()) {
-            if (
-                $this->getAvailableFrom()->InPast() &&
-                ($this->getAvailableTill()->InFuture() || $this->getAvailableTill()->IsToday())
-            ) {
-                return true;
-            }
+        if (
+            ($from = $this->getAvailableFrom()) &&
+            ($till = $this->getAvailableTill()) &&
+            $from->InPast() &&
+            $till->InFuture()
+        ) {
+            return true;
         }
 
         return false;

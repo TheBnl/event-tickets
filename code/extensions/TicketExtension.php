@@ -184,6 +184,7 @@ class TicketExtension extends DataExtension
         foreach ($this->owner->Tickets() as $ticket) {
             $expired = (!$ticket->validateDate() && $expired);
         }
+        
         return $expired;
     }
 
