@@ -39,6 +39,7 @@ nl:
     MAKE_RESERVATION: 'Reserveer tickets'
     WAITINGLIST_INTRO: 'Het evenement is uitverkocht. U kunt zich hieronder inschrijven om op de hoogte te worden gehouden wanneer er plaatsen vrijkomen.'
     WAITINGLIST_SUCCESS: 'Bedankt voor uw inschrijving, wij houden u op de hoogte zodra er een plekken beschikbaar komen.'
+    EXPIRED: 'Het evenement is afgelopen.'
   TicketsField:
     TICKETS: 'Tickets'
     PRICE: 'Prijs'
