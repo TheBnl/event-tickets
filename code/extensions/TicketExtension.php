@@ -179,12 +179,14 @@ class TicketExtension extends DataExtension
      */
     public function getEventExpired()
     {
-        $expired = true;
-        /** @var Ticket $ticket */
-        foreach ($this->owner->Tickets() as $ticket) {
-            $expired = (!$ticket->validateDate() && $expired);
+        $expired = false;
+        if (($tickets = $this->owner->Tickets()) && $expired = $tickets->exists()) {
+            /** @var Ticket $ticket */
+            foreach ($this->owner->Tickets() as $ticket) {
+                $expired = (!$ticket->validateDate() && $expired);
+            }
         }
-        
+
         return $expired;
     }
 
