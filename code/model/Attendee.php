@@ -99,6 +99,8 @@ class Attendee extends DataObject
         'CheckedIn' => 'Boolean'
     );
 
+    private static $default_sort = 'Created DESC';
+
     private static $indexes = array(
         'TicketCode' => 'unique("TicketCode")'
     );

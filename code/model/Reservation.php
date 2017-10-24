@@ -88,6 +88,8 @@ class Reservation extends DataObject
         'ReservationCode' => 'Varchar(255)'
     );
 
+    private static $default_sort = 'Created DESC';
+
     private static $has_one = array(
         'Event' => 'CalendarEvent',
         'MainContact' => 'Broarm\EventTickets\Attendee'
