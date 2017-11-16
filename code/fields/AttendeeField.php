@@ -72,7 +72,7 @@ class AttendeeField extends CompositeField
         $this->setChildren($children);
 
         // Add a hook to modify the added fields if needed
-        $this->extend('updateAttendeeField');
+        $this->extend('updateAttendeeField', $attendee, $main, $required);
     }
 
     /**

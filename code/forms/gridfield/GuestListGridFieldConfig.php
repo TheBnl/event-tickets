@@ -11,7 +11,7 @@ use GridFieldConfig_RecordEditor;
  * @author Bram de Leeuw
  * @package Broarm\EventTickets
  */
-class GuestListGridFieldConfig extends GridFieldConfig_RecordEditor
+class GuestListGridFieldConfig extends ReservationGridFieldConfig
 {
     public function __construct(CalendarEvent $event, $itemsPerPage = null)
     {
