@@ -137,7 +137,8 @@ class Attendee extends DataObject
      * @var array
      */
     private static $better_buttons_actions = array(
-        'sendTicket'
+        'sendTicket',
+        'createTicketFile'
     );
 
     public function getCMSFields()
@@ -181,6 +182,10 @@ class Attendee extends DataObject
         $fields = parent::getBetterButtonsActions();
         if ($this->TicketFile()->exists() && !empty($this->getEmail())) {
             $fields->push(BetterButtonCustomAction::create('sendTicket', _t('Attendee.SEND', 'Send the ticket')));
+        }
+
+        if (!empty($this->getName()) && !empty($this->getEmail())) {
+            $fields->push(BetterButtonCustomAction::create('createTicketFile', _t('Attendee.CREATE_TICKET', 'Create the ticket')));
         }
 
         return $fields;
@@ -227,14 +232,13 @@ class Attendee extends DataObject
         }
 
         if (
-            ($folder = $this->Reservation()->fileFolder())
-            && !empty($this->getEmail())
+            !empty($this->getEmail())
             && !empty($this->getName())
             && !$this->TicketFile()->exists()
             && !$this->TicketQRCode()->exists()
         ) {
-            $this->createQRCode($folder);
-            $this->createTicketFile($folder);
+            $this->createQRCode();
+            $this->createTicketFile();
         }
 
         if ($fields = $this->Fields()) {
@@ -265,6 +269,16 @@ class Attendee extends DataObject
         }
 
         parent::onBeforeDelete();
+    }
+
+    /**
+     * Create the folder for the qr code and ticket file
+     *
+     * @return Folder|DataObject|null
+     */
+    public function fileFolder()
+    {
+        return Folder::find_or_make("/event-tickets/{$this->Event()->URLSegment}/{$this->TicketCode}/");
     }
 
     /**
@@ -379,12 +393,11 @@ class Attendee extends DataObject
     /**
      * Create a QRCode for the attendee based on the Ticket code
      *
-     * @param Folder $folder
-     *
      * @return Image
      */
-    public function createQRCode(Folder $folder)
+    public function createQRCode()
     {
+        $folder = $this->fileFolder();
         $relativeFilePath = "/{$folder->Filename}{$this->TicketCode}.png";
         $absoluteFilePath = Director::baseFolder() . $relativeFilePath;
 
@@ -419,13 +432,12 @@ class Attendee extends DataObject
     /**
      * Creates a printable ticket for the attendee
      *
-     * @param Folder $folder
-     *
      * @return File
      */
-    public function createTicketFile(Folder $folder)
+    public function createTicketFile()
     {
         // Find or make a folder
+        $folder = $this->fileFolder();
         $relativeFilePath = "/{$folder->Filename}{$this->TicketCode}.pdf";
         $absoluteFilePath = Director::baseFolder() . $relativeFilePath;
 

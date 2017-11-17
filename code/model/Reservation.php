@@ -331,25 +331,14 @@ class Reservation extends DataObject
     }
 
     /**
-     * Create the folder for the qr code and ticket file
-     *
-     * @return Folder|DataObject|null
-     */
-    public function fileFolder()
-    {
-        return Folder::find_or_make("/event-tickets/{$this->ReservationCode}/");
-    }
-
-    /**
      * Generate the qr codes and downloadable pdf
      */
     public function createFiles()
     {
-        $folder = $this->fileFolder();
         /** @var Attendee $attendee */
         foreach ($this->Attendees() as $attendee) {
-            $attendee->createQRCode($folder);
-            $attendee->createTicketFile($folder);
+            $attendee->createQRCode();
+            $attendee->createTicketFile();
         }
     }
 
