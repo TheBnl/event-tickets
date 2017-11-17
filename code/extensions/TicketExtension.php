@@ -173,6 +173,45 @@ class TicketExtension extends DataExtension
     }
 
     /**
+     * Check if the tickets are still available
+     *
+     * @return bool
+     */
+    public function getTicketsAvailable()
+    {
+        return $this->owner->getAvailability() > 0;
+    }
+
+    /**
+     * Check if the tickets are sold out
+     * @return bool
+     */
+    public function getTicketsSoldOut()
+    {
+        return $this->owner->getAvailability() <= 0;
+    }
+
+    /**
+     * get The sale start date
+     *
+     * @return \SS_DateTime
+     */
+    public function getTicketSaleStartDate()
+    {
+        $saleStart = null;
+        if (($tickets = $this->owner->Tickets())) {
+            /** @var Ticket $ticket */
+            foreach ($this->owner->Tickets() as $ticket) {
+                if (($date = $ticket->getAvailableFrom()) && strtotime($date) < strtotime($saleStart) || $saleStart === null) {
+                    $saleStart = $date;
+                }
+            }
+        }
+
+        return $saleStart;
+    }
+
+    /**
      * Check if the event is expired, either by unavailable tickets or because the date has passed
      *
      * @return bool
@@ -188,6 +227,16 @@ class TicketExtension extends DataExtension
         }
 
         return $expired;
+    }
+
+    /**
+     * Check if the ticket sale is still pending
+     *
+     * @return bool
+     */
+    public function getTicketSalePending()
+    {
+        return time() < strtotime($this->owner->getTicketSaleStartDate());
     }
 
     /**

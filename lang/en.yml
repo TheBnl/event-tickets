@@ -38,6 +38,7 @@ en:
     MAKE_RESERVATION: 'Make a reservation'
     WAITINGLIST_INTRO: 'The event is sold out. You can subscribe to the waiting list in order to get notified when tickets come available.'
     WAITINGLIST_SUCCESS: 'Thank you for subscribing to our waiting list, you will hear from us when tickets come available.'
+    PENDING: 'Ticket sale starts from {date}.'
   TicketsField:
     TICKETS: 'Tickets'
     PRICE: 'Price'

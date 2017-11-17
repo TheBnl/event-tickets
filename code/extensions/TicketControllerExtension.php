@@ -33,7 +33,7 @@ class TicketControllerExtension extends Extension
      */
     public function TicketForm()
     {
-        if ($this->owner->Tickets()->count() && $this->owner->getAvailability() > 0) {
+        if ($this->owner->Tickets()->count() && $this->owner->getTicketsAvailable()) {
             $ticketForm = new TicketForm($this->owner, 'TicketForm', $this->owner->Tickets(), $this->owner->dataRecord);
             $ticketForm->setNextStep(CheckoutSteps::start());
             return $ticketForm;
@@ -49,7 +49,11 @@ class TicketControllerExtension extends Extension
      */
     public function WaitingListRegistrationForm()
     {
-        if ($this->owner->Tickets()->count() && !$this->owner->getEventExpired()) {
+        if (
+            $this->owner->Tickets()->count()
+            && $this->owner->getTicketsSoldOut()
+            && !$this->owner->getEventExpired()
+        ) {
             return new WaitingListRegistrationForm($this->owner, 'WaitingListRegistrationForm');
         } else {
             return null;
