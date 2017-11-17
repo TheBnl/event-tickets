@@ -239,8 +239,9 @@ class Attendee extends DataObject
 
         if ($fields = $this->Fields()) {
             foreach ($fields as $field) {
-                $value = $this->{"$field->Name[$field->ID]"};
-                $this->Fields()->add($field->ID, array('Value' => $value));
+                if ($value = $this->{"$field->Name[$field->ID]"}) {
+                    $this->Fields()->add($field->ID, array('Value' => $value));
+                }
             }
         }
 
@@ -347,7 +348,7 @@ class Attendee extends DataObject
         foreach (self::config()->get('table_fields') as $field) {
             $data = new ViewableData();
             $data->Header = _t("Attendee.$field", $field);
-            $data->Value = $this->$field;
+            $data->Value = $this->{$field};
             $fields->add($data);
         }
         return $fields;

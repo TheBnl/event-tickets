@@ -93,7 +93,7 @@ class ReservationForm extends FormStep
                     $attendee->setField($field, $value);
                 }
             }
-            
+
             $attendee->write();
 
             // Set the main contact
