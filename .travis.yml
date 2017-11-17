@@ -1,36 +1,64 @@
-# See https://github.com/silverstripe-labs/silverstripe-travis-support for setup details
 language: php
+
+dist: precise
+
 sudo: false
 
-php:
-  - 5.3
-
-env:
-  - DB=MYSQL CORE_RELEASE=3.1
+addons:
+  apt:
+    packages:
+      - tidy
 
 matrix:
   include:
-    - php: 5.5
-      env: DB=PGSQL CORE_RELEASE=3.1
-    - php: 5.6
-      env: DB=SQLITE CORE_RELEASE=3.2
-    - php: 5.6
-      env: DB=SQLITE CORE_RELEASE=3.4
-    - php: 5.6
-      env: DB=PGSQL CORE_RELEASE=master
+    - php: 5.3
+      env: DB=MYSQL
     - php: 5.4
-      env: DB=SQLITE CORE_RELEASE=3.1 COVERAGE=1
-  allow_failures:
-    - env: DB=PGSQL CORE_RELEASE=master
+      env: DB=PGSQL
+    - php: 5.5
+      env: DB=SQLITE
+    - php: 5.6
+      env: DB=MYSQL PDO=1
+    - php: 7.0
+      env: DB=MYSQL
+    - php: 7.1
+      env: DB=MYSQL PDO=1
+    - php: 5.6
+      env: DB=MYSQL BEHAT_TEST=1
+    - php: 7.0
+      env: DB=MYSQL CMS_TEST=1
+    - php: 7.0
+      env: DB=MYSQL BEHAT_TEST=1 CMS_TEST=1
 
 before_script:
-  - phpenv rehash
-  - composer self-update
-  - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
-  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
-  - cd ~/builds/ss
-  - composer install
+ - export CORE_RELEASE=$TRAVIS_BRANCH
+ - if ! [ $(phpenv version-name) = "5.3" ]; then printf "\n" | pecl install imagick; fi
+ - if [ $(phpenv version-name) = "5.3" ]; then printf "\n" | pecl install imagick-3.3.0; fi
+ - composer self-update || true
+ - phpenv rehash
+ - phpenv config-rm xdebug.ini
+ - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
+ - "if [ \"$BEHAT_TEST\" = \"\" ] && [ \"$CMS_TEST\" = \"\" ]; then php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss; fi"
+ - "if [ \"$BEHAT_TEST\" = \"1\" ] && [ \"$CMS_TEST\" = \"\" ]; then php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss --require silverstripe/behat-extension; fi"
+ - "if [ \"$BEHAT_TEST\" = \"\" ] && [ \"$CMS_TEST\" = \"1\" ]; then php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss --require silverstripe/cms:$CORE_RELEASE.x-dev; fi"
+ - "if [ \"$BEHAT_TEST\" = \"1\" ] && [ \"$CMS_TEST\" = \"1\" ]; then php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss --require silverstripe/behat-extension,silverstripe/cms:$CORE_RELEASE.x-dev; fi"
+ - cd ~/builds/ss
+ - php ~/travis-support/travis_setup_selenium.php --if-env BEHAT_TEST
+ - php ~/travis-support/travis_setup_php54_webserver.php --if-env BEHAT_TEST
 
-# TODO write actual tests to do
-#script:
-#  - vendor/bin/phpunit event-tickets/tests
+script:
+ - "if [ \"$BEHAT_TEST\" = \"\" ] && [ \"$CMS_TEST\" = \"\" ]; then vendor/bin/phpunit framework/tests; fi"
+ - "if [ \"$BEHAT_TEST\" = \"\" ] && [ \"$CMS_TEST\" = \"\" ]; then vendor/bin/phpunit framework/admin/tests; fi"
+ - "if [ \"$BEHAT_TEST\" = \"1\" ] && [ \"$CMS_TEST\" = \"\" ]; then vendor/bin/behat @framework; fi"
+ - "if [ \"$BEHAT_TEST\" = \"\" ] && [ \"$CMS_TEST\" = \"1\" ]; then vendor/bin/phpunit cms/tests; fi"
+ - "if [ \"$BEHAT_TEST\" = \"1\" ] && [ \"$CMS_TEST\" = \"1\" ]; then vendor/bin/behat @cms; fi"
+
+after_failure:
+ - php ~/travis-support/travis_upload_artifacts.php --if-env BEHAT_TEST,ARTIFACTS_KEY --target-path $TRAVIS_REPO_SLUG/$TRAVIS_BUILD_ID/$TRAVIS_JOB_ID --artifacts-base-url https://s3.amazonaws.com/$ARTIFACTS_BUCKET/
+
+branches:
+  except:
+    - 2.1
+    - 2.2
+    - 2.3
+    - translation-staging
