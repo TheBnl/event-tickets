@@ -16,6 +16,7 @@ use SSViewer;
 
 /**
  * Class CheckInController
+ *
  * @mixin TicketExtension
  *
  * @package Broarm\EventTickets
@@ -35,7 +36,6 @@ class CheckInController extends Page_Controller implements PermissionProvider
     public function init()
     {
         $params = $this->getURLParams();
-        $success = $this->getRequest()->getVar('success');
 
         // Check if the current user has permissions to check in guest
         if (!Permission::check('HANDLE_CHECK_IN')) {
@@ -49,7 +49,7 @@ class CheckInController extends Page_Controller implements PermissionProvider
             parent::init();
         }
     }
-    
+
     /**
      * Get the check in form
      *

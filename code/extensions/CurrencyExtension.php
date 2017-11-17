@@ -30,9 +30,9 @@ class CurrencyExtension extends DataExtension
      */
     public function NiceDecimalPoint()
     {
-        $currencySymbol = $this->owner->config()->currency_symbol;
-        $decimalPoint = $this->owner->config()->decimal_point;
-        $thousandSeparator = $this->owner->config()->thousand_seperator;
+        $currencySymbol = Currency::config()->get('currency_symbol');
+        $decimalPoint = Currency::config()->get('decimal_point');
+        $thousandSeparator = Currency::config()->get('thousand_seperator');
         $val = $currencySymbol . number_format(abs($this->owner->value), 2, $decimalPoint, $thousandSeparator);
         if ((double)$this->owner->value === (double)0) {
             return _t('CurrencyExtension.FREE', 'Free');

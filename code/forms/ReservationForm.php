@@ -36,19 +36,19 @@ class ReservationForm extends FormStep
     {
         $requiredFields = array();
         $fields = FieldList::create();
-        $this->reservation = $reservation;
+        if ($this->reservation = $reservation) {
+            // Ask details about created attendees
+            foreach ($reservation->Attendees() as $index => $attendee) {
+                // The main reservation information is the first field
+                $main = $index === 0;
+                // Set required to true for all attendees or for the first only
+                $required = self::config()->get('require_all_attendees')
+                    ? self::config()->get('require_all_attendees')
+                    : $main;
 
-        // Ask details about created attendees
-        foreach ($reservation->Attendees() as $index => $attendee) {
-            // The main reservation information is the first field
-            $main = $index === 0;
-            // Set required to true for all attendees or for the first only
-            $required = self::config()->get('require_all_attendees')
-                ? self::config()->get('require_all_attendees')
-                : $main;
-
-            $fields->add($field = AttendeeField::create($attendee, $main, $required));
-            $requiredFields = array_merge($requiredFields, $field->getRequiredFields());
+                $fields->add($field = AttendeeField::create($attendee, $main, $required));
+                $requiredFields = array_merge($requiredFields, $field->getRequiredFields());
+            }
         }
 
         $actions = FieldList::create(

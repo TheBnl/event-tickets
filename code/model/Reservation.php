@@ -476,11 +476,21 @@ class Reservation extends DataObject
     /**
      * Get the download link
      *
-     * @return string
+     * @return string|null
      */
     public function getDownloadLink()
     {
-        return $this->reservation->Attendees()->first()->TicketFile()->Link();
+        /** @var Attendee $attendee */
+        if (
+            ($attendees = $this->Attendees())
+            && ($attendee = $attendees->first())
+            && ($file = $attendee->TicketFile())
+            && $file->exists()
+        ) {
+            return $file->Link();
+        }
+
+        return null;
     }
 
     public function canView($member = null)

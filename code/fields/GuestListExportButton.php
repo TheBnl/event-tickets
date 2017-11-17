@@ -11,6 +11,8 @@ namespace Broarm\EventTickets;
 use CalendarEvent;
 use GridField;
 use GridFieldExportButton;
+use GridFieldFilterHeader;
+use GridFieldSortableHeader;
 use SS_HTTPRequest;
 
 /**
