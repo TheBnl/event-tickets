@@ -482,8 +482,7 @@ class Reservation extends DataObject
     {
         /** @var Attendee $attendee */
         if (
-            ($attendees = $this->Attendees())
-            && ($attendee = $attendees->first())
+            ($attendee = $this->Attendees()->first())
             && ($file = $attendee->TicketFile())
             && $file->exists()
         ) {
