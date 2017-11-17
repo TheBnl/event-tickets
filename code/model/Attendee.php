@@ -174,7 +174,7 @@ class Attendee extends DataObject
     /**
      * Utility method for fetching the default field, FirstName, value
      *
-     * @return string
+     * @return string|null
      */
     public function getFirstName()
     {
@@ -188,7 +188,7 @@ class Attendee extends DataObject
     /**
      * Utility method for fetching the default field, Surname, value
      *
-     * @return string
+     * @return string|null
      */
     public function getSurname()
     {
@@ -202,7 +202,7 @@ class Attendee extends DataObject
     /**
      * Get the combined first and last nave for display on the ticket and attendee list
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -219,7 +219,7 @@ class Attendee extends DataObject
     /**
      * Utility method for fetching the default field, Email, value
      *
-     * @return string
+     * @return string|null
      */
     public function getEmail()
     {

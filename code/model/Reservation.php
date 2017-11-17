@@ -238,8 +238,8 @@ class Reservation extends DataObject
     public function getName()
     {
         /** @var Attendee $attendee */
-        if ($this->MainContact()->exists()) {
-            return $this->MainContact()->getName();
+        if (($mainContact = $this->MainContact()) && $mainContact->exists() && $name = $mainContact->getName()) {
+            return $name;
         } else {
             return 'new reservation';
         }

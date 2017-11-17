@@ -201,7 +201,7 @@ class TicketExtension extends DataExtension
         $saleStart = null;
         if (($tickets = $this->owner->Tickets())) {
             /** @var Ticket $ticket */
-            foreach ($this->owner->Tickets() as $ticket) {
+            foreach ($tickets as $ticket) {
                 if (($date = $ticket->getAvailableFrom()) && strtotime($date) < strtotime($saleStart) || $saleStart === null) {
                     $saleStart = $date;
                 }
@@ -221,7 +221,7 @@ class TicketExtension extends DataExtension
         $expired = false;
         if (($tickets = $this->owner->Tickets()) && $expired = $tickets->exists()) {
             /** @var Ticket $ticket */
-            foreach ($this->owner->Tickets() as $ticket) {
+            foreach ($tickets as $ticket) {
                 $expired = (!$ticket->validateDate() && $expired);
             }
         }
