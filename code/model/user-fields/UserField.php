@@ -118,6 +118,16 @@ class UserField extends DataObject
     }
 
     /**
+     * Get the filed type
+     *
+     * @return FormField
+     */
+    public function getFieldType()
+    {
+        return $this->fieldType;
+    }
+
+    /**
      * Show if the field is required in a nice format
      *
      * BUGFIX Using the shorthand Required.Nice in the summary_fields

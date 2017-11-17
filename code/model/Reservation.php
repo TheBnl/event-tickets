@@ -414,21 +414,7 @@ class Reservation extends DataObject
         if ($ticketReceivers->exists()) {
             /** @var Attendee $ticketReceiver */
             foreach ($ticketReceivers as $ticketReceiver) {
-                $email = new Email();
-                $email->setSubject(_t(
-                    'AttendeeMail.TITLE',
-                    'Your ticket for {event}',
-                    null,
-                    array(
-                        'event' => $this->Event()->Title
-                    )
-                ));
-                $email->setFrom($from);
-                $email->setTo($ticketReceiver->Email);
-                $email->setTemplate('AttendeeMail');
-                $email->populateTemplate($ticketReceiver);
-                $this->extend('updateTicketMail', $email);
-                $email->send();
+                $ticketReceiver->sendTicket();
             }
         }
     }

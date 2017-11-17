@@ -10,10 +10,13 @@ namespace Broarm\EventTickets;
 
 use ArrayList;
 use BaconQrCode;
+use BetterButtonCustomAction;
 use CalendarEvent;
+use Config;
 use DataObject;
 use Director;
 use Dompdf\Dompdf;
+use Email;
 use FieldList;
 use File;
 use Folder;
@@ -32,9 +35,6 @@ use ViewableData;
  * @package Broarm\EventTickets
  *
  * @property string    Title
- * @property string    FirstName
- * @property string    Surname
- * @property string    Email
  * @property string    TicketCode
  * @property boolean   TicketReceiver
  * @property boolean   CheckedIn
@@ -131,20 +131,29 @@ class Attendee extends DataObject
         'CheckedIn.Nice' => 'Checked in',
     );
 
+    /**
+     * Actions usable on the cms detail view
+     *
+     * @var array
+     */
+    private static $better_buttons_actions = array(
+        'sendTicket'
+    );
+
     public function getCMSFields()
     {
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));
 
         $fields->addFieldsToTab('Root.Main', array(
             ReadonlyField::create('TicketCode', _t('Attendee.Ticket', 'Ticket')),
-            ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'),
-                $this->dbObject('CheckedIn')->Nice())
+            ReadonlyField::create('MyCheckedIn', _t('Attendee.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
         ));
 
         foreach ($this->Fields() as $field) {
+            $fieldType = $field->getFieldType();
             $fields->addFieldToTab(
                 'Root.Main',
-                ReadonlyField::create("{$field->Name}_Preview", $field->Title, $field->getValue())
+                $fieldType::create("{$field->Name}[$field->ID]", $field->Title, $field->getValue())
             );
         }
 
@@ -162,6 +171,102 @@ class Attendee extends DataObject
     }
 
     /**
+     * Add utility actions to the attendee details view
+     *
+     * @return FieldList
+     */
+    public function getBetterButtonsActions()
+    {
+        /** @var FieldList $fields */
+        $fields = parent::getBetterButtonsActions();
+        if ($this->TicketFile()->exists() && !empty($this->getEmail())) {
+            $fields->push(BetterButtonCustomAction::create('sendTicket', _t('Attendee.SEND', 'Send the ticket')));
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Attendee constructor
+     * If the fields don't exist yet add them
+     * If they do populate the record with the set data
+     *
+     * @param null $record
+     * @param bool $isSingleton
+     * @param null $model
+     */
+    public function __construct($record = null, $isSingleton = false, $model = null)
+    {
+        parent::__construct($record, $isSingleton, $model);
+        if (($event = $this->Event()) && $event->exists() && !$this->Fields()->exists()) {
+            $this->Fields()->addMany($event->Fields()->column());
+        }
+        /* todo populate the records with the set UserFields
+        elseif ($this->Fields()->exists()) {
+            // Populate the record with the set field names
+            foreach ($this->Fields() as $field) {
+                if (!isset($this->record[$field->Name])) {
+                    $this->record[$field->Name] = $field->Value;
+                }
+            }
+        }
+        */
+    }
+
+    /**
+     * Set the title and ticket code before writing
+     */
+    public function onBeforeWrite()
+    {
+        // Set the title of the attendee
+        $this->Title = $this->getName();
+
+        // Generate the ticket code
+        if ($this->exists() && empty($this->TicketCode)) {
+            $this->TicketCode = $this->generateTicketCode();
+        }
+
+        if (
+            ($folder = $this->Reservation()->fileFolder())
+            && !empty($this->getEmail())
+            && !empty($this->getName())
+            && !$this->TicketFile()->exists()
+            && !$this->TicketQRCode()->exists()
+        ) {
+            $this->createQRCode($folder);
+            $this->createTicketFile($folder);
+        }
+
+        if ($fields = $this->Fields()) {
+            foreach ($fields as $field) {
+                $value = $this->{"$field->Name[$field->ID]"};
+                $this->Fields()->add($field->ID, array('Value' => $value));
+            }
+        }
+
+        parent::onBeforeWrite();
+    }
+
+    /**
+     * Delete any stray files before deleting the object
+     */
+    public function onBeforeDelete()
+    {
+        // If an attendee is deleted from the guest list remove it's qr code
+        // after deleting the code it's not validatable anymore, simply here for cleanup
+        if ($this->TicketQRCode()->exists()) {
+            $this->TicketQRCode()->delete();
+        }
+
+        // cleanup the ticket file
+        if ($this->TicketFile()->exists()) {
+            $this->TicketFile()->delete();
+        }
+
+        parent::onBeforeDelete();
+    }
+
+    /**
      * todo Extend the get field property to lookup data from the User field set
      *
      * @param string $field
@@ -169,7 +274,8 @@ class Attendee extends DataObject
      * @return mixed|string
      * /
     public function getField($field)
-    {} //*/
+    {} */
+
 
     /**
      * Utility method for fetching the default field, FirstName, value
@@ -228,41 +334,6 @@ class Attendee extends DataObject
         }
 
         return null;
-    }
-
-    /**
-     * Set the title and ticket code before writing
-     */
-    public function onBeforeWrite()
-    {
-        // Set the title of the attendee
-        $this->Title = $this->getName();
-
-        // Generate the ticket code
-        if ($this->exists() && empty($this->TicketCode)) {
-            $this->TicketCode = $this->generateTicketCode();
-        }
-
-        parent::onBeforeWrite();
-    }
-
-    /**
-     * Delete any stray files before deleting the object
-     */
-    public function onBeforeDelete()
-    {
-        // If an attendee is deleted from the guest list remove it's qr code
-        // after deleting the code it's not validatable anymore, simply here for cleanup
-        if ($this->TicketQRCode()->exists()) {
-            $this->TicketQRCode()->delete();
-        }
-
-        // cleanup the ticket file
-        if ($this->TicketFile()->exists()) {
-            $this->TicketFile()->delete();
-        }
-
-        parent::onBeforeDelete();
     }
 
     /**
@@ -385,6 +456,33 @@ class Attendee extends DataObject
         $this->write();
 
         return $file;
+    }
+
+    /**
+     * Send the attendee ticket
+     */
+    public function sendTicket()
+    {
+        // Get the mail sender or fallback to the admin email
+        if (empty($from = Reservation::config()->get('mail_sender'))) {
+            $from = Config::inst()->get('Email', 'admin_email');
+        }
+
+        $email = new Email();
+        $email->setSubject(_t(
+            'AttendeeMail.TITLE',
+            'Your ticket for {event}',
+            null,
+            array(
+                'event' => $this->Event()->Title
+            )
+        ));
+        $email->setFrom($from);
+        $email->setTo($this->getEmail());
+        $email->setTemplate('AttendeeMail');
+        $email->populateTemplate($this);
+        $this->extend('updateTicketMail', $email);
+        $email->send();
     }
 
     /**
