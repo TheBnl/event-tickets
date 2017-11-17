@@ -3,6 +3,7 @@
 namespace Broarm\EventTickets;
 
 use CalendarEvent;
+use GridFieldAddNewButton;
 use GridFieldConfig_RecordEditor;
 use GridFieldDataColumns;
 use GridFieldPaginator;
@@ -18,6 +19,6 @@ class ReservationGridFieldConfig extends GridFieldConfig_RecordEditor
     public function __construct($itemsPerPage = null)
     {
         parent::__construct($itemsPerPage);
-        // todo add pagination in header
+        $this->removeComponentsByType(new GridFieldAddNewButton('buttons-before-left'));
     }
 }

@@ -85,7 +85,7 @@ class TicketExtension extends DataExtension
             $reservationLabel = _t('TicketExtension.Reservations', 'Reservations');
             $fields->addFieldToTab(
                 "Root.$reservationLabel",
-                GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), GridFieldConfig_RecordEditor::create())
+                GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), ReservationGridFieldConfig::create())
             );
         }
 
