@@ -12,6 +12,7 @@ use Object;
  */
 class CheckInValidator extends Object
 {
+    const MESSAGE_ERROR = 'MESSAGE_ERROR';
     const MESSAGE_NO_CODE = 'MESSAGE_NO_CODE';
     const MESSAGE_CODE_NOT_FOUND = 'MESSAGE_CODE_NOT_FOUND';
     const MESSAGE_TICKET_CANCELLED = 'MESSAGE_TICKET_CANCELLED';
