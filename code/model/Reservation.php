@@ -310,9 +310,22 @@ class Reservation extends DataObject
     }
 
     /**
-     * Set the main contact id
+     * Complete the reservation
      *
+     * @throws \ValidationException
+     */
+    public function complete()
+    {
+        $this->changeState('PAID');
+        $this->send();
+        $this->write();
+    }
+
+    /**
+     * Set the main contact id
      * @param $id
+     *
+     * @throws \ValidationException
      */
     public function setMainContact($id)
     {
