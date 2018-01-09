@@ -26,5 +26,3 @@ Broarm\EventTickets\Reservation:
 Payment:
   extensions:
     - 'Broarm\EventTickets\TicketPayment'
-  allowed_gateways:
-    - 'Manual'

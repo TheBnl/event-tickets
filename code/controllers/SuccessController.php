@@ -35,6 +35,9 @@ class SuccessController extends CheckoutStepController
         if (!in_array($reservation->Status, array('PENDING', 'PAID'))) {
             ReservationSession::end();
             $this->redirect($this->Link('/'));
+        } elseif ($reservation->Status !== 'PAID') {
+            // todo move to TicketPayment::onCaptured()
+            $this->extend('afterPaymentComplete', $reservation);
         }
     }
 }
