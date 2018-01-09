@@ -24,7 +24,7 @@ Broarm\EventTickets\Reservation:
   extensions:
     - Payable
 Payment:
-  has_one:
-    Reservation: 'Broarm\EventTickets\Reservation'
+  extensions:
+    - TicketPayment
   allowed_gateways:
     - 'Manual'
