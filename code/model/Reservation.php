@@ -361,7 +361,7 @@ class Reservation extends DataObject
     public function sendReservation()
     {
         // Get the mail sender or fallback to the admin email
-        if (empty($from = self::config()->get('mail_sender'))) {
+        if (($from = self::config()->get('mail_sender')) && empty($from)) {
             $from = Config::inst()->get('Email', 'admin_email');
         }
 
@@ -389,7 +389,7 @@ class Reservation extends DataObject
     public function sendTickets()
     {
         // Get the mail sender or fallback to the admin email
-        if (empty($from = self::config()->get('mail_sender'))) {
+        if (($from = self::config()->get('mail_sender')) && empty($from)) {
             $from = Config::inst()->get('Email', 'admin_email');
         }
 
@@ -427,11 +427,11 @@ class Reservation extends DataObject
      */
     public function sendNotification()
     {
-        if (empty($from = self::config()->get('mail_sender'))) {
+        if (($from = self::config()->get('mail_sender')) && empty($from)) {
             $from = Config::inst()->get('Email', 'admin_email');
         }
 
-        if (empty($to = self::config()->get('mail_receiver'))) {
+        if (($to = self::config()->get('mail_receiver')) && empty($to)) {
             $to = Config::inst()->get('Email', 'admin_email');
         }
 
