@@ -53,6 +53,11 @@ class PriceModifier extends DataObject implements PriceModifierInterface
         'TableValue' => 'Currency'
     );
 
+    private static $summary_fields = array(
+        'TableTitle',
+        'TableValue'
+    );
+
     public function getCMSFields()
     {
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));

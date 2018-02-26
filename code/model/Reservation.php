@@ -140,7 +140,8 @@ class Reservation extends DataObject
             ReadonlyField::create('Comments', _t('Reservation.Comments', 'Comments')),
             CheckboxField::create('AgreeToTermsAndConditions', _t('Reservation.AgreeToTermsAndConditions', 'Agreed to terms and conditions'))->performReadonlyTransformation(),
             GridField::create('Attendees', 'Attendees', $this->Attendees(), $gridFieldConfig),
-            GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig)
+            GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig),
+            GridField::create('PriceModifiers', 'PriceModifiers', $this->PriceModifiers(), $gridFieldConfig)
         ));
         $fields->addFieldsToTab('Root.Main', array());
         $this->extend('updateCMSFields', $fields);

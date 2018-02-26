@@ -44,8 +44,13 @@ class CheckInValidator extends Object
      *
      * @return array
      */
-    public function validate($ticketCode = null) {
-
+    public function validate($ticketCode = null)
+    {
+        if (filter_var($ticketCode, FILTER_VALIDATE_URL)) {
+            $asURL = explode('/', parse_url($ticketCode, PHP_URL_PATH));
+            $ticketCode = end($asURL);
+        }
+        
         // Check if a code is given to the validator
         if (!isset($ticketCode)) {
             return array(
