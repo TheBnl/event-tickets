@@ -20,6 +20,7 @@ class CheckInForm extends Form
     {
         $fields = FieldList::create(
             TextField::create('TicketCode', _t('CheckInForm.TICKET_CODE', 'Ticket code'))
+                ->setAttribute('autofocus', true)
         );
 
         $actions = FieldList::create(
