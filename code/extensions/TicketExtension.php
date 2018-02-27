@@ -69,6 +69,8 @@ class TicketExtension extends DataExtension
         'SuccessMessageMail'
     );
 
+    protected $cachedGuestList;
+
     public function updateCMSFields(FieldList $fields)
     {
         $ticketLabel = _t('TicketExtension.Tickets', 'Tickets');
@@ -243,13 +245,18 @@ class TicketExtension extends DataExtension
      * Get only the attendees who are certain to attend
      * Also includes attendees without any reservation, these are manually added
      *
-     * @return \ArrayList
+     * @return \DataList
      */
     public function getGuestList()
     {
-        return $this->owner->Attendees()->filterByCallback(function(Attendee $attendee, HasManyList $list) {
-            return $attendee->Reservation()->Status === 'PAID' || !$attendee->Reservation()->exists();
-        });
+        $reservationClass = Reservation::singleton()->getClassName();
+        $attendeeClass = Attendee::singleton()->getClassName();
+        return $this->owner->Attendees()
+            ->leftJoin($reservationClass, "`$attendeeClass`.`ReservationID` = `$reservationClass`.`ID`")
+            ->filterAny(array(
+                'ReservationID' => 0,
+                'Status' => Reservation::STATUS_PAID
+            ));
     }
 
     /**

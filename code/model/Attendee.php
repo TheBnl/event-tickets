@@ -24,6 +24,7 @@ use Image;
 use ManyManyList;
 use Member;
 use ReadonlyField;
+use SilverStripe\Omnipay\Exception\Exception;
 use SSViewer;
 use Tab;
 use TabSet;
@@ -141,6 +142,8 @@ class Attendee extends DataObject
         'createTicketFile'
     );
 
+    protected static $cachedFields = array();
+
     public function getCMSFields()
     {
         $fields = new FieldList(new TabSet('Root', $mainTab = new Tab('Main')));
@@ -203,19 +206,19 @@ class Attendee extends DataObject
     public function __construct($record = null, $isSingleton = false, $model = null)
     {
         parent::__construct($record, $isSingleton, $model);
-        if (($event = $this->Event()) && $event->exists() && !$this->Fields()->exists()) {
-            $this->Fields()->addMany($event->Fields()->column());
-        }
+        //if (($event = $this->Event()) && $event->exists() && !$this->Fields()->exists()) {
+        //    $this->Fields()->addMany($event->Fields()->column());
+        //}
+        
         /* todo populate the records with the set UserFields
-        elseif ($this->Fields()->exists()) {
+        if ($this->Fields()->exists()) {
             // Populate the record with the set field names
             foreach ($this->Fields() as $field) {
                 if (!isset($this->record[$field->Name])) {
                     $this->record[$field->Name] = $field->Value;
                 }
             }
-        }
-        */
+        }*/
     }
 
     /**
@@ -232,8 +235,8 @@ class Attendee extends DataObject
         }
 
         if (
-            !empty($this->getEmail())
-            && !empty($this->getName())
+            $this->getEmail()
+            && $this->getName()
             && !$this->TicketFile()->exists()
             && !$this->TicketQRCode()->exists()
         ) {
@@ -244,12 +247,22 @@ class Attendee extends DataObject
         if ($fields = $this->Fields()) {
             foreach ($fields as $field) {
                 if ($value = $this->{"$field->Name[$field->ID]"}) {
-                    $this->Fields()->add($field->ID, array('Value' => $value));
+                    //$cache = self::getCacheFactory();
+                    //$cache->save(serialize($value), $this->getFieldCacheKey($field));
+                    $fields->add($field->ID, array('Value' => $value));
                 }
             }
         }
 
         parent::onBeforeWrite();
+    }
+
+    public function onAfterWrite()
+    {
+        parent::onAfterWrite();
+        if (($event = $this->Event()) && $event->exists() && !$this->Fields()->exists()) {
+            $this->Fields()->addMany($event->Fields()->column());
+        }
     }
 
     /**
@@ -268,6 +281,10 @@ class Attendee extends DataObject
             $this->TicketFile()->delete();
         }
 
+        if ($this->Fields()->exists()) {
+            $this->Fields()->removeAll();
+        }
+
         parent::onBeforeDelete();
     }
 
@@ -282,28 +299,13 @@ class Attendee extends DataObject
     }
 
     /**
-     * todo Extend the get field property to lookup data from the User field set
-     *
-     * @param string $field
-     *
-     * @return mixed|string
-     * /
-    public function getField($field)
-    {} */
-
-
-    /**
      * Utility method for fetching the default field, FirstName, value
      *
      * @return string|null
      */
     public function getFirstName()
     {
-        if ($firstName = $this->Fields()->find('Name', 'FirstName')) {
-            return (string)$firstName->getField('Value');
-        }
-
-        return null;
+        return self::getUserField('FirstName');
     }
 
     /**
@@ -313,11 +315,17 @@ class Attendee extends DataObject
      */
     public function getSurname()
     {
-        if ($surname = $this->Fields()->find('Name', 'Surname')) {
-            return (string)$surname->getField('Value');
-        }
+        return self::getUserField('Surname');
+    }
 
-        return null;
+    /**
+     * Utility method for fetching the default field, Email, value
+     *
+     * @return string|null
+     */
+    public function getEmail()
+    {
+        return self::getUserField('Email');
     }
 
     /**
@@ -328,9 +336,9 @@ class Attendee extends DataObject
     public function getName()
     {
         $mainContact = $this->Reservation()->MainContact();
-        if (!empty($this->getSurname())) {
+        if ($this->getSurname()) {
             return trim("{$this->getFirstName()} {$this->getSurname()}");
-        } elseif ($mainContact->exists() && !empty($mainContact->getSurname())) {
+        } elseif ($mainContact->exists() && $mainContact->getSurname()) {
             return _t('Attendee.GUEST_OF', 'Guest of {name}', null, array('name' => $mainContact->getName()));
         } else {
             return null;
@@ -338,17 +346,34 @@ class Attendee extends DataObject
     }
 
     /**
-     * Utility method for fetching the default field, Email, value
+     * Get the user field and store it in a static cache
+     * todo: add a cache that saves the field value on save and retrieves the values here, dumb, so empty fields don't trigger queries
      *
-     * @return string|null
+     * @param $field
+     * @return mixed|null|string
      */
-    public function getEmail()
+    public function getUserField($field)
     {
-        if ($email = $this->Fields()->find('Name', 'Email')) {
-            return (string)$email->getField('Value');
+        //$cache = self::getCacheFactory();
+        //return unserialize($cache->load($this->getFieldCacheKey($field)));
+
+        if (isset(self::$cachedFields[$this->ID][$field])) {
+            return self::$cachedFields[$this->ID][$field];
+        } elseif ($userField = $this->Fields()->find('Name', $field)) {
+            return self::$cachedFields[$this->ID][$field] = (string)$userField->getField('Value');
         }
 
         return null;
+    }
+
+    protected static function getCacheFactory()
+    {
+        return \SS_Cache::factory('event_tickets_user_field');
+    }
+
+    protected function getFieldCacheKey($field)
+    {
+        return md5(serialize(array($this->ID, $field)));
     }
 
     /**

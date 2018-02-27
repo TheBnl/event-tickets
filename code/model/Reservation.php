@@ -51,6 +51,11 @@ use TabSet;
  */
 class Reservation extends DataObject
 {
+    const STATUS_CART = 'CART';
+    const STATUS_PENDING = 'PENDING';
+    const STATUS_PAID = 'PAID';
+    const STATUS_CANCELED = 'CANCELED';
+    
     /**
      * Time to wait before deleting the discarded cart
      * Give a string that is parsable by strtotime
