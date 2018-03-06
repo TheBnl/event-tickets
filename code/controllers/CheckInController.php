@@ -35,19 +35,19 @@ class CheckInController extends Page_Controller implements PermissionProvider
 
     public function init()
     {
-        $params = $this->getURLParams();
-
         // Check if the current user has permissions to check in guest
         if (!Permission::check('HANDLE_CHECK_IN')) {
             Security::permissionFailure();
-            parent::init();
-        // check if an id is set, then validate it
-        } elseif (isset($params['ID']) && !in_array($params['ID'], self::config()->get('allowed_actions'))) {
+        }
+
+        $params = $this->getURLParams();
+        if (isset($params['ID']) && !in_array($params['ID'], self::config()->get('allowed_actions'))) {
             $form = CheckInForm::create($this);
             $form->doCheckIn(array('TicketCode' => $params['ID']), $form);
-        } else {
-            parent::init();
+            $this->redirect($this->Link());
         }
+
+        parent::init();
     }
 
     /**
