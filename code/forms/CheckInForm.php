@@ -28,8 +28,8 @@ class CheckInForm extends Form
         );
 
         $required = new RequiredFields(array('TicketCode'));
-
         parent::__construct($controller, $name, $fields, $actions, $required);
+        $this->extend('onAfterConstruct');
     }
 
     /**
@@ -38,7 +38,7 @@ class CheckInForm extends Form
      * @param             $data
      * @param CheckInForm $form
      *
-     * @return bool
+     * @return \SS_HTTPResponse
      */
     public function doCheckIn($data, CheckInForm $form)
     {
@@ -47,10 +47,6 @@ class CheckInForm extends Form
         $validator = CheckInValidator::create();
         $result = $validator->validate($data['TicketCode']);
         switch ($result['Code']) {
-            default:
-                $form->sessionMessage($result['Message'], strtolower($result['Type']), false);
-                $controller->redirect($controller->Link());
-                return false;
             case CheckInValidator::MESSAGE_CHECK_OUT_SUCCESS:
                 $validator->getAttendee()->checkOut();
                 break;
@@ -58,9 +54,9 @@ class CheckInForm extends Form
                 $validator->getAttendee()->checkIn();
                 break;
         }
-
+        
         $form->sessionMessage($result['Message'], strtolower($result['Type']), false);
-        $controller->redirect($controller->Link());
-        return true;
+        $this->extend('onAfterCheckIn', $response, $form, $result);
+        return $response ? $response : $controller->redirect($controller->Link());
     }
 }
