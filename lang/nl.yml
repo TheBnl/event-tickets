@@ -25,11 +25,11 @@ nl:
     CheckOut: 'Uitchecken'
   CheckInValidator:
     MESSAGE_NO_CODE: 'Voer een ticketnummer in'
-    MESSAGE_CODE_NOT_FOUND: 'Het ingevoerde ticketnummer is niet gevonden.'
-    MESSAGE_TICKET_CANCELLED: 'Het ingevoerde ticketnummer is van een geannuleerde bestelling'
-    MESSAGE_ALREADY_CHECKED_IN: 'Het ingevoerde ticketnummer is al ingecheckt.'
-    MESSAGE_CHECK_OUT_SUCCESS: 'Het ticket is succesvol uitgecheckt.'
-    MESSAGE_CHECK_IN_SUCCESS: 'Het ticket is succesvol ingecheckt.'
+    MESSAGE_CODE_NOT_FOUND: 'Het ingevoerde ticketnummer #{ticket} is niet gevonden.'
+    MESSAGE_TICKET_CANCELLED: 'Het ingevoerde ticketnummer #{ticket} is van een geannuleerde bestelling'
+    MESSAGE_ALREADY_CHECKED_IN: 'Het ingevoerde ticketnummer #{ticket} is al ingecheckt.'
+    MESSAGE_CHECK_OUT_SUCCESS: 'Het ticket #{ticket} is succesvol uitgecheckt.'
+    MESSAGE_CHECK_IN_SUCCESS: 'Het ticket #{ticket} is succesvol ingecheckt.'
   CurrencyExtension:
     FREE: 'Gratis'
   SiteConfigExtension:

@@ -55,8 +55,9 @@ class CheckInValidator extends Object
         if (!isset($ticketCode)) {
             return array(
                 'Code' => self::MESSAGE_NO_CODE,
-                'Message' => self::message(self::MESSAGE_NO_CODE),
-                'Type' => self::MESSAGE_TYPE_BAD
+                'Message' => self::message(self::MESSAGE_NO_CODE, $ticketCode),
+                'Type' => self::MESSAGE_TYPE_BAD,
+                'Ticket' => $ticketCode
             );
         }
 
@@ -64,8 +65,9 @@ class CheckInValidator extends Object
         if (!$this->attendee = Attendee::get()->find('TicketCode', $ticketCode)) {
             return array(
                 'Code' => self::MESSAGE_CODE_NOT_FOUND,
-                'Message' => self::message(self::MESSAGE_CODE_NOT_FOUND),
-                'Type' => self::MESSAGE_TYPE_BAD
+                'Message' => self::message(self::MESSAGE_CODE_NOT_FOUND, $ticketCode),
+                'Type' => self::MESSAGE_TYPE_BAD,
+                'Ticket' => $ticketCode
             );
         }
 
@@ -73,8 +75,9 @@ class CheckInValidator extends Object
         if (!(bool)$this->attendee->Event()->getGuestList()->find('ID', $this->attendee->ID)) {
             return array(
                 'Code' => self::MESSAGE_TICKET_CANCELLED,
-                'Message' => self::message(self::MESSAGE_TICKET_CANCELLED),
-                'Type' => self::MESSAGE_TYPE_BAD
+                'Message' => self::message(self::MESSAGE_TICKET_CANCELLED, $ticketCode),
+                'Type' => self::MESSAGE_TYPE_BAD,
+                'Ticket' => $ticketCode
             );
         }
 
@@ -82,8 +85,9 @@ class CheckInValidator extends Object
         elseif ((bool)$this->attendee->CheckedIn && !(bool)self::config()->get('allow_checkout')) {
             return array(
                 'Code' => self::MESSAGE_ALREADY_CHECKED_IN,
-                'Message' => self::message(self::MESSAGE_ALREADY_CHECKED_IN),
-                'Type' => self::MESSAGE_TYPE_BAD
+                'Message' => self::message(self::MESSAGE_ALREADY_CHECKED_IN, $ticketCode),
+                'Type' => self::MESSAGE_TYPE_BAD,
+                'Ticket' => $ticketCode
             );
         }
 
@@ -91,16 +95,18 @@ class CheckInValidator extends Object
         elseif ((bool)$this->attendee->CheckedIn && (bool)self::config()->get('allow_checkout')) {
             return array(
                 'Code' => self::MESSAGE_CHECK_OUT_SUCCESS,
-                'Message' => self::message(self::MESSAGE_CHECK_OUT_SUCCESS),
-                'Type' => self::MESSAGE_TYPE_WARNING
+                'Message' => self::message(self::MESSAGE_CHECK_OUT_SUCCESS, $ticketCode),
+                'Type' => self::MESSAGE_TYPE_WARNING,
+                'Ticket' => $ticketCode
             );
         }
 
         // Successfully checked in
         else return array(
             'Code' => self::MESSAGE_CHECK_IN_SUCCESS,
-            'Message' => self::message(self::MESSAGE_CHECK_IN_SUCCESS),
-            'Type' => self::MESSAGE_TYPE_GOOD
+            'Message' => self::message(self::MESSAGE_CHECK_IN_SUCCESS, $ticketCode),
+            'Type' => self::MESSAGE_TYPE_GOOD,
+            'Ticket' => $ticketCode
         );
     }
 
@@ -118,10 +124,11 @@ class CheckInValidator extends Object
      * Translate the given type to a readable message
      *
      * @param $message string
+     * @param $ticket string
      *
      * @return string
      */
-    private static function message($message) {
-        return _t("CheckInValidator.$message", $message);
+    private static function message($message, $ticket = null) {
+        return _t("CheckInValidator.$message", $message, null, array('ticket' => $ticket));
     }
 }
