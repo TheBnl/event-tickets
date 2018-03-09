@@ -466,6 +466,10 @@ class Attendee extends DataObject
         $relativeFilePath = "/{$folder->Filename}{$this->TicketCode}.pdf";
         $absoluteFilePath = Director::baseFolder() . $relativeFilePath;
 
+        if (!$this->TicketQRCode()->exists()) {
+            $this->createQRCode();
+        }
+
         if (!$file = File::get()->find('Filename', $relativeFilePath)) {
             $file = File::create();
             $file->ParentID = $folder->ID;
