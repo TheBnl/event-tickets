@@ -61,18 +61,6 @@ class CheckInController extends Page_Controller implements PermissionProvider
     }
 
     /**
-     * Get the checked in count for display in templates
-     *
-     * @return string
-     */
-    public function getCheckedInCount()
-    {
-        $attendees = $this->getGuestList();
-        $checkedIn = $attendees->filter('CheckedIn', true)->count();
-        return "($checkedIn/{$attendees->count()})";
-    }
-
-    /**
      * Force the controller action
      *
      * @param string $action

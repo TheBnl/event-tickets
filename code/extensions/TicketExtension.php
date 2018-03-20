@@ -260,6 +260,18 @@ class TicketExtension extends DataExtension
     }
 
     /**
+     * Get the checked in count for display in templates
+     *
+     * @return string
+     */
+    public function getCheckedInCount()
+    {
+        $attendees = $this->getGuestList();
+        $checkedIn = $attendees->filter('CheckedIn', true)->count();
+        return "($checkedIn/{$attendees->count()})";
+    }
+
+    /**
      * Get the success message
      *
      * @return mixed|string
