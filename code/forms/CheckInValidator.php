@@ -64,42 +64,59 @@ class CheckInValidator extends Object
 
         // Check if a ticket exists with the given ticket code
         if (!$this->attendee = Attendee::get()->find('TicketCode', $ticketCode)) {
-            $result['Code'] = self::MESSAGE_CODE_NOT_FOUND;
-            $result['Message'] = self::message(self::MESSAGE_CODE_NOT_FOUND, $ticketCode);
-            return $result;
+            return $result = array(
+                'Code' => self::MESSAGE_CODE_NOT_FOUND,
+                'Message' => self::message(self::MESSAGE_CODE_NOT_FOUND, $ticketCode),
+                'Type' => self::MESSAGE_TYPE_BAD,
+                'Ticket' => $ticketCode,
+                'Attendee' => null
+            );
         } else {
             $name = $this->attendee->getName();
-            $result['Attendee'] = $this->attendee;
         }
 
         // Check if the reservation is not canceled
         if (!(bool)$this->attendee->Event()->getGuestList()->find('ID', $this->attendee->ID)) {
-            $result['Code'] = self::MESSAGE_TICKET_CANCELLED;
-            $result['Message'] = self::message(self::MESSAGE_TICKET_CANCELLED, $name);
-            return $result;
+            return $result = array(
+                'Code' => self::MESSAGE_TICKET_CANCELLED,
+                'Message' => self::message(self::MESSAGE_TICKET_CANCELLED, $name),
+                'Type' => self::MESSAGE_TYPE_BAD,
+                'Ticket' => $ticketCode,
+                'Attendee' => $this->attendee
+            );
         }
 
         // Check if the ticket is already checked in and not allowed to check out
         elseif ((bool)$this->attendee->CheckedIn && !(bool)self::config()->get('allow_checkout')) {
-            $result['Code'] = self::MESSAGE_ALREADY_CHECKED_IN;
-            $result['Message'] = self::message(self::MESSAGE_ALREADY_CHECKED_IN, $name);
-            return $result;
+            return $result = array(
+                'Code' => self::MESSAGE_ALREADY_CHECKED_IN,
+                'Message' => self::message(self::MESSAGE_ALREADY_CHECKED_IN, $name),
+                'Type' => self::MESSAGE_TYPE_BAD,
+                'Ticket' => $ticketCode,
+                'Attendee' => $this->attendee
+            );
         }
 
         // Successfully checked out
         elseif ((bool)$this->attendee->CheckedIn && (bool)self::config()->get('allow_checkout')) {
-            $result['Code'] = self::MESSAGE_CHECK_OUT_SUCCESS;
-            $result['Message'] = self::message(self::MESSAGE_CHECK_OUT_SUCCESS, $name);
-            $result['Type'] = self::MESSAGE_TYPE_WARNING;
-            return $result;
+            return $result = array(
+                'Code' => self::MESSAGE_CHECK_OUT_SUCCESS,
+                'Message' => self::message(self::MESSAGE_CHECK_OUT_SUCCESS, $name),
+                'Type' => self::MESSAGE_TYPE_WARNING,
+                'Ticket' => $ticketCode,
+                'Attendee' => $this->attendee
+            );
         }
 
         // Successfully checked in
         else {
-            $result['Code'] = self::MESSAGE_CHECK_IN_SUCCESS;
-            $result['Message'] = self::message(self::MESSAGE_CHECK_IN_SUCCESS, $name);
-            $result['Type'] = self::MESSAGE_TYPE_GOOD;
-            return $result;
+            return $result = array(
+                'Code' => self::MESSAGE_CHECK_IN_SUCCESS,
+                'Message' => self::message(self::MESSAGE_CHECK_IN_SUCCESS, $name),
+                'Type' => self::MESSAGE_TYPE_GOOD,
+                'Ticket' => $ticketCode,
+                'Attendee' => $this->attendee
+            );
         }
     }
 
