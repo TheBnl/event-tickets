@@ -25,10 +25,10 @@ en:
   CheckInValidator:
     MESSAGE_NO_CODE: 'Enter a ticket number'
     MESSAGE_CODE_NOT_FOUND: 'The ticket number #{ticket} is not found.'
-    MESSAGE_TICKET_CANCELLED: 'The ticket number #{ticket} is from a cancelled reservation.'
-    MESSAGE_ALREADY_CHECKED_IN: 'The ticket number #{ticket} is already checked in.'
-    MESSAGE_CHECK_OUT_SUCCESS: 'The ticket #{ticket} is successfully checked out.'
-    MESSAGE_CHECK_IN_SUCCESS: 'The ticket #{ticket} is successfully checked in.'
+    MESSAGE_TICKET_CANCELLED: '{ticket} is part of a cancelled reservation.'
+    MESSAGE_ALREADY_CHECKED_IN: '{ticket} is already checked in.'
+    MESSAGE_CHECK_OUT_SUCCESS: '{ticket} is successfully checked out.'
+    MESSAGE_CHECK_IN_SUCCESS: '{ticket} is successfully checked in.'
   CurrencyExtension:
     FREE: 'Free'
   SiteConfigExtension:

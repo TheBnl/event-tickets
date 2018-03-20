@@ -50,64 +50,57 @@ class CheckInValidator extends Object
             $asURL = explode('/', parse_url($ticketCode, PHP_URL_PATH));
             $ticketCode = end($asURL);
         }
-        
+
         // Check if a code is given to the validator
         if (!isset($ticketCode)) {
-            return array(
+            return $result = array(
                 'Code' => self::MESSAGE_NO_CODE,
                 'Message' => self::message(self::MESSAGE_NO_CODE, $ticketCode),
                 'Type' => self::MESSAGE_TYPE_BAD,
-                'Ticket' => $ticketCode
+                'Ticket' => $ticketCode,
+                'Attendee' => null
             );
         }
 
         // Check if a ticket exists with the given ticket code
         if (!$this->attendee = Attendee::get()->find('TicketCode', $ticketCode)) {
-            return array(
-                'Code' => self::MESSAGE_CODE_NOT_FOUND,
-                'Message' => self::message(self::MESSAGE_CODE_NOT_FOUND, $ticketCode),
-                'Type' => self::MESSAGE_TYPE_BAD,
-                'Ticket' => $ticketCode
-            );
+            $result['Code'] = self::MESSAGE_CODE_NOT_FOUND;
+            $result['Message'] = self::message(self::MESSAGE_CODE_NOT_FOUND, $ticketCode);
+            return $result;
+        } else {
+            $name = $this->attendee->getName();
+            $result['Attendee'] = $this->attendee;
         }
 
         // Check if the reservation is not canceled
         if (!(bool)$this->attendee->Event()->getGuestList()->find('ID', $this->attendee->ID)) {
-            return array(
-                'Code' => self::MESSAGE_TICKET_CANCELLED,
-                'Message' => self::message(self::MESSAGE_TICKET_CANCELLED, $ticketCode),
-                'Type' => self::MESSAGE_TYPE_BAD,
-                'Ticket' => $ticketCode
-            );
+            $result['Code'] = self::MESSAGE_TICKET_CANCELLED;
+            $result['Message'] = self::message(self::MESSAGE_TICKET_CANCELLED, $name);
+            return $result;
         }
 
         // Check if the ticket is already checked in and not allowed to check out
         elseif ((bool)$this->attendee->CheckedIn && !(bool)self::config()->get('allow_checkout')) {
-            return array(
-                'Code' => self::MESSAGE_ALREADY_CHECKED_IN,
-                'Message' => self::message(self::MESSAGE_ALREADY_CHECKED_IN, $ticketCode),
-                'Type' => self::MESSAGE_TYPE_BAD,
-                'Ticket' => $ticketCode
-            );
+            $result['Code'] = self::MESSAGE_ALREADY_CHECKED_IN;
+            $result['Message'] = self::message(self::MESSAGE_ALREADY_CHECKED_IN, $name);
+            return $result;
         }
 
         // Successfully checked out
         elseif ((bool)$this->attendee->CheckedIn && (bool)self::config()->get('allow_checkout')) {
-            return array(
-                'Code' => self::MESSAGE_CHECK_OUT_SUCCESS,
-                'Message' => self::message(self::MESSAGE_CHECK_OUT_SUCCESS, $ticketCode),
-                'Type' => self::MESSAGE_TYPE_WARNING,
-                'Ticket' => $ticketCode
-            );
+            $result['Code'] = self::MESSAGE_CHECK_OUT_SUCCESS;
+            $result['Message'] = self::message(self::MESSAGE_CHECK_OUT_SUCCESS, $name);
+            $result['Type'] = self::MESSAGE_TYPE_WARNING;
+            return $result;
         }
 
         // Successfully checked in
-        else return array(
-            'Code' => self::MESSAGE_CHECK_IN_SUCCESS,
-            'Message' => self::message(self::MESSAGE_CHECK_IN_SUCCESS, $ticketCode),
-            'Type' => self::MESSAGE_TYPE_GOOD,
-            'Ticket' => $ticketCode
-        );
+        else {
+            $result['Code'] = self::MESSAGE_CHECK_IN_SUCCESS;
+            $result['Message'] = self::message(self::MESSAGE_CHECK_IN_SUCCESS, $name);
+            $result['Type'] = self::MESSAGE_TYPE_GOOD;
+            return $result;
+        }
     }
 
     /**
