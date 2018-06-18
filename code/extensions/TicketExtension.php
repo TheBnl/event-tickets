@@ -251,9 +251,10 @@ class TicketExtension extends DataExtension
     {
         $reservationClass = Reservation::singleton()->getClassName();
         $attendeeClass = Attendee::singleton()->getClassName();
-        return $this->owner->Attendees()
+        return Attendee::get()
             ->leftJoin($reservationClass, "`$attendeeClass`.`ReservationID` = `$reservationClass`.`ID`")
             ->filterAny(array(
+                'EventID' => $this->owner->ID,
                 'ReservationID' => 0,
                 'Status' => Reservation::STATUS_PAID
             ));
