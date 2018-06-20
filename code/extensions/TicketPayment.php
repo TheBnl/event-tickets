@@ -20,6 +20,20 @@ class TicketPayment extends DataExtension
     );
 
     /**
+     * Fix issue manual gateway doesn't call onCaptured hook
+     *
+     * @param ServiceResponse $response
+     */
+    public function onAuthorized(ServiceResponse $response)
+    {
+        if ($response->getPayment()->Gateway === 'Manual') {
+            if (($reservation = Reservation::get()->byID($this->owner->ReservationID)) && $reservation->exists()) {
+                $reservation->complete();
+            }
+        }
+    }
+
+    /**
      * Complete the order on a successful transaction
      *
      * @param ServiceResponse $response

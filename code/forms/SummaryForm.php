@@ -63,10 +63,10 @@ class SummaryForm extends FormStep
     /**
      * Handle the ticket form registration
      *
-     * @param array       $data
+     * @param array $data
      * @param SummaryForm $form
-     *
-     * @return string
+     * @return \SS_HTTPResponse
+     * @throws \ValidationException
      */
     public function makePayment(array $data, SummaryForm $form)
     {
