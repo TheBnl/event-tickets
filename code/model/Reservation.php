@@ -325,6 +325,7 @@ class Reservation extends DataObject
         $this->changeState('PAID');
         $this->send();
         $this->write();
+        $this->extend('onAfterComplete');
     }
 
     /**
