@@ -24,7 +24,7 @@
         "silverstripe/silverstripe-omnipay": "*",
         "symbiote/silverstripe-gridfieldextensions": "*",
         "omnipay/manual": "*",
-        "bacon/bacon-qr-code": "*",
+        "bacon/bacon-qr-code": "1.0.*",
         "dompdf/dompdf": "*",
         "unclecheese/betterbuttons": "*",
         "jonom/silverstripe-share-care": "*"
