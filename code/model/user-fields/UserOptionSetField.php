@@ -57,6 +57,10 @@ class UserOptionSetField extends Broarm\EventTickets\UserField
      */
     public function getValue()
     {
-        return $this->Options()->byID($this->getField('Value'))->Title;
+        if ($option = $this->Options()->byID($this->getField('Value'))) {
+            return $option->Title;
+        }
+
+        return null;
     }
 }
