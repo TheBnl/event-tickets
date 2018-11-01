@@ -9,150 +9,164 @@
 namespace Broarm\EventTickets;
 
 use CalendarEvent;
+use ExcelGridFieldExportButton;
+use ExcelImportExport;
+use Exception;
+use FileNameFilter;
 use GridField;
-use GridFieldExportButton;
+use GridField_FormAction;
 use GridFieldFilterHeader;
 use GridFieldSortableHeader;
-use SS_HTTPRequest;
+use PHPExcel;
+use PHPExcel_Cell;
 
 /**
  * Class GuestListExportButton
  */
-class GuestListExportButton extends GridFieldExportButton
+class GuestListExportButton extends ExcelGridFieldExportButton
 {
-    /**
-     * @var CalendarEvent
-     */
-    protected $event;
 
-    /**
-     * GuestListExportButton constructor.
-     *
-     * @param CalendarEvent $event
-     * @param string        $targetFragment
-     * @param null          $exportColumns
-     */
-    public function __construct(CalendarEvent $event, $targetFragment = "after", $exportColumns = null)
-    {
-        $this->event = $event;
-        parent::__construct($targetFragment, $exportColumns);
+    public function getHTMLFragments($gridField) {
+        $title = $this->buttonTitle ? $this->buttonTitle : _t(
+            'TableListField.XLSEXPORT',
+            'Export to Excel'
+        );
+
+        $name = $this->getActionName();
+
+        $button = new GridField_FormAction(
+            $gridField,
+            $name,
+            $title,
+            $name,
+            null
+        );
+        $button->addExtraClass('btn btn-secondary font-icon-down-circled btn--icon-large action_export no-ajax');
+        $button->setForm($gridField->getForm());
+
+        return array(
+            $this->targetFragment => '<p class="grid-excel-button">' . $button->Field() . '</p>',
+        );
     }
 
     /**
-     * Get the parent event
-     *
-     * @return CalendarEvent|TicketExtension
-     */
-    public function getEvent()
-    {
-        return $this->event;
-    }
-
-    /**
-     * @param      $gridField
-     * @param null $request
-     *
-     * @return mixed
-     */
-    public function handleExport($gridField, $request = null) {
-        $now = Date("d-m-Y-H-i");
-        $fileName = "guestlist-$now.csv";
-
-        if($fileData = $this->generateExportFileData($gridField)){
-            return SS_HTTPRequest::send_file($fileData, $fileName, 'text/csv');
-        }
-    }
-
-    /**
-     * Generate export fields for CSV.
+     * Generate export fields for Excel.
      *
      * @param GridField $gridField
-     * @return array
+     * @return PHPExcel
+     * @throws \PHPExcel_Exception
      */
-    public function generateExportFileData($gridField) {
-        $separator = $this->csvSeparator;
-        $csvColumns = $this->getExportColumnsForGridField($gridField);
-        // Get a map of added fields and fieldnames
-        $extraFieldColumns = $this->getEvent()->Fields()->map()->toArray();
+    public function generateExportFileData($gridField)
+    {
+        $class = $gridField->getModelClass();
+        $columns = ($this->exportColumns) ? $this->exportColumns : ExcelImportExport::exportFieldsForClass($class);
         $fileData = '';
 
-        $headers = array();
-        
-        // determine the CSV headers. If a field is callable (e.g. anonymous function) then use the
-        // source name as the header instead
-        // todo add connected extra fields headers
-        foreach($csvColumns as $columnSource => $columnHeader) {
-            if (is_array($columnHeader) && array_key_exists('title', $columnHeader)) {
-                $headers[] = $columnHeader['title'];
-            } else {
-                $headers[] = (!is_string($columnHeader) && is_callable($columnHeader)) ? $columnSource : $columnHeader;
+        $singl = singleton($class);
+
+        $singular = $class ? $singl->i18n_singular_name() : '';
+        $plural = $class ? $singl->i18n_plural_name() : '';
+
+        $filter = new FileNameFilter;
+        if ($this->exportName) {
+            $this->exportName = $filter->filter($this->exportName);
+        } else {
+            $this->exportName = $filter->filter('export-' . $plural);
+        }
+
+        $excel = new PHPExcel();
+        $excelProperties = $excel->getProperties();
+        $excelProperties->setTitle($this->exportName);
+
+        $sheet = $excel->getActiveSheet();
+        if ($plural) {
+            $sheet->setTitle($plural);
+        }
+
+        $row = 1;
+        $col = 0;
+
+        if ($this->hasHeader) {
+            $headers = array();
+
+            // determine the headers. If a field is callable (e.g. anonymous function) then use the
+            // source name as the header instead
+            foreach ($columns as $columnSource => $columnHeader) {
+                $headers[] = (!is_string($columnHeader) && is_callable($columnHeader))
+                    ? $columnSource : $columnHeader;
             }
+
+            foreach ($headers as $header) {
+                $sheet->setCellValueByColumnAndRow($col, $row, $header);
+                $col++;
+            }
+
+            $endcol = PHPExcel_Cell::stringFromColumnIndex($col - 1);
+            $sheet->setAutoFilter("A1:{$endcol}1");
+            $sheet->getStyle("A1:{$endcol}1")->getFont()->setBold(true);
+
+            $col = 0;
+            $row++;
         }
 
-        // Add the extra fields as headers
-        foreach ($extraFieldColumns as $source => $header) {
-            $headers[] = $header;
+        // Autosize
+        $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
+        try {
+            $cellIterator->setIterateOnlyExistingCells(true);
+        } catch (Exception $ex) {
+            // Ignore exceptions
         }
-
-        $fileData .= "\"" . implode("\"{$separator}\"", array_values($headers)) . "\"";
-        $fileData .= "\n";
+        foreach ($cellIterator as $cell) {
+            $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
+        }
 
         //Remove GridFieldPaginator as we're going to export the entire list.
         $gridField->getConfig()->removeComponentsByType('GridFieldPaginator');
 
         $items = $gridField->getManipulatedList();
 
-
-        foreach($gridField->getConfig()->getComponents() as $component){
-            if($component instanceof GridFieldFilterHeader || $component instanceof GridFieldSortableHeader) {
+        // @todo should GridFieldComponents change behaviour based on whether others are available in the config?
+        foreach ($gridField->getConfig()->getComponents() as $component) {
+            if ($component instanceof GridFieldFilterHeader || $component instanceof GridFieldSortableHeader) {
                 $items = $component->getManipulatedData($gridField, $items);
             }
         }
 
-        foreach($items->limit(null) as $item) {
-            /** @var Attendee $item */
-            if(!$item->hasMethod('canView') || $item->canView()) {
-                $columnData = array();
+        $list = $items->limit(null);
+        if (!empty($this->listFilters)) {
+            $list = $list->filter($this->listFilters);
+        }
 
-                foreach($csvColumns as $columnSource => $columnHeader) {
-                    if(!is_string($columnHeader) && is_callable($columnHeader)) {
-                        if($item->hasMethod($columnSource)) {
+        /** @var Attendee $item */
+        foreach ($list as $item) {
+            if (!$this->checkCanView || !$item->hasMethod('canView') || $item->canView()) {
+                foreach ($columns as $columnSource => $columnHeader) {
+                    if (!is_string($columnHeader) && is_callable($columnHeader)) {
+                        if ($item->hasMethod($columnSource)) {
                             $relObj = $item->{$columnSource}();
                         } else {
                             $relObj = $item->relObject($columnSource);
                         }
-
                         $value = $columnHeader($relObj);
+                    } elseif ($field = $item->Fields()->byID($columnSource)) {
+                        $value = $field->getValue();
                     } else {
                         $value = $gridField->getDataFieldValue($item, $columnSource);
-
-                        if($value === null) {
-                            $value = $gridField->getDataFieldValue($item, $columnHeader);
-                        }
                     }
 
-                    $value = str_replace(array("\r", "\n"), "\n", $value);
-                    $columnData[] = '"' . str_replace('"', '""', $value) . '"';
+                    $sheet->setCellValueByColumnAndRow($col, $row, $value);
+                    $col++;
                 }
-
-                // Add the extra field data
-                foreach ($extraFieldColumns as $source => $header) {
-                    if ($field = $item->Fields()->byID($source)) {
-                        $columnData[] = "\"{$field->getValue()}\"";
-                    } else {
-                        $columnData[] = '""';
-                    }
-                }
-
-                $fileData .= implode($separator, $columnData);
-                $fileData .= "\n";
             }
 
-            if($item->hasMethod('destroy')) {
+            if ($item->hasMethod('destroy')) {
                 $item->destroy();
             }
+
+            $col = 0;
+            $row++;
         }
 
-        return $fileData;
+        return $excel;
     }
 }

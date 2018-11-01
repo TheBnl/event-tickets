@@ -14,11 +14,16 @@ use GridFieldConfig_RecordEditor;
  */
 class GuestListGridFieldConfig extends ReservationGridFieldConfig
 {
+    /**
+     * GuestListGridFieldConfig constructor.
+     * @param CalendarEvent|TicketExtension $event
+     * @param null $itemsPerPage
+     */
     public function __construct(CalendarEvent $event, $itemsPerPage = null)
     {
         parent::__construct($itemsPerPage);
         $this->addComponent(new GridFieldAddNewButton('buttons-before-left'));
-        $this->addComponent(new GuestListExportButton($event, 'buttons-before-left'));
+        $this->addComponent(new GuestListExportButton('buttons-before-left', $event->Fields()->map()->toArray()));
         $this->extend('updateGuestListConfig', $event);
     }
 }

@@ -195,33 +195,6 @@ class Attendee extends DataObject
     }
 
     /**
-     * Attendee constructor
-     * If the fields don't exist yet add them
-     * If they do populate the record with the set data
-     *
-     * @param null $record
-     * @param bool $isSingleton
-     * @param null $model
-     */
-    public function __construct($record = null, $isSingleton = false, $model = null)
-    {
-        parent::__construct($record, $isSingleton, $model);
-        //if (($event = $this->Event()) && $event->exists() && !$this->Fields()->exists()) {
-        //    $this->Fields()->addMany($event->Fields()->column());
-        //}
-        
-        /* todo populate the records with the set UserFields
-        if ($this->Fields()->exists()) {
-            // Populate the record with the set field names
-            foreach ($this->Fields() as $field) {
-                if (!isset($this->record[$field->Name])) {
-                    $this->record[$field->Name] = $field->Value;
-                }
-            }
-        }*/
-    }
-
-    /**
      * Set the title and ticket code before writing
      */
     public function onBeforeWrite()

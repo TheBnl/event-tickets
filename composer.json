@@ -1,29 +1,35 @@
 {
-  "name": "bramdeleeuw/silverstripe-event-tickets",
-  "description": "Event tickets for SilverStripe Event Calendar",
-  "type": "silverstripe-module",
-  "homepage": "https://github.com/TheBnl/event-tickets",
-  "keywords": ["silverstripe", "ticket", "omnipay", "event", "calendar"],
-  "license": "BSD-3-Clause",
-  "authors": [
-    {
-      "name": "Bram de Leeuw",
-      "email": "bram-de-leeuw@hotmai.com"
+    "name": "bramdeleeuw/silverstripe-event-tickets",
+    "description": "Event tickets for SilverStripe Event Calendar",
+    "type": "silverstripe-module",
+    "homepage": "https://github.com/TheBnl/event-tickets",
+    "keywords": [
+        "silverstripe",
+        "ticket",
+        "omnipay",
+        "event",
+        "calendar"
+    ],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Bram de Leeuw",
+            "email": "bram-de-leeuw@hotmai.com"
+        }
+    ],
+    "require": {
+        "silverstripe/framework": "~3.1",
+        "silverstripe/cms": "~3.1",
+        "silverstripe/event-calendar": "*",
+        "silverstripe/silverstripe-omnipay": "*",
+        "symbiote/silverstripe-gridfieldextensions": "*",
+        "omnipay/manual": "*",
+        "bacon/bacon-qr-code": "*",
+        "dompdf/dompdf": "*",
+        "unclecheese/betterbuttons": "*",
+        "jonom/silverstripe-share-care": "*"
+    },
+    "extra": {
+        "installer-name": "event-tickets"
     }
-  ],
-  "require": {
-    "silverstripe/framework": "~3.1",
-    "silverstripe/cms": "~3.1",
-    "silverstripe/event-calendar": "*",
-    "silverstripe/silverstripe-omnipay": "*",
-    "symbiote/silverstripe-gridfieldextensions": "*",
-    "omnipay/manual": "*",
-    "bacon/bacon-qr-code": "*",
-    "dompdf/dompdf": "*",
-    "unclecheese/betterbuttons": "*",
-    "jonom/silverstripe-share-care": "*"
-  },
-  "extra": {
-    "installer-name": "event-tickets"
-  }
 }
