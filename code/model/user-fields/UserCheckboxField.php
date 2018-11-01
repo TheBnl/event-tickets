@@ -18,7 +18,7 @@ class UserCheckboxField extends Broarm\EventTickets\UserField
      *
      * @return string
      */
-    public function getValue()
+    public function getNiceValue()
     {
         return (bool)$this->getField('Value')
             ? _t('Boolean.YESANSWER', 'Yes')
