@@ -58,7 +58,7 @@ class Reservation extends DataObject
     const STATUS_PENDING = 'PENDING';
     const STATUS_PAID = 'PAID';
     const STATUS_CANCELED = 'CANCELED';
-    
+
     /**
      * Time to wait before deleting the discarded cart
      * Give a string that is parsable by strtotime
@@ -294,7 +294,7 @@ class Reservation extends DataObject
         // Calculate any price modifications if added
         if ($this->PriceModifiers()->exists()) {
             foreach ($this->PriceModifiers() as $priceModifier) {
-                $priceModifier->updateTotal($total);
+                $priceModifier->updateTotal($total, $this);
             }
         }
 
