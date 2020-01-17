@@ -475,6 +475,8 @@ class Attendee extends DataObject
 
     /**
      * Send the attendee ticket
+     *
+     * @return mixed
      */
     public function sendTicket()
     {
@@ -497,7 +499,7 @@ class Attendee extends DataObject
         $email->setTemplate('AttendeeMail');
         $email->populateTemplate($this);
         $this->extend('updateTicketMail', $email);
-        $email->send();
+        return $email->send();
     }
 
     /**

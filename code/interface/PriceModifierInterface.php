@@ -14,8 +14,9 @@ interface PriceModifierInterface
      * Modify the given total
      *
      * @param float $total
+     * @param Reservation $reservation
      */
-    public function updateTotal(&$total);
+    public function updateTotal(&$total, Reservation $reservation);
 
     /**
      * Get the title for display in the summary table

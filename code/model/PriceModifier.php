@@ -74,8 +74,9 @@ class PriceModifier extends DataObject implements PriceModifierInterface
      * Implement this on your modifier
      *
      * @param float $total
+     * @param Reservation $reservation
      */
-    public function updateTotal(&$total) {}
+    public function updateTotal(&$total, Reservation $reservation) {}
 
     /**
      * Return a title to display in the summary table

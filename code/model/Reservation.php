@@ -39,6 +39,9 @@ use TabSet;
  * @property string Comments
  * @property string ReservationCode
  * @property string Gateway
+ * @property boolean SentTickets
+ * @property boolean SentReservation
+ * @property boolean SentNotification
  *
  * @property int    EventID
  * @property int    MainContactID
@@ -108,7 +111,10 @@ class Reservation extends DataObject
         'Gateway' => 'Varchar(255)',
         'Comments' => 'Text',
         'AgreeToTermsAndConditions' => 'Boolean',
-        'ReservationCode' => 'Varchar(255)'
+        'ReservationCode' => 'Varchar(255)',
+        'SentTickets' => 'Boolean',
+        'SentReservation' => 'Boolean',
+        'SentNotification' => 'Boolean',
     );
 
     private static $default_sort = 'Created DESC';
@@ -306,7 +312,7 @@ class Reservation extends DataObject
         // Calculate any price modifications if added
         if ($this->PriceModifiers()->exists()) {
             foreach ($this->PriceModifiers() as $priceModifier) {
-                $priceModifier->updateTotal($total);
+                $priceModifier->updateTotal($total, $this);
             }
         }
 
@@ -382,6 +388,8 @@ class Reservation extends DataObject
 
     /**
      * Send the reservation mail
+     *
+     * @return mixed
      */
     public function sendReservation()
     {
@@ -409,11 +417,13 @@ class Reservation extends DataObject
         $email->setTemplate('ReservationMail');
         $email->populateTemplate($this);
         $this->extend('updateReservationMail', $email);
-        $email->send();
+        return $email->send();
     }
 
     /**
      * Send the reserved tickets
+     *
+     * @return mixed
      */
     public function sendTickets()
     {
@@ -437,7 +447,7 @@ class Reservation extends DataObject
         $email->setTemplate('MainContactMail');
         $email->populateTemplate($this);
         $this->extend('updateMainContactMail', $email);
-        $email->send();
+        $sent = $email->send();
 
 
         // Get the attendees for this event that are checked as receiver
@@ -445,14 +455,20 @@ class Reservation extends DataObject
         if ($ticketReceivers->exists()) {
             /** @var Attendee $ticketReceiver */
             foreach ($ticketReceivers as $ticketReceiver) {
-                $ticketReceiver->sendTicket();
+                $sentAttendee = $ticketReceiver->sendTicket();
+                if ($sent && !$sentAttendee) {
+                    $sent = $sentAttendee;
+                }
             }
         }
+
+        return $sent;
     }
 
 
     /**
      * Send a booking notification to the ticket mail sender or the site admin
+     * @return mixed
      */
     public function sendNotification()
     {
@@ -480,7 +496,7 @@ class Reservation extends DataObject
         $email->setTemplate('NotificationMail');
         $email->populateTemplate($this);
         $this->extend('updateNotificationMail', $email);
-        $email->send();
+        return $email->send();
     }
 
     /**
@@ -489,9 +505,9 @@ class Reservation extends DataObject
     public function send()
     {
         $this->createFiles();
-        $this->sendReservation();
-        $this->sendNotification();
-        $this->sendTickets();
+        $this->SentReservation = (boolean)$this->sendReservation();
+        $this->SentNotification = (boolean)$this->sendNotification();
+        $this->SentTickets = (boolean)$this->sendTickets();
     }
 
     /**
