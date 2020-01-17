@@ -394,7 +394,7 @@ class Reservation extends DataObject
     public function sendReservation()
     {
         if (!self::config()->get('send_receipt_mail')) {
-            return;
+            return true;
         }
 
         // Get the mail sender or fallback to the admin email
@@ -473,7 +473,7 @@ class Reservation extends DataObject
     public function sendNotification()
     {
         if (!self::config()->get('send_admin_notification')) {
-            return;
+            return true;
         }
 
         if (($from = self::config()->get('mail_sender')) && empty($from)) {
