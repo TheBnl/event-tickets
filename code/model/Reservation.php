@@ -55,7 +55,7 @@ class Reservation extends DataObject
     const STATUS_PENDING = 'PENDING';
     const STATUS_PAID = 'PAID';
     const STATUS_CANCELED = 'CANCELED';
-    
+
     /**
      * Time to wait before deleting the discarded cart
      * Give a string that is parsable by strtotime
@@ -81,6 +81,24 @@ class Reservation extends DataObject
      * @var string
      */
     private static $mail_receiver;
+
+    /**
+     * Send the receipt mail
+     * For organisations that only do free events you can configure
+     * this to hold back the receipt and only send the tickets
+     *
+     * @config
+     * @var bool
+     */
+    private static $send_receipt_mail = true;
+
+    /**
+     * Send the admin notification
+     *
+     * @config
+     * @var bool
+     */
+    private static $send_admin_notification = true;
 
     private static $db = array(
         'Status' => 'Enum("CART,PENDING,PAID,CANCELED","CART")',
@@ -367,6 +385,10 @@ class Reservation extends DataObject
      */
     public function sendReservation()
     {
+        if (!self::config()->get('send_receipt_mail')) {
+            return;
+        }
+
         // Get the mail sender or fallback to the admin email
         if (($from = self::config()->get('mail_sender')) && empty($from)) {
             $from = Config::inst()->get('Email', 'admin_email');
@@ -434,6 +456,10 @@ class Reservation extends DataObject
      */
     public function sendNotification()
     {
+        if (!self::config()->get('send_admin_notification')) {
+            return;
+        }
+
         if (($from = self::config()->get('mail_sender')) && empty($from)) {
             $from = Config::inst()->get('Email', 'admin_email');
         }
