@@ -150,6 +150,8 @@ class GuestListExportButton extends ExcelGridFieldExportButton
                         $value = $columnHeader($relObj);
                     } elseif ($field = $item->Fields()->byID($columnSource)) {
                         $value = $field->getValue();
+                    } elseif ($field = $item->Fields()->find('Name', $columnSource)) {
+                        $value = $field->getValue();
                     } else {
                         $value = $gridField->getDataFieldValue($item, $columnSource);
                     }
