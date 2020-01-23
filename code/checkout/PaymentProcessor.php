@@ -8,7 +8,7 @@
 
 namespace Broarm\EventTickets;
 
-use Object;
+use SS_Object;
 use Payment;
 use SilverStripe\Omnipay\Exception\Exception;
 use SilverStripe\Omnipay\GatewayInfo;
@@ -20,7 +20,7 @@ use SilverStripe\Omnipay\Service\ServiceResponse;
  *
  * @package Broarm\EventTickets
  */
-class PaymentProcessor extends Object
+class PaymentProcessor extends SS_Object
 {
     /**
      * @config
