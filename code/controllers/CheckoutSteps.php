@@ -10,10 +10,10 @@ namespace Broarm\EventTickets;
 
 use ArrayList;
 use Controller;
-use Object;
+use SS_Object;
 use ViewableData;
 
-class CheckoutSteps extends Object
+class CheckoutSteps extends SS_Object
 {
     private static $checkout_steps = array(
         'register',
