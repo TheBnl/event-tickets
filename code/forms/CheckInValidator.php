@@ -2,7 +2,7 @@
 
 namespace Broarm\EventTickets;
 
-use Object;
+use SS_Object;
 
 /**
  * CheckInValidator.php
@@ -10,7 +10,7 @@ use Object;
  * @author Bram de Leeuw
  * Date: 14/06/2017
  */
-class CheckInValidator extends Object
+class CheckInValidator extends SS_Object
 {
     const MESSAGE_ERROR = 'MESSAGE_ERROR';
     const MESSAGE_NO_CODE = 'MESSAGE_NO_CODE';
