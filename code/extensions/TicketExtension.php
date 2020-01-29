@@ -73,6 +73,13 @@ class TicketExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
+        $guestListStatusDescription = _t('TicketExtension.GuestListStatusDescription', 'Tickets sold: {guestListStatus}', null, [
+            'guestListStatus' => $this->owner->getGuestListStatus()
+        ]);
+        $fields->addFieldsToTab('Root.Main', [
+            LiteralField::create('GuestListStatus', "<p class='message notice'>{$guestListStatusDescription}</p>")
+        ], 'Title');
+
         $ticketLabel = _t('TicketExtension.Tickets', 'Tickets');
         $fields->addFieldsToTab(
             "Root.$ticketLabel", array(
@@ -162,6 +169,16 @@ class TicketExtension extends DataExtension
         if ($this->owner->Attendees()->exists()) {
             $actions->push($checkInButton);
         }
+    }
+
+    /**
+     * Get the guest list status used in the summary fields
+     */
+    public function getGuestListStatus()
+    {
+        $guests = $this->owner->getGuestList()->count();
+        $capacity = $this->owner->Capacity;
+        return "$guests/$capacity";
     }
 
     /**
