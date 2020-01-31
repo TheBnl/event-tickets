@@ -1,14 +1,7 @@
 <?php
-/**
- * GuestListExportButton.php
- *
- * @author Bram de Leeuw
- * Date: 01/06/17
- */
 
 namespace Broarm\EventTickets;
 
-use CalendarEvent;
 use ExcelGridFieldExportButton;
 use ExcelImportExport;
 use Exception;
@@ -25,22 +18,10 @@ use PHPExcel_Cell;
  */
 class GuestListExportButton extends ExcelGridFieldExportButton
 {
-
     public function getHTMLFragments($gridField) {
-        $title = $this->buttonTitle ? $this->buttonTitle : _t(
-            'TableListField.XLSEXPORT',
-            'Export to Excel'
-        );
-
+        $title = $this->buttonTitle ?: _t('TableListField.XLSEXPORT', 'Export to Excel');
         $name = $this->getActionName();
-
-        $button = new GridField_FormAction(
-            $gridField,
-            $name,
-            $title,
-            $name,
-            null
-        );
+        $button = new GridField_FormAction($gridField, $name, $title, $name, null);
         $button->addExtraClass('btn btn-secondary font-icon-down-circled btn--icon-large action_export no-ajax');
         $button->setForm($gridField->getForm());
 
@@ -59,20 +40,11 @@ class GuestListExportButton extends ExcelGridFieldExportButton
     public function generateExportFileData($gridField)
     {
         $class = $gridField->getModelClass();
-        $columns = ($this->exportColumns) ? $this->exportColumns : ExcelImportExport::exportFieldsForClass($class);
-        $fileData = '';
+        $columns = $this->exportColumns ?: ExcelImportExport::exportFieldsForClass($class);
+        $plural = $class ? singleton($class)->i18n_plural_name() : '';
 
-        $singl = singleton($class);
-
-        $singular = $class ? $singl->i18n_singular_name() : '';
-        $plural = $class ? $singl->i18n_plural_name() : '';
-
-        $filter = new FileNameFilter;
-        if ($this->exportName) {
-            $this->exportName = $filter->filter($this->exportName);
-        } else {
-            $this->exportName = $filter->filter('export-' . $plural);
-        }
+        $filter = new FileNameFilter();
+        $this->exportName = $filter->filter($this->exportName ?: 'export-' . $plural);
 
         $excel = new PHPExcel();
         $excelProperties = $excel->getProperties();
@@ -93,7 +65,8 @@ class GuestListExportButton extends ExcelGridFieldExportButton
             // source name as the header instead
             foreach ($columns as $columnSource => $columnHeader) {
                 $headers[] = (!is_string($columnHeader) && is_callable($columnHeader))
-                    ? $columnSource : $columnHeader;
+                    ? $columnSource
+                    : $columnHeader;
             }
 
             foreach ($headers as $header) {
@@ -101,9 +74,9 @@ class GuestListExportButton extends ExcelGridFieldExportButton
                 $col++;
             }
 
-            $endcol = PHPExcel_Cell::stringFromColumnIndex($col - 1);
-            $sheet->setAutoFilter("A1:{$endcol}1");
-            $sheet->getStyle("A1:{$endcol}1")->getFont()->setBold(true);
+            $endCol = PHPExcel_Cell::stringFromColumnIndex($col - 1);
+            $sheet->setAutoFilter("A1:{$endCol}1");
+            $sheet->getStyle("A1:{$endCol}1")->getFont()->setBold(true);
 
             $col = 0;
             $row++;
@@ -122,7 +95,6 @@ class GuestListExportButton extends ExcelGridFieldExportButton
 
         //Remove GridFieldPaginator as we're going to export the entire list.
         $gridField->getConfig()->removeComponentsByType('GridFieldPaginator');
-
         $items = $gridField->getManipulatedList();
 
         // @todo should GridFieldComponents change behaviour based on whether others are available in the config?
