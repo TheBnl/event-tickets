@@ -57,6 +57,17 @@ class WaitingListRegistration extends DataObject
         return $fields;
     }
 
+    /**
+     * Returns the singular name without the namespaces
+     *
+     * @return string
+     */
+    public function singular_name()
+    {
+        $name = explode('\\', parent::singular_name());
+        return trim(end($name));
+    }
+
     public function canView($member = null)
     {
         return $this->Event()->canView($member);
