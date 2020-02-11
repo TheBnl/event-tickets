@@ -23,11 +23,6 @@ use TextareaField;
  */
 class SummaryForm extends FormStep
 {
-    /**
-     * @var Reservation
-     */
-    protected $reservation;
-
     public function __construct($controller, $name, Reservation $reservation)
     {
         $fields = FieldList::create(

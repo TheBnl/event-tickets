@@ -19,6 +19,11 @@ use SS_HTTPResponse;
 abstract class FormStep extends Form
 {
     /**
+     * @var Reservation
+     */
+    protected $reservation;
+
+    /**
      * @var string the next action to go to
      */
     protected $nextStep;
@@ -52,5 +57,15 @@ abstract class FormStep extends Form
     public function nextStep()
     {
         return $this->getController()->redirect($this->getController()->Link($this->nextStep));
+    }
+
+    /**
+     * Accessor to the reservation
+     *
+     * @return Reservation
+     */
+    public function getReservation()
+    {
+        return $this->reservation;
     }
 }

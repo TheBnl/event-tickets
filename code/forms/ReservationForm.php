@@ -27,11 +27,6 @@ class ReservationForm extends FormStep
      */
     private static $require_all_attendees = false;
 
-    /**
-     * @var Reservation
-     */
-    protected $reservation;
-
     public function __construct($controller, $name, Reservation $reservation = null)
     {
         $requiredFields = array();
@@ -58,16 +53,7 @@ class ReservationForm extends FormStep
         $required = new RequiredFields($requiredFields);
 
         parent::__construct($controller, $name, $fields, $actions, $required);
-    }
-
-    /**
-     * Get the attached reservation
-     *
-     * @return Reservation
-     */
-    public function getReservation()
-    {
-        return $this->reservation;
+        $this->extend('updateForm');
     }
 
     /**
@@ -101,12 +87,12 @@ class ReservationForm extends FormStep
                 $reservation->setMainContact($attendeeID);
             }
         }
-        
+
         // add the tax modifier
         $reservation->PriceModifiers()->add(TaxModifier::findOrMake($reservation));
         $reservation->calculateTotal();
         $reservation->write();
-        
+
         $this->extend('beforeNextStep', $data, $form);
         return $this->nextStep();
     }
