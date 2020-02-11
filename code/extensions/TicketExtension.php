@@ -112,7 +112,7 @@ class TicketExtension extends DataExtension
             $waitingListLabel = _t('TicketExtension.WaitingList', 'WaitingList');
             $fields->addFieldToTab(
                 "Root.$waitingListLabel",
-                GridField::create('WaitingList', $waitingListLabel, $this->owner->WaitingList(), GridFieldConfig_RecordEditor::create())
+                GridField::create('WaitingList', $waitingListLabel, $this->owner->WaitingList(), WaitingListGridFieldConfig::create())
             );
         }
 
