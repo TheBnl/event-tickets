@@ -35,14 +35,15 @@ class UserNumericField extends Broarm\EventTickets\UserField
     /**
      * Create a default text field
      *
-     * @param string $fieldName
-     * @param null   $defaultValue
+     * @param string  $fieldName
+     * @param null    $defaultValue
+     * @param boolean $main check if the field is for the main attendee
      *
      * @return NumericField|FormField
      */
-    public function createField($fieldName, $defaultValue = null)
+    public function createField($fieldName, $defaultValue = null, $main = false)
     {
-        $numericField = parent::createField($fieldName, $defaultValue);
+        $numericField = parent::createField($fieldName, $defaultValue, $main);
 
         if (!empty($this->Min)) {
             $numericField->setAttribute('min', $this->Min);

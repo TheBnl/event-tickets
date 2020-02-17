@@ -45,16 +45,22 @@ class AttendeeField extends CompositeField
         foreach ($savableFields as $field) {
             // Generate a unique field name
             $fieldName = "{$this->name}[{$attendee->ID}][$field->ID]";
-            
-            // Check if the field is required
-            if ($field->Required && $required) {
-                $this->addRequiredField($fieldName);
-            }
 
             // Create the field an fill with attendee data
             $hasField = $attendee->Fields()->find('ID', $field->ID);
             $value = $hasField ? $hasField->getField('Value') : null;
-            $formField = $field->createField($fieldName, $value);
+            $formField = $field->createField($fieldName, $value, $main);
+
+            // Check if the field is required
+            if ($field->Required && $required) {
+                if ($formField instanceof CompositeField) {
+                    foreach ($formField->getChildren()->column('Name') as $requiredField) {
+                        $this->addRequiredField($requiredField);
+                    }
+                } else {
+                    $this->addRequiredField($fieldName);
+                }
+            }
 
             // Pre fill the field if a member is logged in
             if ($main && empty($formField->value) && $member = Member::currentUser()) {

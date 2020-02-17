@@ -181,10 +181,11 @@ class UserField extends DataObject
      *
      * @param $fieldName string Created by the AttendeeField
      * @param $defaultValue string Set a default value
+     * @param $main boolean check if the field is for the main attendee
      *
      * @return FormField
      */
-    public function createField($fieldName, $defaultValue = null)
+    public function createField($fieldName, $defaultValue = null, $main = false)
     {
         $fieldType = $this->fieldType;
         $field = $fieldType::create($fieldName, $this->Title, $defaultValue);

@@ -11,6 +11,8 @@ namespace Broarm\EventTickets;
 use FieldList;
 use FormAction;
 use RequiredFields;
+use SS_HTTPResponse;
+use ValidationException;
 
 /**
  * Class ReservationForm
@@ -59,10 +61,10 @@ class ReservationForm extends FormStep
     /**
      * Finish the registration and continue to checkout
      *
-     * @param array           $data
+     * @param array $data
      * @param ReservationForm $form
-     *
-     * @return \SS_HTTPResponse
+     * @return bool|SS_HTTPResponse
+     * @throws ValidationException
      */
     public function goToNextStep(array $data, ReservationForm $form)
     {
@@ -73,6 +75,18 @@ class ReservationForm extends FormStep
 
             // populate the attendees
             foreach ($attendeeData as $field => $value) {
+                // Array value means we have a composite field.
+                // This is used by the email field, main attendee to check if we have a correct mail address set.
+                // todo, should be moved somewhere in the field classes.
+                if (is_array($value)) {
+                    if (count(array_unique($value)) !== 1) {
+                        $form->addErrorMessage($field, 'Make sure your email address is spelled correctly', 'bad');
+                        return $form->getController()->redirectBack();
+                    } else {
+                        $value = array_shift($value);
+                    }
+                }
+
                 if (is_int($field)) {
                     $attendee->Fields()->add($field, array('Value' => $value));
                 } else {

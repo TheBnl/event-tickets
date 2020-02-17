@@ -35,15 +35,16 @@ class UserDateField extends Broarm\EventTickets\UserField
     /**
      * Create a default text field
      *
-     * @param string $fieldName
-     * @param null   $defaultValue
+     * @param string  $fieldName
+     * @param null    $defaultValue
+     * @param boolean $main check if the field is for the main attendee
      *
      * @return DateField
      */
-    public function createField($fieldName, $defaultValue = null)
+    public function createField($fieldName, $defaultValue = null, $main = false)
     {
         /** @var DateField $dateField */
-        $dateField = parent::createField($fieldName, $defaultValue);
+        $dateField = parent::createField($fieldName, $defaultValue, $main);
 
         if ($this->MinDate) {
             $dateField->setConfig('min', $this->dbObject('MinDate')->Format('Y-m-d'));

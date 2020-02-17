@@ -36,15 +36,16 @@ class UserOptionSetField extends Broarm\EventTickets\UserField
     }
 
     /**
-     * @param string $fieldName
-     * @param null   $defaultValue
+     * @param string  $fieldName
+     * @param null    $defaultValue
+     * @param boolean $main check if the field is for the main attendee
      *
      * @return OptionsetField
      */
-    public function createField($fieldName, $defaultValue = null)
+    public function createField($fieldName, $defaultValue = null, $main = false)
     {
         /** @var OptionsetField $field */
-        $field = parent::createField($fieldName, $defaultValue);
+        $field = parent::createField($fieldName, $defaultValue, $main);
         $field->setSource($this->Options()->map()->toArray());
         $field->setValue($defaultValue);
         return $field;
