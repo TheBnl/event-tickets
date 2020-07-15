@@ -509,7 +509,7 @@ class Attendee extends DataObject
      */
     public function getCheckInLink()
     {
-        return $this->Event()->AbsoluteLink("checkin/{$this->TicketCode}");
+        return $this->Event()->AbsoluteLink("checkin/ticket/{$this->TicketCode}");
     }
 
     /**

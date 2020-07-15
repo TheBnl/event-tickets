@@ -30,24 +30,27 @@ class CheckInController extends Page_Controller implements PermissionProvider
     const SUCCESS = 1;
 
     private static $allowed_actions = array(
-        'CheckInForm'
+        'CheckInForm',
+        'ticket'
     );
 
-    public function init()
-    {
-        // Check if the current user has permissions to check in guest
+    /**
+     * Add a ticket action for a cleaner API
+     *
+     * @return \SS_HTTPResponse|void
+     */
+    public function ticket() {
         if (!Permission::check('HANDLE_CHECK_IN')) {
             Security::permissionFailure();
         }
 
         $params = $this->getURLParams();
-        if (isset($params['ID']) && !in_array($params['ID'], self::config()->get('allowed_actions'))) {
+        if (isset($params['ID'])) {
             $form = CheckInForm::create($this);
-            $form->doCheckIn(array('TicketCode' => $params['ID']), $form);
-            $this->redirect($this->Link());
+            return $form->doCheckIn(array('TicketCode' => $params['ID']), $form);
         }
 
-        parent::init();
+        return $this->httpError(404);
     }
 
     /**
@@ -106,5 +109,30 @@ class CheckInController extends Page_Controller implements PermissionProvider
                 'category' => _t('TicketControllerExtension.PERMISSIONS_CAT', 'Event tickets'),
             )
         );
+    }
+
+    /**
+     * Here for legacy app support
+     *
+     * @deprecated use the ticket action when checking user in trough url
+     * @return \SS_HTTPResponse|void
+     * @throws \Exception
+     */
+    public function init()
+    {
+        // Check if the current user has permissions to check in guest
+        if (!Permission::check('HANDLE_CHECK_IN')) {
+            Security::permissionFailure();
+        }
+
+        // Here for legacy support
+        $params = $this->getURLParams();
+        if (isset($params['ID']) && !in_array($params['ID'], self::config()->get('allowed_actions'))) {
+            $form = CheckInForm::create($this);
+            $form->doCheckIn(array('TicketCode' => $params['ID']), $form);
+            $this->redirect($this->Link());
+        }
+
+        parent::init();
     }
 }
