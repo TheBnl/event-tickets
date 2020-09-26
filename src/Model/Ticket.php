@@ -48,10 +48,10 @@ class Ticket extends DataObject
     private static $sale_end_threshold = '-12 hours';
 
     private static $db = array(
-        'Title' => 'Varchar(255)',
+        'Title' => 'Varchar',
         'Price' => 'Currency',
-        'AvailableFromDate' => 'SS_DateTime',
-        'AvailableTillDate' => 'SS_DateTime',
+        'AvailableFromDate' => 'DBDatetime',
+        'AvailableTillDate' => 'DBDatetime',
         'OrderMin' => 'Int',
         'OrderMax' => 'Int',
         'Sort' => 'Int'

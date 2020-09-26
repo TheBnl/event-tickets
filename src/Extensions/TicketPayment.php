@@ -6,6 +6,7 @@ use Broarm\EventTickets\Model\Reservation;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\ValidationException;
 
 /**
  * Class TicketPayment
@@ -25,6 +26,7 @@ class TicketPayment extends DataExtension
      * Fix issue manual gateway doesn't call onCaptured hook
      *
      * @param ServiceResponse $response
+     * @throws ValidationException
      */
     public function onAuthorized(ServiceResponse $response)
     {
@@ -40,6 +42,7 @@ class TicketPayment extends DataExtension
      * Complete the order on a successful transaction
      *
      * @param ServiceResponse $response
+     * @throws ValidationException
      */
     public function onCaptured(ServiceResponse $response)
     {
