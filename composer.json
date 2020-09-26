@@ -1,7 +1,7 @@
 {
     "name": "bramdeleeuw/silverstripe-event-tickets",
     "description": "Event tickets for SilverStripe Event Calendar",
-    "type": "silverstripe-module",
+    "type": "silverstripe-vendormodule",
     "homepage": "https://github.com/TheBnl/event-tickets",
     "keywords": [
         "silverstripe",
@@ -18,18 +18,22 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "~3.1",
-        "silverstripe/cms": "~3.1",
-        "silverstripe/event-calendar": "*",
+        "silverstripe/framework": "~4.1",
+        "silverstripe/cms": "~4.1",
         "silverstripe/silverstripe-omnipay": "*",
         "symbiote/silverstripe-gridfieldextensions": "*",
         "omnipay/manual": "*",
         "bacon/bacon-qr-code": "1.0.*",
-        "dompdf/dompdf": "*",
-        "unclecheese/betterbuttons": "*",
-        "jonom/silverstripe-share-care": "*"
+        "dompdf/dompdf": "*"
     },
     "extra": {
-        "installer-name": "event-tickets"
+        "expose": [
+            "client"
+        ]
+    },
+    "autoload": {
+        "psr-4": {
+            "Broarm\\EventTickets\\": "src"
+        }
     }
 }
