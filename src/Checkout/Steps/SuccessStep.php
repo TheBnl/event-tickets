@@ -25,8 +25,6 @@ class SuccessStep extends CheckoutStep
             return $this->owner->redirect($this->owner->Link());
         }
 
-        // End the reservation and show the success view
-        ReservationSession::end();
         return $this->owner;
     }
 }
