@@ -2,6 +2,8 @@
 
 namespace Broarm\EventTickets\Model;
 
+use Broarm\EventTickets\Extensions\TicketExtension;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 
@@ -13,6 +15,8 @@ use SilverStripe\ORM\DataObject;
  * @property string Title
  * @property string Email
  * @property string Telephone
+ *
+ * @method TicketExtension|SiteTree TicketPage()
  */
 class WaitingListRegistration extends DataObject
 {
@@ -25,7 +29,7 @@ class WaitingListRegistration extends DataObject
     );
 
     private static $has_one = array(
-        //'Event' => 'CalendarEvent'
+        'TicketPage' => SiteTree::class,
     );
 
     private static $summary_fields = array(
@@ -57,23 +61,23 @@ class WaitingListRegistration extends DataObject
         return trim(end($name));
     }
 
-//    public function canView($member = null)
-//    {
-//        return $this->Event()->canView($member);
-//    }
-//
-//    public function canEdit($member = null)
-//    {
-//        return $this->Event()->canEdit($member);
-//    }
-//
-//    public function canDelete($member = null)
-//    {
-//        return $this->Event()->canDelete($member);
-//    }
-//
-//    public function canCreate($member = null)
-//    {
-//        return $this->Event()->canCreate($member);
-//    }
+    public function canView($member = null)
+    {
+        return $this->TicketPage()->canView($member);
+    }
+
+    public function canEdit($member = null)
+    {
+        return $this->TicketPage()->canEdit($member);
+    }
+
+    public function canDelete($member = null)
+    {
+        return $this->TicketPage()->canDelete($member);
+    }
+
+    public function canCreate($member = null, $context = [])
+    {
+        return $this->TicketPage()->canCreate($member, $context);
+    }
 }

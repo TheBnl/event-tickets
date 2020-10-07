@@ -3,9 +3,9 @@
 namespace Broarm\EventTickets\Forms;
 
 use Broarm\EventTickets\Checkout\PaymentProcessor;
-use Broarm\EventTickets\Extensions\PaymentGatewayField;
-use Broarm\EventTickets\Extensions\SummaryField;
-use Broarm\EventTickets\Extensions\TermsAndConditionsField;
+use Broarm\EventTickets\Fields\PaymentGatewayField;
+use Broarm\EventTickets\Fields\SummaryField;
+use Broarm\EventTickets\Fields\TermsAndConditionsField;
 use Broarm\EventTickets\Model\Reservation;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\FieldList;

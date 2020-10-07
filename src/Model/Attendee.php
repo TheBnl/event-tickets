@@ -2,12 +2,21 @@
 
 namespace Broarm\EventTickets\Model;
 
+use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Forms\CheckInValidator;
+use Broarm\EventTickets\Model\UserFields\UserEmailField;
 use Broarm\EventTickets\Model\UserFields\UserField;
+use Broarm\EventTickets\Model\UserFields\UserTextField;
+use Dompdf\Dompdf;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Assets\Image;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
@@ -17,6 +26,7 @@ use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Security\Member;
 use SilverStripe\View\ArrayData;
+use SilverStripe\View\SSViewer;
 
 /**
  * Class Attendee
@@ -32,15 +42,13 @@ use SilverStripe\View\ArrayData;
  * @property int TicketQRCodeID
  * @property int TicketFileID
  * @property int ReservationID
- * @property int EventID
+ * @property int TicketPageID
  * @property int MemberID
  *
  * @method Reservation Reservation()
  * @method Ticket Ticket()
- * @method Image TicketQRCode()
- * @method File TicketFile()
  * @method Member Member()
- * @method TicketExtension Event()
+ * @method TicketExtension|SiteTree TicketPage()
  * @method ManyManyList Fields()
  */
 class Attendee extends DataObject
@@ -59,19 +67,19 @@ class Attendee extends DataObject
     private static $default_fields = array(
         'FirstName' => array(
             'Title' => 'First name',
-            'FieldType' => 'UserTextField',
+            'FieldType' => UserTextField::class,
             'Required' => true,
             'Editable' => false
         ),
         'Surname' => array(
             'Title' => 'Surname',
-            'FieldType' => 'UserTextField',
+            'FieldType' => UserTextField::class,
             'Required' => true,
             'Editable' => false
         ),
         'Email' => array(
             'Title' => 'Email',
-            'FieldType' => 'UserEmailField',
+            'FieldType' => UserEmailField::class,
             'Required' => true,
             'Editable' => false
         )
@@ -99,12 +107,10 @@ class Attendee extends DataObject
     );
 
     private static $has_one = array(
+        'TicketPage' => SiteTree::class,
         'Reservation' => Reservation::class,
         'Ticket' => Ticket::class,
-        //'Event' => 'CalendarEvent',
-        'Member' => Member::class,
-        'TicketQRCode' => Image::class,
-        'TicketFile' => File::class
+        'Member' => Member::class
     );
 
     private static $many_many = array(
@@ -122,16 +128,6 @@ class Attendee extends DataObject
         'Ticket.Title' => 'Ticket',
         'TicketCode' => 'Ticket #',
         'CheckedIn.Nice' => 'Checked in',
-    );
-
-    /**
-     * Actions usable on the cms detail view
-     *
-     * @var array
-     */
-    private static $better_buttons_actions = array(
-        'sendTicket',
-        'createTicketFile'
     );
 
     protected static $cachedFields = array();
@@ -152,36 +148,7 @@ class Attendee extends DataObject
             );
         }
 
-        if ($this->TicketFile()->exists()) {
-            $fields->addFieldToTab('Root.Main', $reservationFileField = ReadonlyField::create(
-                'ReservationFile',
-                _t('Attendee.Reservation', 'Reservation'),
-                "<a class='readonly' href='{$this->TicketFile()->Link()}' target='_blank'>Download reservation PDF</a>"
-            ));
-            $reservationFileField->dontEscape = true;
-        }
-
         return $fields;
-    }
-
-    /**
-     * Add utility actions to the attendee details view
-     *
-     * @deprecated
-     */
-    public function getBetterButtonsActions()
-    {
-        /** @var FieldList $fields */
-//        $fields = parent::getBetterButtonsActions();
-//        if ($this->TicketFile()->exists() && !empty($this->getEmail())) {
-//            $fields->push(BetterButtonCustomAction::create('sendTicket', _t('Attendee.SEND', 'Send the ticket')));
-//        }
-//
-//        if (!empty($this->getName()) && !empty($this->getEmail())) {
-//            $fields->push(BetterButtonCustomAction::create('createTicketFile', _t('Attendee.CREATE_TICKET', 'Create the ticket')));
-//        }
-
-        //return $fields;
     }
 
     /**
@@ -195,16 +162,6 @@ class Attendee extends DataObject
         // Generate the ticket code
         if ($this->exists() && empty($this->TicketCode)) {
             $this->TicketCode = $this->generateTicketCode();
-        }
-
-        if (
-            $this->getEmail()
-            && $this->getName()
-            && !$this->TicketFile()->exists()
-            && !$this->TicketQRCode()->exists()
-        ) {
-            $this->createQRCode();
-            $this->createTicketFile();
         }
 
         if ($fields = $this->Fields()) {
@@ -221,8 +178,8 @@ class Attendee extends DataObject
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-        if (($event = $this->Event()) && $event->exists() && !$this->Fields()->exists()) {
-            $this->Fields()->addMany($event->Fields()->column());
+        if (($ticketPage = $this->TicketPage()) && $ticketPage->exists() && !$this->Fields()->exists()) {
+            $this->Fields()->addMany($ticketPage->Fields()->column());
         }
     }
 
@@ -231,22 +188,33 @@ class Attendee extends DataObject
      */
     public function onBeforeDelete()
     {
-        // If an attendee is deleted from the guest list remove it's qr code
-        // after deleting the code it's not validatable anymore, simply here for cleanup
-        if ($this->TicketQRCode()->exists()) {
-            $this->TicketQRCode()->delete();
-        }
-
-        // cleanup the ticket file
-        if ($this->TicketFile()->exists()) {
-            $this->TicketFile()->delete();
-        }
-
         if ($this->Fields()->exists()) {
             $this->Fields()->removeAll();
         }
 
         parent::onBeforeDelete();
+    }
+
+    /**
+     * Check if the attendee has all required fields set
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        $fields = self::config()->get('default_fields');
+        $requiredFields = array_filter($fields, function ($field) {
+            return $field['Required'];
+        });
+        
+        $valid = true;
+        foreach ($requiredFields as $requiredField => $requiredFieldConfig) {
+            if ($valid) {
+                $valid = !empty($this->getUserField($requiredField));
+            }
+        }
+
+        return $valid;
     }
 
     /**
@@ -257,7 +225,7 @@ class Attendee extends DataObject
      */
     public function fileFolder()
     {
-        return Folder::find_or_make("/event-tickets/{$this->Event()->URLSegment}/{$this->TicketCode}/");
+        return Folder::find_or_make("/event-tickets/{$this->TicketPage()->URLSegment}/{$this->TicketCode}/");
     }
 
     /**
@@ -372,123 +340,19 @@ class Attendee extends DataObject
     }
 
     /**
-     * Create a QRCode for the attendee based on the Ticket code
+     * Get a base64 encoded QR png code
      *
-     * @return Image
+     * @return string
      */
-    public function createQRCode()
+    public function getQRCode()
     {
-        // todo dont store qr code file
+        $renderer = new ImageRenderer(
+            new RendererStyle(400),
+            new ImagickImageBackEnd()
+        );
 
-
-        $folder = $this->fileFolder();
-        $relativeFilePath = "/{$folder->Filename}{$this->TicketCode}.png";
-        $absoluteFilePath = Director::baseFolder() . $relativeFilePath;
-
-        if (!$image = Image::get()->find('Filename', $relativeFilePath)) {
-            // Generate the QR code
-            $renderer = new BaconQrCode\Renderer\Image\Png();
-            $renderer->setHeight(256);
-            $renderer->setWidth(256);
-            $writer = new BaconQrCode\Writer($renderer);
-            if (self::config()->get('qr_as_link')) {
-                $writer->writeFile($this->getCheckInLink(), $absoluteFilePath);
-            } else {
-                $writer->writeFile($this->TicketCode, $absoluteFilePath);
-            }
-
-            // Store the image in an image object
-            $image = Image::create();
-            $image->ParentID = $folder->ID;
-            $image->OwnerID = (Member::currentUser()) ? Member::currentUser()->ID : 0;
-            $image->Title = $this->TicketCode;
-            $image->setFilename($relativeFilePath);
-            $image->write();
-
-            // Attach the QR code to the Attendee
-            $this->TicketQRCodeID = $image->ID;
-            $this->write();
-        }
-
-        return $image;
-    }
-
-    /**
-     * Creates a printable ticket for the attendee
-     *
-     * @return File
-     */
-    public function createTicketFile()
-    {
-        // todo dont store ticket file
-
-        // Find or make a folder
-        $folder = $this->fileFolder();
-        $relativeFilePath = "/{$folder->Filename}{$this->TicketCode}.pdf";
-        $absoluteFilePath = Director::baseFolder() . $relativeFilePath;
-
-        if (!$this->TicketQRCode()->exists()) {
-            $this->createQRCode();
-        }
-
-        if (!$file = File::get()->find('Filename', $relativeFilePath)) {
-            $file = File::create();
-            $file->ParentID = $folder->ID;
-            $file->OwnerID = (Member::currentUser()) ? Member::currentUser()->ID : 0;
-            $file->Title = $this->TicketCode;
-            $file->setFilename($relativeFilePath);
-            $file->write();
-        }
-
-        // Set the template and parse the data
-        $template = new SSViewer('PrintableTicket');
-        $html = $template->process($this->data());// getViewableData());
-
-        // Create a DomPDF instance
-        $domPDF = new Dompdf();
-        $domPDF->loadHtml($html);
-        $domPDF->setPaper('A4');
-        $domPDF->getOptions()->setDpi(150);
-        $domPDF->render();
-
-        // Save the pdf stream as a file
-        file_put_contents($absoluteFilePath, $domPDF->output());
-
-        // Attach the ticket file to the Attendee
-        $this->TicketFileID = $file->ID;
-        $this->write();
-
-        return $file;
-    }
-
-    /**
-     * Send the attendee ticket
-     *
-     * @return mixed
-     */
-    public function sendTicket()
-    {
-        // Get the mail sender or fallback to the admin email
-        if (empty($from = Reservation::config()->get('mail_sender'))) {
-            $from = Email::config()->get('admin_email');
-        }
-
-        $email = new Email();
-        $email->setSubject(_t(
-            __CLASS__ . '.Title',
-            'Your ticket for {event}',
-            null,
-            array(
-                // todo Dont depend on event
-                'event' => $this->Event()->Title
-            )
-        ));
-        $email->setFrom($from);
-        $email->setTo($this->getEmail());
-        $email->setHTMLTemplate('AttendeeMail');
-        $email->setData($this);
-        $this->extend('updateTicketMail', $email);
-        return $email->send();
+        $writer = new Writer($renderer);
+        return base64_encode($writer->writeString($this->TicketCode));
     }
 
     /**
@@ -498,8 +362,7 @@ class Attendee extends DataObject
      */
     public function getCheckInLink()
     {
-        // todo Dont depend on event
-        return $this->Event()->AbsoluteLink("checkin/ticket/{$this->TicketCode}");
+        return $this->TicketPage()->AbsoluteLink("checkin/ticket/{$this->TicketCode}");
     }
 
     /**

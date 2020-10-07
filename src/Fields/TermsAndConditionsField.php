@@ -1,7 +1,9 @@
 <?php
 
-namespace Broarm\EventTickets\Extensions;
+namespace Broarm\EventTickets\Fields;
 
+use Broarm\EventTickets\Extensions\SiteConfigExtension;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\SiteConfig\SiteConfig;
 
@@ -10,7 +12,7 @@ class TermsAndConditionsField extends CheckboxField
     protected $fieldHolderTemplate = 'TermsAndConditionsField_holder';
 
     /**
-     * @var \Page
+     * @var SiteTree
      */
     protected $termsPage;
 

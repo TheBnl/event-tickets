@@ -3,7 +3,12 @@
 namespace Broarm\EventTickets\Model;
 
 use Broarm\EventTickets\Extensions\TicketExtension;
+use Exception;
+use Mpdf\Mpdf;
+use Mpdf\Output\Destination;
+use SilverStripe\Assets\FileNameFilter;
 use SilverStripe\Assets\Folder;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\CheckboxField;
@@ -17,7 +22,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ValidationException;
-use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\View\SSViewer;
 
 /**
  * Class Reservation
@@ -35,10 +40,10 @@ use SilverStripe\SiteConfig\SiteConfig;
  * @property boolean SentReservation
  * @property boolean SentNotification
  *
- * @property int EventID
+ * @property int TicketPageID
  * @property int MainContactID
  *
- * @method TicketExtension Event()
+ * @method TicketExtension|SiteTree TicketPage()
  * @method Attendee MainContact()
  * @method HasManyList Payments()
  * @method HasManyList Attendees()
@@ -114,12 +119,11 @@ class Reservation extends DataObject
     private static $default_sort = 'Created DESC';
 
     private static $has_one = array(
-        //'Event' => 'CalendarEvent',
+        'TicketPage' => SiteTree::class,
         'MainContact' => Attendee::class
     );
 
     private static $has_many = array(
-        //'Payments' => Payment::class,
         'Attendees' => Attendee::class . '.Reservation'
     );
 
@@ -159,6 +163,7 @@ class Reservation extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->removeByName(['Attendees', 'Payments', 'PriceModifiers', 'Subtotal', 'Gateway', 'SentTickets', 'SentReservation', 'SentNotification', 'TicketPageID']);
         $gridFieldConfig = GridFieldConfig_RecordViewer::create();
         $fields->addFieldsToTab('Root.Main', array(
             ReadonlyField::create('ReservationCode', _t(__CLASS__ . '.Code', 'Code')),
@@ -282,7 +287,11 @@ class Reservation extends DataObject
      */
     public function getState()
     {
-        return _t(__CLASS__ . ".{$this->Status}", $this->Status);
+        if ($this->exists()) {
+            return _t(__CLASS__ . ".{$this->Status}", $this->Status);
+        }
+
+        return null;
     }
 
     /**
@@ -304,8 +313,8 @@ class Reservation extends DataObject
      */
     public function calculateTotal()
     {
-        $ticket = Ticket::class;
-        $attendee = Attendee::class;
+        $ticket = DataObject::getSchema()->tableName(Ticket::class);
+        $attendee = DataObject::getSchema()->tableName(Attendee::class);
         $total = $this->Subtotal = $this->Attendees()->leftJoin(
             $ticket,
             "`$attendee`.`TicketID` = `$ticket`.`ID`"
@@ -336,7 +345,7 @@ class Reservation extends DataObject
             $this->Status = $state;
             return true;
         } else {
-            user_error(_t('Reservation.STATE_CHANGE_ERROR', 'Selected state is not available'));
+            user_error(_t(__CLASS__ . '.STATE_CHANGE_ERROR', 'Selected state is not available'));
             return false;
         }
     }
@@ -377,21 +386,26 @@ class Reservation extends DataObject
     }
 
     /**
-     * Generate the qr codes and downloadable pdf
+     * Creates a printable ticket for the attendee
+     *
+     * @return Mpdf
+     * @throws \Mpdf\MpdfException
      */
-    public function createFiles()
+    public function createTicketFile()
     {
-        /** @var Attendee $attendee */
-        foreach ($this->Attendees() as $attendee) {
-            $attendee->createQRCode();
-            $attendee->createTicketFile();
-        }
+        // Set the template and parse the data
+        $html = SSViewer::create('Broarm\\EventTickets\\ReservationPrintable')->process($this);
+
+        $pdf = new Mpdf();
+        $pdf->WriteHTML($html);
+        return $pdf;
     }
 
     /**
      * Send the reservation mail
      *
-     * @return mixed
+     * @return bool
+     * @throws \Mpdf\MpdfException
      */
     public function sendReservation()
     {
@@ -404,73 +418,36 @@ class Reservation extends DataObject
             $from = Config::inst()->get('Email', 'admin_email');
         }
 
+        $eventName = $this->TicketPage()->getEventTitle();
+
         // Create the email with given template and reservation data
         $email = new Email();
         $email->setSubject(_t(
-            'ReservationMail.TITLE',
-            'Your order at {sitename}',
+            __CLASS__ .'.ReservationSubject',
+            'Your tickets for {event}',
             null,
             array(
-                'sitename' => SiteConfig::current_site_config()->Title
+                'event' => $eventName
             )
         ));
         $email->setFrom($from);
-        $email->setTo($this->MainContact()->Email);
+        $email->setTo($this->MainContact()->getEmail());
         $email->setHTMLTemplate('Broarm\\EventTickets\\ReservationEmail');
+
+        $pdf = $this->createTicketFile();
+        $fileName = FileNameFilter::create()->filter("Tickets {$eventName}.pdf");
+        $email->addAttachmentFromData($pdf->Output($fileName, Destination::STRING_RETURN), $fileName, 'application/pdf');
+
         $email->setData($this);
         $this->extend('updateReservationMail', $email);
         return $email->send();
     }
 
     /**
-     * Send the reserved tickets
-     *
-     * @return mixed
-     */
-    public function sendTickets()
-    {
-        // Get the mail sender or fallback to the admin email
-        if (($from = self::config()->get('mail_sender')) && empty($from)) {
-            $from = Config::inst()->get('Email', 'admin_email');
-        }
-
-        // Send the tickets to the main contact
-        $email = new Email();
-        $email->setSubject(_t(
-            __CLASS__ . '.Title',
-            'Uw tickets voor {event}',
-            null,
-            array(
-                'event' => $this->Event()->Title
-            )
-        ));
-
-        $email->setFrom($from);
-        $email->setTo($this->MainContact()->Email);
-        $email->setHTMLTemplate('MainContactMail');
-        $email->setData($this);
-        $this->extend('updateMainContactMail', $email);
-        $sent = $email->send();
-
-        // Get the attendees for this event that are checked as receiver
-        $ticketReceivers = $this->Attendees()->filter('TicketReceiver', 1)->exclude('ID', $this->MainContactID);
-        if ($ticketReceivers->exists()) {
-            /** @var Attendee $ticketReceiver */
-            foreach ($ticketReceivers as $ticketReceiver) {
-                $sentAttendee = $ticketReceiver->sendTicket();
-                if ($sent && !$sentAttendee) {
-                    $sent = $sentAttendee;
-                }
-            }
-        }
-
-        return $sent;
-    }
-
-
-    /**
      * Send a booking notification to the ticket mail sender or the site admin
-     * @return mixed
+     *
+     * @return bool
+     * @throws Exception
      */
     public function sendNotification()
     {
@@ -488,67 +465,49 @@ class Reservation extends DataObject
 
         $email = new Email();
         $email->setSubject(_t(
-            'NotificationMail.TITLE',
-            'Nieuwe reservering voor {event}',
-            null, array('event' => $this->Event()->Title)
+            __CLASS__ . '.NotificationSubject',
+            'Nieuwe reservering voor {event} door {name}',
+            null, [
+                'event' => $this->TicketPage()->getEventTitle(),
+                'name' => $this->getName()
+            ]
         ));
 
         $email->setFrom($from);
         $email->setTo($to);
-        $email->setHTMLTemplate('NotificationMail');
+        $email->setHTMLTemplate('Broarm\\EventTickets\\NotificationMail');
         $email->setData($this);
         $this->extend('updateNotificationMail', $email);
         return $email->send();
     }
 
     /**
-     * Create the files and send the reservation, notification and tickets
+     * Send the reservation and notification
+     * @throws Exception
      */
     public function send()
     {
-        // todo send one confirmation with the tickets
-        $this->createFiles();
         $this->SentReservation = (boolean)$this->sendReservation();
         $this->SentNotification = (boolean)$this->sendNotification();
-        $this->SentTickets = (boolean)$this->sendTickets();
     }
 
-    /**
-     * Get the download link
-     *
-     * @return string|null
-     */
-    public function getDownloadLink()
+    public function canView($member = null)
     {
-        /** @var Attendee $attendee */
-        if (
-            ($attendee = $this->Attendees()->first())
-            && ($file = $attendee->TicketFile())
-            && $file->exists()
-        ) {
-            return $file->Link();
-        }
-
-        return null;
+        return $this->TicketPage()->canView($member);
     }
 
-//    public function canView($member = null)
-//    {
-//        return $this->Event()->canView($member);
-//    }
-//
-//    public function canEdit($member = null)
-//    {
-//        return $this->Event()->canEdit($member);
-//    }
-//
-//    public function canDelete($member = null)
-//    {
-//        return $this->Event()->canDelete($member);
-//    }
-//
-//    public function canCreate($member = null)
-//    {
-//        return $this->Event()->canCreate($member);
-//    }
+    public function canEdit($member = null)
+    {
+        return $this->TicketPage()->canEdit($member);
+    }
+
+    public function canDelete($member = null)
+    {
+        return $this->TicketPage()->canDelete($member);
+    }
+
+    public function canCreate($member = null, $context = [])
+    {
+        return $this->TicketPage()->canCreate($member, $context);
+    }
 }

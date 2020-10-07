@@ -13,16 +13,24 @@ use Broarm\EventTickets\Model\Ticket;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use Broarm\EventTickets\Model\WaitingListRegistration;
 use DateTime;
+use Exception;
 use SilverStripe\Assets\Image;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBDate;
+use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\HasManyList;
+use SilverStripe\ORM\ManyManyList;
 use SilverStripe\SiteConfig\SiteConfig;
 
 /**
@@ -36,12 +44,13 @@ use SilverStripe\SiteConfig\SiteConfig;
  * @property int OrderMax
  * @property string SuccessMessage
  * @property string SuccessMessageMail
+ * @property string PrintedTicketContent
  *
  * @method HasManyList Tickets()
  * @method HasManyList Reservations()
  * @method HasManyList Attendees()
  * @method HasManyList WaitingList()
- * @method HasManyList Fields()
+ * @method ManyManyList Fields()
  */
 class TicketExtension extends DataExtension
 {
@@ -52,16 +61,26 @@ class TicketExtension extends DataExtension
         'OrderMin' => 'Int',
         'OrderMax' => 'Int',
         'SuccessMessage' => 'HTMLText',
-        'SuccessMessageMail' => 'HTMLText'
+        'SuccessMessageMail' => 'HTMLText',
+        'PrintedTicketContent' => 'HTMLText',
     );
 
     private static $has_many = array(
-        'Tickets' => Ticket::class . '.Event',
-        'Reservations' => Reservation::class . '.Event',
-        'Attendees' => Attendee::class . '.Event',
-        'WaitingList' => WaitingListRegistration::class . '.Event',
-        'Fields' => UserField::class . '.Event'
+        'Tickets' => Ticket::class . '.TicketPage',
+        'Reservations' => Reservation::class . '.TicketPage',
+        'Attendees' => Attendee::class . '.TicketPage',
+        'WaitingList' => WaitingListRegistration::class . '.TicketPage',
     );
+
+    private static $many_many = array(
+        'Fields' => UserField::class
+    );
+
+    private static $many_many_extraFields = [
+        'Fields' => [
+            'Sort' => 'Int'
+        ]
+    ];
 
     private static $defaults = array(
         'Capacity' => 50
@@ -76,7 +95,7 @@ class TicketExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
-        $guestListStatusDescription = _t('TicketExtension.GuestListStatusDescription', 'Tickets sold: {guestListStatus}', null, [
+        $guestListStatusDescription = _t(__CLASS__ . '.GuestListStatusDescription', 'Tickets sold: {guestListStatus}', null, [
             'guestListStatus' => $this->owner->getGuestListStatus()
         ]);
 
@@ -84,18 +103,19 @@ class TicketExtension extends DataExtension
             LiteralField::create('GuestListStatus', "<p class='message notice'>{$guestListStatusDescription}</p>")
         ], 'Title');
 
-        $ticketLabel = _t('TicketExtension.Tickets', 'Tickets');
+        $ticketLabel = _t(__CLASS__ . '.Tickets', 'Tickets');
         $fields->addFieldsToTab(
             "Root.$ticketLabel", array(
-            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), TicketsGridFieldConfig::create($this->canCreateTickets())),
-            NumericField::create('Capacity', _t('TicketExtension.Capacity', 'Capacity')),
-            HtmlEditorField::create('SuccessMessage', _t('TicketExtension.SuccessMessage', 'Success message'))->setRows(4),
-            HtmlEditorField::create('SuccessMessageMail', _t('TicketExtension.MailMessage', 'Mail message'))->setRows(4)
+            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), TicketsGridFieldConfig::create()),
+            NumericField::create('Capacity', _t(__CLASS__ . '.Capacity', 'Capacity')),
+            HtmlEditorField::create('SuccessMessage', _t(__CLASS__ . '.SuccessMessage', 'Success message'))->addExtraClass('stacked')->setRows(4),
+            HtmlEditorField::create('SuccessMessageMail', _t(__CLASS__ . '.MailMessage', 'Mail message'))->addExtraClass('stacked')->setRows(4),
+            HtmlEditorField::create('PrintedTicketContent', _t(__CLASS__ . '.PrintedTicketContent', 'Ticket description'))->addExtraClass('stacked')->setRows(4)
         ));
 
         // Create Reservations tab
         if ($this->owner->Reservations()->exists()) {
-            $reservationLabel = _t('TicketExtension.Reservations', 'Reservations');
+            $reservationLabel = _t(__CLASS__ . '.Reservations', 'Reservations');
             $fields->addFieldToTab(
                 "Root.$reservationLabel",
                 GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), ReservationGridFieldConfig::create())
@@ -104,16 +124,16 @@ class TicketExtension extends DataExtension
 
         // Create Attendees tab
         if ($this->owner->Attendees()->exists()) {
-            $guestListLabel = _t('TicketExtension.GuestList', 'GuestList');
+            $guestListLabel = _t(__CLASS__ . '.GuestList', 'GuestList');
             $fields->addFieldToTab(
                 "Root.$guestListLabel",
-                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), GuestListGridFieldConfig::create($this->owner))
+                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), GuestListGridFieldConfig::create())
             );
         }
 
         // Create WaitingList tab
         if ($this->owner->WaitingList()->exists()) {
-            $waitingListLabel = _t('TicketExtension.WaitingList', 'WaitingList');
+            $waitingListLabel = _t(__CLASS__ . '.WaitingList', 'WaitingList');
             $fields->addFieldToTab(
                 "Root.$waitingListLabel",
                 GridField::create('WaitingList', $waitingListLabel, $this->owner->WaitingList(), WaitingListGridFieldConfig::create())
@@ -121,10 +141,18 @@ class TicketExtension extends DataExtension
         }
 
         // Create Fields tab
-        $extraFieldsLabel = _t('TicketExtension.ExtraFields', 'Attendee fields');
+        $extraFieldsLabel = _t(__CLASS__ . '.ExtraFields', 'Attendee fields');
         $fields->addFieldToTab(
             "Root.$extraFieldsLabel",
-            GridField::create('ExtraFields', $extraFieldsLabel, $this->owner->Fields(), UserFieldsGridFieldConfig::create())
+            GridField::create('ExtraFields', $extraFieldsLabel, $this->owner->Fields(), UserFieldsGridFieldConfig::create([
+                'ClassName' => function($record, $column, $grid) {
+                    return new DropdownField($column, $column, UserField::availableFields());
+                },
+                'Title' => function($record, $column, $grid) {
+                    return new TextField($column);
+                },
+                'RequiredNice' => 'Required field'
+            ]))
         );
 
         $this->owner->extend('updateTicketExtensionFields', $fields);
@@ -146,9 +174,11 @@ class TicketExtension extends DataExtension
     {
         $fields = Attendee::config()->get('default_fields');
         if (!$this->owner->Fields()->exists()) {
+            $sort = 0;
             foreach ($fields as $fieldName => $config) {
                 $field = UserField::createDefaultField($fieldName, $config);
-                $this->owner->Fields()->add($field);
+                $this->owner->Fields()->add($field, ['Sort' => $sort]);
+                $sort++;
             }
         }
     }
@@ -217,7 +247,8 @@ class TicketExtension extends DataExtension
     /**
      * get The sale start date
      *
-     * @return DateTime
+     * @return DBDate|DBField|null
+     * @throws Exception
      */
     public function getTicketSaleStartDate()
     {
@@ -238,6 +269,7 @@ class TicketExtension extends DataExtension
      * Check if the event is expired, either by unavailable tickets or because the date has passed
      *
      * @return bool
+     * @throws Exception
      */
     public function getEventExpired()
     {
@@ -270,12 +302,12 @@ class TicketExtension extends DataExtension
      */
     public function getGuestList()
     {
-        $reservationClass = Reservation::singleton()->getClassName();
-        $attendeeClass = Attendee::singleton()->getClassName();
+        $reservation = Reservation::singleton()->baseTable();
+        $attendee = Attendee::singleton()->baseTable();
         return Attendee::get()
-            ->leftJoin($reservationClass, "`$attendeeClass`.`ReservationID` = `$reservationClass`.`ID`")
+            ->leftJoin($reservation, "`$attendee`.`ReservationID` = `$reservation`.`ID`")
             ->filter(array(
-                'EventID' => $this->owner->ID
+                'TicketPageID' => $this->owner->ID
             ))
             ->filterAny(array(
                 'ReservationID' => 0,
@@ -323,46 +355,37 @@ class TicketExtension extends DataExtension
         }
     }
 
-    /**
-     * Get the Ticket logo
-     *
-     * @return Image
-     */
-    public function getMailLogo()
+    public function getTicketContent()
     {
-        /** @var SiteConfigExtension $siteConfig */
-        $siteConfig = SiteConfig::current_site_config();
-        return $siteConfig->TicketLogo();
+        if (!empty($this->owner->PrintedTicketContent)) {
+            return $this->owner->dbObject('PrintedTicketContent');
+        } else {
+            return SiteConfig::current_site_config()->dbObject('PrintedTicketContent');
+        }
     }
 
     /**
-     * Check if the current event can have tickets
+     * Check if the method 'getTicketEventTitle' has been set and retrieve the event name.
+     * This is used in ticket emails
      *
-     * @return bool
+     * @return string
+     * @throws Exception
      */
-    public function canCreateTickets()
+    public function getEventTitle()
     {
-        return true;
+        if (!$this->owner->hasMethod('getTicketEventTitle')) {
+            throw new Exception("You should create a method 'getTicketEventTitle' on {$this->owner->ClassName}");
+        }
 
-        // Todo how to make this flexible
-//        $currentDate = $this->owner->getController()->CurrentDate();
-//        if ($currentDate && $currentDate->exists()) {
-//            return $currentDate->dbObject('StartDate')->InFuture();
-//        }
-//
-//        return false;
+        return $this->owner->getTicketEventTitle();
     }
 
-    /**
-     * Get the calendar controller
-     *
-     * @deprecated dont depend on calendar event module
-     */
-    public function getController()
+    public function getEventStartDate()
     {
-        return null;
-//        return $this->controller
-//            ? $this->controller
-//            : $this->controller = CalendarEvent_Controller::create($this->owner);
+        if (!$this->owner->hasMethod('getTicketEventStartDate')) {
+            throw new Exception("You should create a method 'getTicketEventStartDate' on {$this->owner->ClassName}");
+        }
+
+        return $this->owner->getTicketEventStartDate();
     }
 }

@@ -20,7 +20,12 @@ class UserEmailField extends UserField
     /**
      * @var FormField
      */
-    protected $fieldType = 'EmailField';
+    protected $fieldType = EmailField::class;
+
+    public function getType()
+    {
+        return _t(__CLASS__ . '.Type', 'Email Field');
+    }
 
     /**
      * Create a default text field

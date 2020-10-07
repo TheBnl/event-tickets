@@ -2,7 +2,7 @@
 
 namespace Broarm\EventTickets\Forms;
 
-use Broarm\EventTickets\Extensions\AttendeeField;
+use Broarm\EventTickets\Fields\AttendeeField;
 use Broarm\EventTickets\Model\Attendee;
 use Broarm\EventTickets\Model\Reservation;
 use Broarm\EventTickets\Model\TaxModifier;
@@ -41,17 +41,17 @@ class ReservationForm extends FormStep
                     ? self::config()->get('require_all_attendees')
                     : $main;
 
-                $fields->add($field = AttendeeField::create($attendee, $main, $required));
+                $field = AttendeeField::create($attendee, $main, $required);
+                $fields->add($field);
                 $requiredFields = array_merge($requiredFields, $field->getRequiredFields());
             }
         }
 
         $actions = FieldList::create(
-            FormAction::create('goToNextStep', _t('ReservationForm.PAYMENT', 'Continue to payment'))
+            FormAction::create('goToNextStep', _t(__CLASS__ . '.ContinueToPayment', 'Continue to payment'))
         );
-
+        
         $required = new RequiredFields($requiredFields);
-
         parent::__construct($controller, $name, $fields, $actions, $required);
         $this->extend('updateForm');
     }
@@ -78,7 +78,7 @@ class ReservationForm extends FormStep
                 // todo, should be moved somewhere in the field classes.
                 if (is_array($value)) {
                     if (count(array_unique($value)) !== 1) {
-                        $form->addErrorMessage($field, 'Make sure your email address is spelled correctly', 'bad');
+                        $form->sessionFieldError(_t(__CLASS__ . '.EmailError', 'Make sure your email address is spelled correctly'), $field);
                         return $form->getController()->redirectBack();
                     } else {
                         $value = array_shift($value);

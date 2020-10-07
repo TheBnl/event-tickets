@@ -1,6 +1,6 @@
 <?php
 
-namespace Broarm\EventTickets\Extensions;
+namespace Broarm\EventTickets\Fields;
 
 use Broarm\EventTickets\Model\Ticket;
 use SilverStripe\Forms\DropdownField;
@@ -21,7 +21,7 @@ class TicketsField extends FormField
 
     protected $tickets;
 
-    protected $template = 'TicketsField';
+    //protected $template = 'TicketsField';
 
     public function __construct($name, $title, DataList $tickets)
     {
@@ -72,7 +72,7 @@ class TicketsField extends FormField
                 $ticket->AmountField->setValue($ticket->OrderMin);
             }
 
-            $availability = $ticket->Event()->getAvailability();
+            $availability = $ticket->TicketPage()->getAvailability();
             if ($availability < $ticket->OrderMax) {
                 $disabled = range($availability + 1, $ticket->OrderMax);
                 $ticket->AmountField->setDisabledItems(array_combine($disabled, $disabled));
@@ -137,7 +137,7 @@ class TicketsField extends FormField
         }
 
         // Get the availability
-        $available = $this->getForm()->event->getAvailability();
+        $available = $this->getForm()->getController()->getAvailability();
         // get the sum of selected tickets
         $ticketCount = array_sum(array_map(function ($item) {
             return $item['Amount'];

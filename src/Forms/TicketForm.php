@@ -2,13 +2,18 @@
 
 namespace Broarm\EventTickets\Forms;
 
-use Broarm\EventTickets\Extensions\TicketsField;
+use Broarm\EventTickets\Extensions\TicketExtension;
+use Broarm\EventTickets\Fields\TicketsField;
 use Broarm\EventTickets\Model\Attendee;
 use Broarm\EventTickets\Session\ReservationSession;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\ValidationException;
 
 /**
  * Class TicketForm
@@ -22,50 +27,39 @@ class TicketForm extends FormStep
      */
     protected $tickets;
 
-    protected $event;
-
-    public function __construct($controller, $name, DataList $tickets = null, $event = null)
+    public function __construct(RequestHandler $controller, $name, DataList $tickets = null)
     {
-        $this->event = $event;
         $fields = FieldList::create(
             TicketsField::create('Tickets', '', $this->tickets = $tickets)
         );
 
         $actions = FieldList::create(
-            FormAction::create('handleTicketForm', _t('TicketForm.MAKE_RESERVATION', 'Make reservation'))
-                ->setDisabled($event->getAvailability() === 0)
+            FormAction::create('handleTicketForm', _t(__CLASS__ . '.MakeReservation', 'Make reservation'))
+                ->setDisabled($controller->getAvailability() === 0)
         );
 
-        $requiredFields = RequiredFields::create(array('Tickets'));
+        $requiredFields = RequiredFields::create(['Tickets']);
 
         parent::__construct($controller, $name, $fields, $actions, $requiredFields);
     }
 
     /**
-     * Get the attached reservation
-     */
-    public function getEvent() {
-        return $this->event;
-    }
-
-    /**
      * Handle the ticket form registration
      *
-     * @param array      $data
+     * @param array $data
      * @param TicketForm $form
-     *
-     * @return string
+     * @return HTTPResponse
+     * @throws ValidationException
      */
     public function handleTicketForm(array $data, TicketForm $form)
     {
-        $reservation = ReservationSession::start($this->getEvent());
-
+        $reservation = ReservationSession::start($this->getController()->data());
         foreach ($data['Tickets'] as $ticketID => $ticketData) {
             for ($i = 0; $i < $ticketData['Amount']; $i++) {
                 $attendee = Attendee::create();
                 $attendee->TicketID = $ticketID;
                 $attendee->ReservationID = $reservation->ID;
-                $attendee->EventID = $reservation->EventID;
+                $attendee->TicketPageID = $reservation->TicketPageID;
                 $attendee->write();
                 $reservation->Attendees()->add($attendee);
             }

@@ -2,6 +2,9 @@
 
 namespace Broarm\EventTickets\Model;
 
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ValidationException;
+
 /**
  * Class TaxModifier
  *
@@ -90,8 +93,8 @@ class TaxModifier extends PriceModifier
      * Create a tax modifier if it does not already exists
      *
      * @param Reservation $reservation
-     * @return TaxModifier|\SilverStripe\ORM\DataObject|null
-     * @throws \SilverStripe\ORM\ValidationException
+     * @return TaxModifier|DataObject|null
+     * @throws ValidationException
      */
     public static function findOrMake(Reservation $reservation)
     {

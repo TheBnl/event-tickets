@@ -4,7 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title><%t Broarm\EventTickets\Model\Reservation.ReservationSubject 'Your tickets for {event}' event=$TicketPage.EventTitle %></title>
+    <title><%t Broarm\EventTickets\Model\Reservation.NotificationSubject 'New reservation for {event} by {name}' event=$TicketPage.EventTitle name=$Name %></title>
     <style type="text/css">
         * {
             font-family: akzidenz-grotesk-next, 'Helvetica Neue', Arial, sans-serif;
@@ -46,9 +46,7 @@
 
 <body itemscope itemtype="http://schema.org/EmailMessage">
 
-    <% if $TicketPage.MailContent %>
-        $TicketPage.MailContent
-    <% end_if %>
+    <p><%t Broarm\EventTickets\Model\Reservation.NotificationSubject 'New reservation for {event} by {name}' event=$TicketPage.EventTitle name=$Name %></p>
 
     <table class="order-content" width="100%" valign="baseline">
         <tr valign="baseline">
@@ -79,12 +77,15 @@
             <% end_loop %>
         <% end_if %>
         <tr valign="baseline" class="divider">
-            <td class="align-left" colspan="{$Top.Attendees.First.TableFields.Count}" valign="baseline" align="left"><strong><%t Broarm\EventTickets\Fields\SummaryField.Total 'Total' %></strong></td>
+            <td class="align-left" colspan="{$Top.Attendees.First.TableFields.Count}" valign="baseline" align="left">
+                <strong><%t Broarm\EventTickets\Fields\SummaryField.Total 'Total' %></strong>
+            </td>
             <td class="align-left" valign="baseline" align="left">&nbsp;</td>
-            <td class="align-right" valign="baseline" align="right"><strong>$Total.NiceDecimalPoint</strong></td>
+            <td class="align-right" valign="baseline" align="right">
+                <strong>$Total.NiceDecimalPoint</strong>
+            </td>
         </tr>
     </table>
-
 
     <p class="payoff">
         <% with $SiteConfig %>

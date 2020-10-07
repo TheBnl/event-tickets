@@ -2,32 +2,35 @@
 
 namespace Broarm\EventTickets\Forms\GridField;
 
-use Broarm\EventTickets\Model\UserFields\UserField;
-use SilverStripe\Core\ClassInfo;
+use SilverStripe\Forms\GridField\GridField_ActionMenu;
+use SilverStripe\Forms\GridField\GridFieldConfig_Base;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldEditButton;
 use Symbiote\GridFieldExtensions\GridFieldAddNewInlineButton;
-use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
+use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 
 /**
- * Class UserFieldsGridFieldConfig
- * @package Broarm\EventTickets\Forms\GridField
+ * Class UserOptionSetFieldGridFieldConfig
  */
-class UserFieldsGridFieldConfig extends UserOptionSetFieldGridFieldConfig
+class UserFieldsGridFieldConfig extends GridFieldConfig_Base
 {
-    public function __construct()
+    public function __construct($editableColumns = [])
     {
         parent::__construct();
-        $availableClasses = ClassInfo::subclassesFor(UserField::class);
-        array_shift($availableClasses);
-
-        $this->removeComponentsByType(new GridFieldAddNewInlineButton());
-        $this->removeComponentsByType(new GridFieldDeleteAction());
+        $this->removeComponentsByType(new GridFieldDataColumns());
         $this->addComponent(new GridFieldDetailForm());
-        $this->addComponent(new GridFieldEditButton());
+        $this->addComponent(new GridFieldOrderableRows());
+        $this->addComponent(new GridFieldAddNewInlineButton());
+        $this->addComponent($gfEditableColumns = new GridFieldEditableColumns());
         $this->addComponent(new GridFieldDeleteAction());
-        $this->addComponent($multiClassComponent = new GridFieldAddNewMultiClass());
-        $multiClassComponent->setClasses($availableClasses);
+        $this->addComponent(new GridFieldEditButton());
+        $this->addComponent(new GridField_ActionMenu());
+
+        if (!empty($editableColumns)) {
+            $gfEditableColumns->setDisplayFields($editableColumns);
+        }
     }
 }

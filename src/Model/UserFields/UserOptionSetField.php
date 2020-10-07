@@ -2,6 +2,7 @@
 
 namespace Broarm\EventTickets\Model\UserFields;
 
+use Broarm\EventTickets\Forms\GridField\UserFieldsGridFieldConfig;
 use Broarm\EventTickets\Forms\GridField\UserOptionSetFieldGridFieldConfig;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\OptionsetField;
@@ -22,11 +23,16 @@ class UserOptionSetField extends UserField
     /**
      * @var OptionsetField
      */
-    protected $fieldType = 'OptionsetField';
+    protected $fieldType = OptionsetField::class;
 
     private static $has_many = array(
         'Options' => UserFieldOption::class
     );
+
+    public function getType()
+    {
+        return _t(__CLASS__ . '.Type', 'Option Set Field');
+    }
 
     public function getCMSFields()
     {
@@ -34,9 +40,9 @@ class UserOptionSetField extends UserField
         if ($this->exists()) {
             $fields->addFieldToTab('Root.Main', GridField::create(
                 'Options',
-                _t('AttendeeExtraField.Options', 'Add field options'),
+                _t(__CLASS__ . '.Options', 'Add field options'),
                 $this->Options(),
-                UserOptionSetFieldGridFieldConfig::create()
+                UserFieldsGridFieldConfig::create()
             ));
         }
 
@@ -53,7 +59,7 @@ class UserOptionSetField extends UserField
     public function createField($fieldName, $defaultValue = null, $main = false)
     {
         /** @var OptionsetField $field */
-        $field = parent::createField($fieldName, $defaultValue, $main);
+        $field = parent::createField($fieldName, $defaultValue ?: [], $main);
         $field->setSource($this->Options()->map()->toArray());
         $field->setValue($defaultValue);
         return $field;

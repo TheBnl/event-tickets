@@ -3,7 +3,7 @@
 namespace Broarm\EventTickets\Extensions;
 
 use Broarm\EventTickets\Controllers\CheckInController;
-use Broarm\EventTickets\Controllers\CheckoutSteps;
+use Broarm\EventTickets\Checkout\Steps\CheckoutSteps;
 use Broarm\EventTickets\Forms\TicketForm;
 use Broarm\EventTickets\Forms\WaitingListRegistrationForm;
 use SilverStripe\CMS\Controllers\ContentController;
@@ -77,4 +77,6 @@ class TicketControllerExtension extends Extension
     {
         return $this->owner->getRequest()->getVar('waitinglist');
     }
+
+
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Broarm\EventTickets\Extensions;
+namespace Broarm\EventTickets\Fields;
 
 use Broarm\EventTickets\Model\Attendee;
 use Broarm\EventTickets\Model\Reservation;

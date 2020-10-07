@@ -5,7 +5,10 @@ namespace Broarm\EventTickets;
 namespace Broarm\EventTickets\Model\UserFields;
 
 use Broarm\EventTickets\Model\Attendee;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
@@ -28,7 +31,7 @@ class UserField extends DataObject
     /**
      * @var FormField
      */
-    protected $fieldType = 'FormField';
+    protected $fieldType = FormField::class;
 
     /**
      * Field name to be used in the AttendeeField (Composite field)
@@ -39,6 +42,11 @@ class UserField extends DataObject
      */
     protected $fieldName;
 
+    public function getType()
+    {
+        return _t(__CLASS__ . '.Type', 'Field');
+    }
+
     private static $db = array(
         'Name' => 'Varchar', // mostly here for default fields lookup
         'Title' => 'Varchar',
@@ -46,27 +54,21 @@ class UserField extends DataObject
         'ExtraClass' => 'Varchar',
         'Required' => 'Boolean',
         'Editable' => 'Boolean',
-        'Sort' => 'Int'
+        //'Sort' => 'Int'
     );
 
     private static $defaults = array(
         'Editable' => 1
     );
 
-    private static $default_sort = 'Sort ASC';
-
-    // todo dont depend on event
-    // todo dont create new fields for each event
-    private static $has_one = array(
-//        'Event' => 'CalendarEvent'
-    );
+    //private static $default_sort = 'Sort ASC';
 
     private static $belongs_many_many = array(
-        'Attendees' => Attendee::class
+        'Attendees' => Attendee::class,
     );
 
     private static $summary_fields = array(
-        'singular_name' => 'Type of field',
+        'ClassName' => 'Type of field',
         'Title' => 'Title',
         'RequiredNice' => 'Required field'
     );
@@ -79,20 +81,27 @@ class UserField extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->removeByName(['Editable']);
         $fields->addFieldsToTab('Root.Main', array(
-            ReadonlyField::create('PreviewFieldType', 'Field type', $this->ClassName),
-            ReadonlyField::create('Name', _t('AttendeeExtraField.Name', 'Name for this field')),
-            TextField::create('Title', _t('AttendeeExtraField.Title', 'Field label or question')),
-            TextField::create('ExtraClass', _t('AttendeeExtraField.ExtraClass', 'Add an extra class to the field')),
-            TextField::create('Default', _t('AttendeeExtraField.Default', 'Set a default value'))
+            DropdownField::create('ClassName', 'Field type', self::availableFields()),
+            ReadonlyField::create('Name', _t(__CLASS__ . '.Name', 'Name for this field')),
+            TextField::create('Title', _t(__CLASS__ . '.Title', 'Field label or question')),
+            TextField::create('ExtraClass', _t(__CLASS__ . '.ExtraClass', 'Add an extra class to the field')),
+            TextField::create('Default', _t(__CLASS__ . '.Default', 'Set a default value'))
         ));
 
         $fields->addFieldsToTab('Root.Validation', array(
             CheckboxField::create('Required', _t(
-                'AttendeeExtraField.Required',
+                __CLASS__ . '.Required',
                 'This field is required'
             ))->setDisabled(!(bool)$this->Editable)
         ));
+
+        if (!$this->Editable) {
+            $fields->fieldByName('Root.Main.ClassName')->setDisabled(1);
+            $fields->fieldByName('Root.Main.Title')->setDisabled(1);
+            $fields->fieldByName('Root.Main.Default')->setDisabled(1);
+        }
 
         $this->extend('updateCMSFields', $fields);
         return $fields;
@@ -158,8 +167,11 @@ class UserField extends DataObject
         /** @var UserField $fieldType */
         $fieldType = $fieldConfig['FieldType'];
 
-        $field = $fieldType::create();
-        $field->Name = $fieldName;
+        if (!$field = self::get()->find('Name', $fieldName)) {
+            $field = $fieldType::create();
+            $field->Name = $fieldName;
+        }
+
         if (is_array($fieldConfig)) {
             foreach ($fieldConfig as $property => $value) {
                 $field->setField($property, $value);
@@ -199,23 +211,18 @@ class UserField extends DataObject
         return trim(str_replace('User', '', end($name)));
     }
 
-//    public function canView($member = null)
-//    {
-//        return $this->Event()->canView($member);
-//    }
-//
-//    public function canEdit($member = null)
-//    {
-//        return $this->Event()->canEdit($member);
-//    }
-
     public function canDelete($member = null)
     {
         return $this->Editable;
     }
 
-//    public function canCreate($member = null)
-//    {
-//        return $this->Event()->canCreate($member);
-//    }
+    public static function availableFields()
+    {
+        $availableClasses = ClassInfo::subclassesFor(UserField::class);
+        array_shift($availableClasses);
+        return array_map(function ($class) {
+            /** @var UserField $class */
+            return $class::singleton()->getType();
+        }, array_combine($availableClasses, $availableClasses));
+    }
 }

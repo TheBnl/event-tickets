@@ -2,7 +2,9 @@
 
 namespace Broarm\EventTickets\Session;
 
+use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Model\Reservation;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
@@ -27,7 +29,11 @@ class ReservationSession
         /** @var HTTPRequest $request */
         $request = Injector::inst()->get(HTTPRequest::class);
         $session = $request->getSession();
-        return Reservation::get_by_id($session->get(self::KEY));
+        if ($id = $session->get(self::KEY)) {
+            return Reservation::get_by_id($id);
+        }
+
+        return null;
     }
 
     /**
@@ -47,14 +53,19 @@ class ReservationSession
     /**
      * Start the ticket session
      *
+     * @param $ticketPage
      * @return Reservation
      * @throws ValidationException
      */
-    public static function start()
+    public static function start(SiteTree $ticketPage)
     {
+        // Check if we can start a reservation session on the given page
+        if (!$ticketPage->hasExtension(TicketExtension::class)) {
+            return null;
+        }
+
         $reservation = Reservation::create();
-        // todo bind reservation to event? How to abstract this
-        //$reservation->EventID = $event->ID;
+        $reservation->TicketPageID = $ticketPage->ID;
         $reservation->write();
         self::set($reservation);
         return $reservation;

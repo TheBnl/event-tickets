@@ -82,7 +82,7 @@ class CheckInValidator
 
         // todo dont depend on "event" page
         // Check if the reservation is not canceled
-        if (!(bool)$this->attendee->Event()->getGuestList()->find('ID', $this->attendee->ID)) {
+        if (!(bool)$this->attendee->TicketPage()->getGuestList()->find('ID', $this->attendee->ID)) {
             return $result = array(
                 'Code' => self::MESSAGE_TICKET_CANCELLED,
                 'Message' => self::message(self::MESSAGE_TICKET_CANCELLED, $name),

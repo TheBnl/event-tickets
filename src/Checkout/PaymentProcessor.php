@@ -74,9 +74,9 @@ class PaymentProcessor
         $this->reservation = $reservation;
         $this->setGatewayData(array(
             'transactionId' => $reservation->Status,
-            'firstName' => $reservation->MainContact()->FirstName,
-            'lastName' => $reservation->MainContact()->Surname,
-            'email' => $reservation->MainContact()->Email,
+            'firstName' => $reservation->MainContact()->getFirstName(),
+            'lastName' => $reservation->MainContact()->getSurname(),
+            'email' => $reservation->MainContact()->getEmail(),
             'description' => $reservation->ReservationCode
         ));
 

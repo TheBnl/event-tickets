@@ -20,7 +20,12 @@ class UserDateField extends UserField
     /**
      * @var DateField
      */
-    protected $fieldType = 'DateField';
+    protected $fieldType = DateField::class;
+
+    public function getType()
+    {
+        return _t(__CLASS__ . '.Type', 'Date Field');
+    }
 
     private static $db = array(
         'MinDate' => 'Date',

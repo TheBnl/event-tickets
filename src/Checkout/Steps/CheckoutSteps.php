@@ -1,13 +1,12 @@
 <?php
 
-namespace Broarm\EventTickets\Controllers;
+namespace Broarm\EventTickets\Checkout\Steps;
 
-
+use SilverStripe\Control\RequestHandler;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\View\ArrayData;
-use SilverStripe\View\ViewableData;
 
 class CheckoutSteps
 {
@@ -62,18 +61,18 @@ class CheckoutSteps
     /**
      * Get the formatted steps
      *
-     * @param CheckoutStepController $controller
+     * @param RequestHandler $controller
      *
      * @return ArrayList
      */
-    public static function get(CheckoutStepController $controller)
+    public static function get(RequestHandler $controller)
     {
         $list = new ArrayList();
         $steps = self::getSteps();
         foreach ($steps as $step) {
             $list->add(new ArrayData([
                 'Link' => $controller->Link($step),
-                'Title' => _t("CheckoutSteps.$step", ucfirst($step)),
+                'Title' => _t(__CLASS__ . ".$step", ucfirst($step)),
                 'InPast' => self::inPast($step, $controller),
                 'InFuture' => self::inFuture($step, $controller),
                 'Current' => self::current($step, $controller),
@@ -100,13 +99,13 @@ class CheckoutSteps
      * Check if the step is in the past
      *
      * @param                        $step
-     * @param CheckoutStepController $controller
+     * @param RequestHandler $controller
      *
      * @return bool
      */
-    private static function inPast($step, CheckoutStepController $controller)
+    private static function inPast($step, RequestHandler $controller)
     {
-        $currentStep = $controller->getURLParams()['Action'];
+        $currentStep = $controller->getRequest()->param('Action');
         return self::getStepIndex($step) < self::getStepIndex($currentStep);
     }
 
@@ -114,13 +113,13 @@ class CheckoutSteps
      * Check if the step is in the future
      *
      * @param                        $step
-     * @param CheckoutStepController $controller
+     * @param RequestHandler $controller
      *
      * @return bool
      */
-    private static function inFuture($step, CheckoutStepController $controller)
+    private static function inFuture($step, RequestHandler $controller)
     {
-        $currentStep = $controller->getURLParams()['Action'];
+        $currentStep = $controller->getRequest()->param('Action');
         return self::getStepIndex($step) > self::getStepIndex($currentStep);
     }
 
@@ -128,13 +127,13 @@ class CheckoutSteps
      * Check at the current step
      *
      * @param                        $step
-     * @param CheckoutStepController $controller
+     * @param RequestHandler $controller
      *
      * @return bool
      */
-    private static function current($step, CheckoutStepController $controller)
+    private static function current($step, RequestHandler $controller)
     {
-        $currentStep = $controller->getURLParams()['Action'];
+        $currentStep = $controller->getRequest()->param('Action');
         return self::getStepIndex($step) === self::getStepIndex($currentStep);
     }
 }

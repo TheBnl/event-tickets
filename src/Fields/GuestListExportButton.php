@@ -1,6 +1,6 @@
 <?php
 
-namespace Broarm\EventTickets\Extensions;
+namespace Broarm\EventTickets\Fields;
 
 use SilverStripe\Forms\GridField\GridFieldExportButton;
 

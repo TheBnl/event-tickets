@@ -14,15 +14,10 @@ use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
  */
 class TicketsGridFieldConfig extends GridFieldConfig_RecordEditor
 {
-    public function __construct($editable = true, $itemsPerPage = null)
+    public function __construct($itemsPerPage = null)
     {
         parent::__construct($itemsPerPage);
         $this->addComponent(new GridFieldOrderableRows('Sort'));
-
-        if (!$editable) {
-            $this->removeComponentsByType(new GridFieldAddNewButton());
-        }
-
         $this->extend('updateConfig');
     }
 }

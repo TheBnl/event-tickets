@@ -17,5 +17,10 @@ class UserTextField extends UserField
     /**
      * @var TextField
      */
-    protected $fieldType = 'TextField';
+    protected $fieldType = TextField::class;
+
+    public function getType()
+    {
+        return _t(__CLASS__ . '.Type', 'Text Field');
+    }
 }

@@ -21,12 +21,17 @@ class UserNumericField extends UserField
     /**
      * @var NumericField
      */
-    protected $fieldType = 'NumericField';
+    protected $fieldType = NumericField::class;
 
     private static $db = array(
         'Min' => 'Int',
         'Max' => 'Int'
     );
+
+    public function getType()
+    {
+        return _t(__CLASS__ . '.Type', 'Numeric Field');
+    }
 
     public function getCMSFields()
     {

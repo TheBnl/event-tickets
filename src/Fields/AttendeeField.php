@@ -1,6 +1,6 @@
 <?php
 
-namespace Broarm\EventTickets\Extensions;
+namespace Broarm\EventTickets\Fields;
 
 
 use Broarm\EventTickets\Model\Attendee;
@@ -17,8 +17,6 @@ use SilverStripe\Security\Security;
  */
 class AttendeeField extends CompositeField
 {
-    protected $name = 'Attendee';
-
     protected $requiredFields = array();
 
     public function __construct(Attendee $attendee, $main = false, $required = true)
@@ -31,12 +29,12 @@ class AttendeeField extends CompositeField
         ));
 
         $children = FieldList::create();
-        $savableFields = $attendee->Event()->Fields();
+        $savableFields = $attendee->TicketPage()->Fields();
 
         /** @var UserField $field */
         foreach ($savableFields as $field) {
             // Generate a unique field name
-            $fieldName = "{$this->name}[{$attendee->ID}][$field->ID]";
+            $fieldName = "Attendee[{$attendee->ID}][$field->ID]";
 
             // Create the field an fill with attendee data
             $hasField = $attendee->Fields()->find('ID', $field->ID);
@@ -64,7 +62,7 @@ class AttendeeField extends CompositeField
         }
 
         // Set the main field
-        $children->add(HiddenField::create("{$this->name}[{$attendee->ID}][Main]", 'Main', (int)$main));
+        $children->add(HiddenField::create("Attendee[{$attendee->ID}][Main]", 'Main', (int)$main));
 
         // set the children
         $this->setChildren($children);

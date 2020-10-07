@@ -3,6 +3,8 @@
 namespace Broarm\EventTickets\Model;
 
 use Broarm\EventTickets\Extensions\TicketExtension;
+use Exception;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\DatetimeField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
@@ -25,7 +27,7 @@ use SilverStripe\ORM\FieldType\DBField;
  * @property string AvailableTillDate
  * @property NumericField AmountField the amount field is set on the TicketForm
  *
- * @method TicketExtension Event()
+ * @method TicketExtension|SiteTree TicketPage()
  */
 class Ticket extends DataObject
 {
@@ -60,7 +62,7 @@ class Ticket extends DataObject
     private static $default_sort = 'Sort ASC, AvailableFromDate DESC';
 
     private static $has_one = array(
-        'Event' => 'CalendarEvent'
+        'TicketPage' => SiteTree::class
     );
 
     private static $defaults = array(
@@ -76,6 +78,13 @@ class Ticket extends DataObject
         'AvailableSummary' => 'Available'
     );
 
+    private static $searchable_fields = [
+        'Title',
+        'Price',
+        'AvailableFromDate',
+        'AvailableTillDate',
+    ];
+
     private static $translate = array(
         'Title'
     );
@@ -83,6 +92,8 @@ class Ticket extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->removeByName(['TicketPageID']);
+
         $fields->addFieldsToTab('Root.Main', array(
             TextField::create('Title', _t(__CLASS__ . '.TITLE_LABEL', 'Title for the ticket')),
             NumericField::create('Price', _t(__CLASS__ . '.PRICE_LABEL', 'Ticket price')),
@@ -94,18 +105,22 @@ class Ticket extends DataObject
         ));
 
         //$saleStart->getDateField()->setConfig('showcalendar', true);
-        $saleStart->setDescription(_t(
-            __CLASS__ . '.SALE_START_DESCRIPTION',
-            'If no date is given the following date will be used: {date}', null,
-            array('date' => $this->getAvailableFrom()->Nice())
-        ));
+        if ($availableFrom = $this->getAvailableFrom()) {
+            $saleStart->setDescription(_t(
+                __CLASS__ . '.SALE_START_DESCRIPTION',
+                'If no date is given the following date will be used: {date}', null,
+                array('date' => $availableFrom ->Nice())
+            ));
+        }
 
         //$saleEnd->getDateField()->setConfig('showcalendar', true);
-        $saleEnd->setDescription(_t(
-            __CLASS__ . '.SALE_END_DESCRIPTION',
-            'If no date is given the event start date will be used: {date}', null,
-            array('date' => $this->getEventStartDate()->Nice())
-        ));
+        if ($eventStart = $this->getEventStartDate()) {
+            $saleEnd->setDescription(_t(
+                __CLASS__ . '.SALE_END_DESCRIPTION',
+                'If no date is given the event start date will be used: {date}', null,
+                array('date' => $eventStart->Nice())
+            ));
+        }
 
         return $fields;
     }
@@ -125,7 +140,8 @@ class Ticket extends DataObject
      * Get the available form date if it is set,
      * otherwise get it from the parent
      *
-     * @return DBDatetime|DBDate|DBField|null
+     * @return DBDate|DBField|null
+     * @throws Exception
      */
     public function getAvailableFrom()
     {
@@ -145,7 +161,8 @@ class Ticket extends DataObject
      * otherwise get it from the parent
      * Use the event start date as last sale possibility
      *
-     * @return DBDatetime|DBDate|DBField|null
+     * @return DBDatetime|DBField|null
+     * @throws Exception
      */
     public function getAvailableTill()
     {
@@ -163,9 +180,9 @@ class Ticket extends DataObject
 
     /**
      * Validate if the start and end date are in the past and the future
-     * todo check start time and treshold
      *
      * @return bool
+     * @throws Exception
      */
     public function validateDate()
     {
@@ -188,13 +205,14 @@ class Ticket extends DataObject
      */
     private function validateAvailability()
     {
-        return $this->Event()->getAvailability() > 0;
+        return $this->TicketPage()->getAvailability() > 0;
     }
 
     /**
      * Return if the ticket is available or not
      *
      * @return bool
+     * @throws Exception
      */
     public function getAvailable()
     {
@@ -211,6 +229,7 @@ class Ticket extends DataObject
      * Return availability for use in grid fields
      *
      * @return LiteralField
+     * @throws Exception
      */
     public function getAvailableSummary()
     {
@@ -224,39 +243,35 @@ class Ticket extends DataObject
     /**
      * Get the event start date
      *
-     * @return DBDate
+     * @return DBDatetime|null
+     * @throws Exception
      */
     private function getEventStartDate()
     {
-        $currentDate = $this->Event()->getController()->CurrentDate();
-        if ($currentDate && $currentDate->exists()) {
-            $date = $currentDate->dbObject('StartDate')->Format('Y-m-d');
-            $time = $currentDate->dbObject('StartTime')->Format('H:i:s');
-            $dateTime = DBDatetime::create();
-            $dateTime->setValue("$date $time");
-            return $dateTime;
-        } else {
-            return null;
+        if ($startDate = $this->TicketPage()->getEventStartDate()) {
+            return $startDate;
         }
+
+        return null;
     }
 
-//    public function canView($member = null)
-//    {
-//        return $this->Event()->canView($member);
-//    }
-//
-//    public function canEdit($member = null)
-//    {
-//        return $this->Event()->canEdit($member);
-//    }
-//
-//    public function canDelete($member = null)
-//    {
-//        return $this->Event()->canDelete($member);
-//    }
-//
-//    public function canCreate($member = null)
-//    {
-//        return $this->Event()->canCreate($member);
-//    }
+    public function canView($member = null)
+    {
+        return $this->TicketPage()->canView($member);
+    }
+
+    public function canEdit($member = null)
+    {
+        return $this->TicketPage()->canEdit($member);
+    }
+
+    public function canDelete($member = null)
+    {
+        return $this->TicketPage()->canDelete($member);
+    }
+
+    public function canCreate($member = null, $context = [])
+    {
+        return $this->TicketPage()->canCreate($member, $context);
+    }
 }

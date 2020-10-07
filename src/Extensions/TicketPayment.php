@@ -14,7 +14,7 @@ use SilverStripe\ORM\ValidationException;
  * @author Bram de Leeuw
  * @property TicketPayment|Payment $owner
  *
- * @property int                    ReservationID
+ * @property int ReservationID
  */
 class TicketPayment extends DataExtension
 {

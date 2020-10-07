@@ -17,7 +17,12 @@ class UserCheckboxField extends UserField
     /**
      * @var CheckboxField
      */
-    protected $fieldType = 'CheckboxField';
+    protected $fieldType = CheckboxField::class;
+
+    public function getType()
+    {
+        return _t(__CLASS__ . '.Type', 'Checkbox Field');
+    }
 
     /**
      * Get the value in a readable manner

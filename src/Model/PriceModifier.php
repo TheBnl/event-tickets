@@ -4,8 +4,12 @@ namespace Broarm\EventTickets\Model;
 
 use Broarm\EventTickets\Interfaces\PriceModifierInterface;
 use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\Connect\DBSchemaManager;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DataObjectSchema;
+use SilverStripe\ORM\DB;
 use SilverStripe\ORM\ManyManyList;
+use SilverStripe\ORM\Queries\SQLUpdate;
 
 /**
  * Class PriceModifier
@@ -100,12 +104,11 @@ class PriceModifier extends DataObject implements PriceModifierInterface
      */
     public function setPriceModification($value)
     {
-        // todo update sql update
         if ($this->exists()) {
-            $join = $this->manyMany('Reservations');
-            $table = end($join);
+            $manyMany = DataObject::getSchema()->manyManyComponent(self::class, 'Reservations');
+            $table = $manyMany['join'];
             $where = $this->getSourceQueryParam('Foreign.Filter');
-            $where["`{$this->baseTable()}ID`"] = $this->ID;
+            $where[$manyMany['parentField']] = $this->ID;
             SQLUpdate::create(
                 "`{$table}`",
                 array('`PriceModification`' => $value),
