@@ -23,8 +23,8 @@
         "silverstripe/silverstripe-omnipay": "*",
         "symbiote/silverstripe-gridfieldextensions": "*",
         "omnipay/manual": "*",
-        "bacon/bacon-qr-code": "1.0.*",
-        "dompdf/dompdf": "*"
+        "bacon/bacon-qr-code": "*",
+        "mpdf/mpdf": "*"
     },
     "extra": {
         "expose": [
