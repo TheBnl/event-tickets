@@ -26,11 +26,6 @@
         "bacon/bacon-qr-code": "*",
         "mpdf/mpdf": "*"
     },
-    "extra": {
-        "expose": [
-            "client"
-        ]
-    },
     "autoload": {
         "psr-4": {
             "Broarm\\EventTickets\\": "src"
