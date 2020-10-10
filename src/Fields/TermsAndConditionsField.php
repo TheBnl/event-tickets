@@ -5,6 +5,7 @@ namespace Broarm\EventTickets\Fields;
 use Broarm\EventTickets\Extensions\SiteConfigExtension;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\CheckboxField;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\SiteConfig\SiteConfig;
 
 class TermsAndConditionsField extends CheckboxField
@@ -21,12 +22,12 @@ class TermsAndConditionsField extends CheckboxField
         /** @var SiteConfigExtension $config */
         $config = SiteConfig::current_site_config();
         if (($this->termsPage = $config->TermsPage()) && $this->termsPage->exists()) {
-            parent::__construct($name, _t(
+            parent::__construct($name, DBHTMLText::create()->setValue(_t(
                 'TermsAndConditionsField.TERMS_CONDITIONS',
                 "I agree to the terms and conditions stated on the <a href='{link}' target='new' title='Read the shop terms and conditions for this site'>{title}</a> page",
                 null,
-                array('link' => $this->termsPage->Link(), 'title' => $this->termsPage->Title)
-            ), $value = null);
+                ['link' => $this->termsPage->Link(), 'title' => $this->termsPage->Title]
+            )), $value = null);
         }
     }
 
