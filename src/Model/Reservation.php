@@ -396,7 +396,7 @@ class Reservation extends DataObject
         }
 
         $eventName = SiteConfig::current_site_config()->getTitle();
-        if (($event = $this->TicketPage()) && $event->hasExtension(TicketExtension::class)) {
+        if (($event = $this->TicketPage()) && $event->hasMethod('getEventTitle')) {
             $eventName = $event->getEventTitle();
         }
 
@@ -444,7 +444,7 @@ class Reservation extends DataObject
         }
 
         $eventName = SiteConfig::current_site_config()->getTitle();
-        if (($event = $this->TicketPage()) && $event->hasExtension(TicketExtension::class)) {
+        if (($event = $this->TicketPage()) && $event->hasMethod('getEventTitle')) {
             $eventName = $event->getEventTitle();
         }
 
