@@ -151,15 +151,6 @@ class Reservation extends DataObject
         'Created.Nice' => 'Date'
     );
 
-    /**
-     * Actions usable on the cms detail view
-     *
-     * @var array
-     */
-    private static $better_buttons_actions = array(
-        'send'
-    );
-
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -180,21 +171,6 @@ class Reservation extends DataObject
         ));
 
         return $fields;
-    }
-
-    /**
-     * Add utility actions to the reservation details view
-     *
-     * @deprecated
-     */
-    public function getBetterButtonsActions()
-    {
-
-//        /** @var FieldList $fields */
-//        $fields = parent::getBetterButtonsActions();
-//        $fields->push(BetterButtonCustomAction::create('send', _t('Reservation.RESEND', 'Resend the reservation')));
-//
-//        return $fields;
     }
 
     /**
