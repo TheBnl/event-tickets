@@ -189,6 +189,7 @@ class Reservation extends DataObject
      */
     public function getBetterButtonsActions()
     {
+
 //        /** @var FieldList $fields */
 //        $fields = parent::getBetterButtonsActions();
 //        $fields->push(BetterButtonCustomAction::create('send', _t('Reservation.RESEND', 'Resend the reservation')));

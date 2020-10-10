@@ -190,18 +190,19 @@ class TicketExtension extends DataExtension
      */
     public function updateCMSActions(FieldList $actions)
     {
-        $checkInButton = new LiteralField('StartCheckIn',
-            "<a class='action ss-ui-button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only'
-                id='Edit_StartCheckIn'
-                role='button'
-                href='{$this->owner->Link('checkin')}'
-                target='_blank'>
-                Start check in
-            </a>"
-        );
-
         if ($this->owner->Attendees()->exists()) {
-            $actions->push($checkInButton);
+            $link = $this->owner->Link('checkin');
+            $label = _t(__CLASS__ . '.StartCheckIn', 'Start check in');
+            $action = LiteralField::create(
+                'StartCheckIn',
+                "<a href='$link' target='_blank' class='no-ajax btn btn-outline-secondary font-icon-checklist'>$label</a>"
+            );
+
+//            echo "<pre>";
+//            print_r($actions->map('Name', 'Title')->toArray());
+//            echo "</pre>";
+//            exit();
+            $actions->push($action);
         }
     }
 
