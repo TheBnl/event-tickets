@@ -370,28 +370,16 @@ class TicketExtension extends DataExtension
      */
     public function getEventTitle()
     {
-        if (!$this->owner->hasMethod('getTicketEventTitle')) {
-            throw new Exception("You should create a method 'getTicketEventTitle' on {$this->owner->ClassName}");
-        }
-
-        return $this->owner->getTicketEventTitle();
+        throw new Exception("You should create a method 'getEventTitle' on {$this->owner->ClassName}");
     }
 
     public function getEventStartDate()
     {
-        if (!$this->owner->hasMethod('getTicketEventStartDate')) {
-            throw new Exception("You should create a method 'getTicketEventStartDate' on {$this->owner->ClassName}");
-        }
-
-        return $this->owner->getTicketEventStartDate();
+        throw new Exception("You should create a method 'getEventStartDate' on {$this->owner->ClassName}");
     }
 
     public function getEventAddress()
     {
-        if (!$this->owner->hasMethod('getTicketEventAddress')) {
-            throw new Exception("You should create a method 'getTicketEventAddress' on {$this->owner->ClassName}");
-        }
-
-        return $this->owner->getTicketEventAddress();
+        throw new Exception("You should create a method 'getEventAddress' on {$this->owner->ClassName}");
     }
 }
