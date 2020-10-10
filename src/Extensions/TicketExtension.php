@@ -198,10 +198,6 @@ class TicketExtension extends DataExtension
                 "<a href='$link' target='_blank' class='no-ajax btn btn-outline-secondary font-icon-checklist'>$label</a>"
             );
 
-//            echo "<pre>";
-//            print_r($actions->map('Name', 'Title')->toArray());
-//            echo "</pre>";
-//            exit();
             $actions->push($action);
         }
     }
