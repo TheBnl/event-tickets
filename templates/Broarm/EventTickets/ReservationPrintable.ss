@@ -101,7 +101,7 @@
                         </tr>
                         <tr>
                             <td><%t Broarm\EventTickets\Model\Reservation.Address 'Address' %></td>
-                            <td>$SiteConfig.Address</td>
+                            <td>$TicketPage.EventAddress</td>
                         </tr>
                         <tr>
                             <td><%t Broarm\EventTickets\Model\Reservation.Date 'Date' %></td>
