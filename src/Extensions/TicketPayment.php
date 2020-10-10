@@ -3,6 +3,7 @@
 namespace Broarm\EventTickets\Extensions;
 
 use Broarm\EventTickets\Model\Reservation;
+use Mpdf\Tag\Em;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\Omnipay\Service\ServiceResponse;
 use SilverStripe\ORM\DataExtension;

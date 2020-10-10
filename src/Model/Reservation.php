@@ -22,6 +22,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ValidationException;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\SSViewer;
 
 /**
@@ -394,7 +395,10 @@ class Reservation extends DataObject
             $from = Config::inst()->get('Email', 'admin_email');
         }
 
-        $eventName = $this->TicketPage()->getEventTitle();
+        $eventName = SiteConfig::current_site_config()->getTitle();
+        if (($event = $this->TicketPage()) && $event->hasExtension(TicketExtension::class)) {
+            $eventName = $event->getEventTitle();
+        }
 
         // Create the email with given template and reservation data
         $email = new Email();
@@ -439,12 +443,17 @@ class Reservation extends DataObject
             $to = Config::inst()->get('Email', 'admin_email');
         }
 
+        $eventName = SiteConfig::current_site_config()->getTitle();
+        if (($event = $this->TicketPage()) && $event->hasExtension(TicketExtension::class)) {
+            $eventName = $event->getEventTitle();
+        }
+
         $email = new Email();
         $email->setSubject(_t(
             __CLASS__ . '.NotificationSubject',
             'Nieuwe reservering voor {event} door {name}',
             null, [
-                'event' => $this->TicketPage()->getEventTitle(),
+                'event' => $eventName,
                 'name' => $this->getName()
             ]
         ));
