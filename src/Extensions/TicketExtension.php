@@ -385,4 +385,13 @@ class TicketExtension extends DataExtension
 
         return $this->owner->getTicketEventStartDate();
     }
+
+    public function getEventAddress()
+    {
+        if (!$this->owner->hasMethod('getTicketEventAddress')) {
+            throw new Exception("You should create a method 'getTicketEventAddress' on {$this->owner->ClassName}");
+        }
+
+        return $this->owner->getTicketEventAddress();
+    }
 }
