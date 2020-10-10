@@ -81,7 +81,6 @@
     </style>
 </head>
 <body>
-
 <% loop $Attendees %>
     <div class="page<% if not $Last %> page--break<% end_if %>">
         <img class="page__logo" src="$SiteConfig.TicketLogo.ScaleWidth(160).AbsoluteURL" alt="$SiteConfig.Title" width="160">
