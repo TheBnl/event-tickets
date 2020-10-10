@@ -11,6 +11,8 @@
         "calendar"
     ],
     "license": "BSD-3-Clause",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "Bram de Leeuw",
@@ -18,8 +20,8 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "~4.5",
-        "silverstripe/cms": "~4.5",
+        "silverstripe/framework": "^4",
+        "silverstripe/cms": "^4",
         "silverstripe/silverstripe-omnipay": "*",
         "symbiote/silverstripe-gridfieldextensions": "*",
         "omnipay/manual": "*",
