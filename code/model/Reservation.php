@@ -504,6 +504,7 @@ class Reservation extends DataObject
      */
     public function send()
     {
+        $this->extend('onBeforeSend');
         $this->createFiles();
         $this->SentReservation = (boolean)$this->sendReservation();
         $this->SentNotification = (boolean)$this->sendNotification();
