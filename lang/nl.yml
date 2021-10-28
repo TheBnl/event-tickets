@@ -119,3 +119,8 @@ nl:
   Broarm\EventTickets\Fields\TermsAndConditionsField:
     TermsAndConditions: 'Ik ga akkoord met de voorwaarden die vermeld staan op de <a href="{link}" target="new" title="Lees de algemene voorwaarden">{title}</a> pagina'
     Agree: 'U moet met de algemene voorwaarden akkoord gaan'
+  Broarm\EventTickets\Forms\WaitingListRegistrationForm:
+    Name: 'Naam'
+    Email: 'E-mail'
+    Telephone: 'Telefoon'
+    Register: 'Inschrijven'

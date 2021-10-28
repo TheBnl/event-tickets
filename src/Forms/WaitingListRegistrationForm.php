@@ -14,13 +14,13 @@ class WaitingListRegistrationForm extends Form
     public function __construct($controller, $name = 'CheckInForm')
     {
         $fields = FieldList::create(
-            TextField::create('Title', _t('WaitingListRegistration.Name', 'Name')),
-            TextField::create('Email', _t('WaitingListRegistration.Email', 'Email')),
-            TextField::create('Telephone', _t('WaitingListRegistration.Telephone', 'Telephone'))
+            TextField::create('Title', _t(__CLASS__ . '.Name', 'Name')),
+            TextField::create('Email', _t(__CLASS__ . '.Email', 'Email')),
+            TextField::create('Telephone', _t(__CLASS__ . '.Telephone', 'Telephone'))
         );
 
         $actions = FieldList::create(
-            FormAction::create('doRegister', _t('WaitingListRegistrationForm.REGISTER', 'Register'))
+            FormAction::create('doRegister', _t(__CLASS__ . '.Register', 'Register'))
         );
 
         $required = new RequiredFields(array('Title', 'Email'));
