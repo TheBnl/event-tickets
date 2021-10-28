@@ -102,6 +102,11 @@ class ReservationForm extends FormStep
             }
         }
 
+        // save all attendees with empty titles to set the guest titles
+        foreach ($reservation->Attendees()->filter(['Title' => null]) as $attendee) {
+            $attendee->write();
+        }
+
         // add the tax modifier
         $reservation->PriceModifiers()->add(TaxModifier::findOrMake($reservation));
         $reservation->calculateTotal();

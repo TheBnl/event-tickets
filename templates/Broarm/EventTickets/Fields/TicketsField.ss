@@ -1,9 +1,9 @@
 <table class="tickets-table" border="0">
     <thead class="tickets-table__header">
         <tr class="tickets-table__header-row">
-            <th class="tickets-table__header-col"><%t TicketsField.TICKETS 'Tickets' %></th>
-            <th class="tickets-table__header-col"><%t TicketsField.PRICE 'Price' %></th>
-            <th class="tickets-table__header-col"><%t TicketsField.AMOUNT 'Amount' %></th>
+            <th class="tickets-table__header-col"><%t Broarm\EventTickets\Fields\TicketsField.TICKETS 'Tickets' %></th>
+            <th class="tickets-table__header-col"><%t Broarm\EventTickets\Fields\TicketsField.PRICE 'Price' %></th>
+            <th class="tickets-table__header-col"><%t Broarm\EventTickets\Fields\TicketsField.AMOUNT 'Amount' %></th>
         </tr>
     </thead>
     <tbody class="tickets-table__body tickets-table__body--tickets">

@@ -23,7 +23,7 @@ class TermsAndConditionsField extends CheckboxField
         $config = SiteConfig::current_site_config();
         if (($this->termsPage = $config->TermsPage()) && $this->termsPage->exists()) {
             parent::__construct($name, DBHTMLText::create()->setValue(_t(
-                'TermsAndConditionsField.TERMS_CONDITIONS',
+                __CLASS__ . '.TermsAndConditions',
                 "I agree to the terms and conditions stated on the <a href='{link}' target='new' title='Read the shop terms and conditions for this site'>{title}</a> page",
                 null,
                 ['link' => $this->termsPage->Link(), 'title' => $this->termsPage->Title]
@@ -33,7 +33,7 @@ class TermsAndConditionsField extends CheckboxField
 
     public function getCustomValidationMessage()
     {
-        return _t('TermsAndConditionsField.AGREE_TO_TERMS', 'You must agree to the terms and conditions');
+        return _t(__CLASS__ . '.Agree', 'You must agree to the terms and conditions');
     }
 
     /**

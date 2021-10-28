@@ -36,7 +36,7 @@ nl:
     SUCCESS_MESSAGE_HELP: 'Dit bericht word getoond op de succes pagina. Hij is per evenement te overschijven onder de "tickets" tab'
     MAIL_MESSAGE_HELP: 'Dit bericht word getoond op het ticket. Hij is per evenement te overschijven onder de "tickets" tab'
   Broarm\EventTickets\Forms\TicketForm:
-    MAKE_RESERVATION: 'Reserveer tickets'
+    MakeReservation: 'Reserveer tickets'
     WAITINGLIST_INTRO: 'Het evenement is uitverkocht. U kunt zich hieronder inschrijven om op de hoogte te worden gehouden wanneer er plaatsen vrijkomen.'
     WAITINGLIST_SUCCESS: 'Bedankt voor uw inschrijving, wij houden u op de hoogte zodra er een plekken beschikbaar komen.'
     EXPIRED: 'Het evenement is afgelopen.'
@@ -101,18 +101,21 @@ nl:
     Email: 'E-mail'
     TicketReceiver: 'Stuur ticket per mail'
     VALUED: '{title} t.w.v {price}'
+    YourDetails: 'Uw gegevens'
   SuccessController:
     DOWNLOAD_TICKETS: 'Download uw tickets'
     BACK: 'Ga terug'
   Broarm\EventTickets\Forms\SummaryForm:
-    COMMENTS: 'Opmerkingen'
+    Comments: 'Opmerkingen'
+    ContinueToPayment: 'Ga verder met betalen'
+    ReserveTicket: 'Reserveer tickets'
   Broarm\EventTickets\Fields\SummaryField:
-    EMAIL_RECEIVER: 'Email ontvanger'
-    TICKET: 'Ticket'
-    PRICE: 'Prijs'
-    SUBTOTAL: 'Subtotaal'
-    TOTAL: 'Totaal'
-    TICKET_RECEIVER_HELP: 'Verstuur tickets naar deze persoon'
+    Ticket: 'Ticket'
+    Price: 'Prijs'
+    Subtotal: 'Subtotaal'
+    Total: 'Totaal'
+  Broarm\EventTickets\Model\UserFields\UserEmailField:
+    ConfirmedEmail: 'Bevestig {title}'
   Broarm\EventTickets\Fields\TermsAndConditionsField:
-    TERMS_CONDITIONS: 'Ik ga akkoord met de voorwaarden die vermeld staan op de <a href="{link}" target="new" title="Lees de algemene voorwaarden">{title}</a> pagina'
-    AGREE_TO_TERMS: 'U moet met de algemene voorwaarden akkoord gaan'
+    TermsAndConditions: 'Ik ga akkoord met de voorwaarden die vermeld staan op de <a href="{link}" target="new" title="Lees de algemene voorwaarden">{title}</a> pagina'
+    Agree: 'U moet met de algemene voorwaarden akkoord gaan'

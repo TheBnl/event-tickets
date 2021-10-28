@@ -14,7 +14,7 @@ Install the module trough composer
 composer require bramdeleeuw/silverstripe-event-tickets
 ```
 
-Add the nessesary extensions to the DataObject you want to sell tickets on. This can be an Event, for example with an [events module](https://github.com/xddesigners/silverstripe-events). Or you can add the tickets to your site config, when you are selling tickets for an festival where one ticket grants access to multiple events.
+Add the nessesary extensions to the DataObject you want to sell tickets on. This can be an Event, for example with an [events module](https://github.com/xddesigners/silverstripe-events). Or you can add the tickets to a special tickets Page, when, for example, you are selling tickets for an festival where one ticket grants access to multiple events.
 
 ```yml
 # the object that sells tickets

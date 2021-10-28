@@ -23,10 +23,16 @@ class AttendeeField extends CompositeField
     {
         parent::__construct();
         $this->setTag('fieldset');
-        $this->setLegend(_t(__CLASS__ . '.VALUED', '{title} valued {price}', null, array(
-            'title' => $attendee->Ticket()->Title,
-            'price' => $attendee->Ticket()->dbObject('Price')->NiceDecimalPoint())
-        ));
+
+        if (self::config()->get('require_all_attendees')) {
+            $this->setLegend(_t(__CLASS__ . '.VALUED', '{title} valued {price}', null, array(
+                'title' => $attendee->Ticket()->Title,
+                'price' => $attendee->Ticket()->dbObject('Price')->NiceDecimalPoint())
+            ));
+        } else {
+            $this->setLegend(_t(__CLASS__ . '.YourDetails', 'Your details'));
+        }
+        
 
         $children = FieldList::create();
         $savableFields = $attendee->TicketPage()->Fields();
