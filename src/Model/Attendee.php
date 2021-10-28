@@ -235,7 +235,7 @@ class Attendee extends DataObject
      */
     public function getFirstName()
     {
-        return self::getUserField('FirstName');
+        return $this->getUserField('FirstName');
     }
 
     /**
@@ -245,7 +245,7 @@ class Attendee extends DataObject
      */
     public function getSurname()
     {
-        return self::getUserField('Surname');
+        return $this->getUserField('Surname');
     }
 
     /**
@@ -255,7 +255,7 @@ class Attendee extends DataObject
      */
     public function getEmail()
     {
-        return self::getUserField('Email');
+        return $this->getUserField('Email');
     }
 
     /**
