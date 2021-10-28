@@ -13,11 +13,7 @@ class CheckoutSteps
     use Configurable;
     use Extensible;
 
-    private static $checkout_steps = array(
-        'register',
-        'summary',
-        'success'
-    );
+    private static $checkout_steps = [];
 
     /**
      * Return the first step

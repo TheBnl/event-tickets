@@ -1,5 +1,5 @@
 nl:
-  Ticket:
+  Broarm\EventTickets\Model\Ticket:
     TITLE_LABEL: 'Titel voor op het ticket'
     PRICE_LABEL: 'Ticket prijs'
     SALE_START_LABEL: 'Ticket verkoop begint vanaf'
@@ -10,7 +10,7 @@ nl:
     UNAVAILABLE: 'Niet te koop'
     OrderMin: 'Minimum te bestellen amount of tickets from this type'
     OrderMax: 'Maximum allowed amount of tickets from this type'
-  CheckoutSteps:
+  Broarm\EventTickets\Checkout\Steps\CheckoutSteps:
     TICKETS_FOR: 'Tickets voor {event}'
     HAVE_FUN_AT: 'Veel plezier bij {event}'
     register: 'Registreren'
@@ -19,41 +19,41 @@ nl:
   CheckIn:
     GUESTLIST: 'Gastenlijst'
     CHECK_IN_TITLE: 'Gasten inchecken voor {event}'
-  CheckInForm:
+  Broarm\EventTickets\Forms\CheckInForm:
     TICKET_CODE: 'ticketnummer'
     CheckIn: 'Inchecken'
     CheckOut: 'Uitchecken'
-  CheckInValidator:
+  Broarm\EventTickets\Forms\CheckInValidator:
     MESSAGE_NO_CODE: 'Voer een ticketnummer in'
     MESSAGE_CODE_NOT_FOUND: 'Het ingevoerde ticketnummer #{ticket} is niet gevonden.'
     MESSAGE_TICKET_CANCELLED: '{ticket} maakt deel uit van een geannuleerde bestelling'
     MESSAGE_ALREADY_CHECKED_IN: '{ticket} is al ingecheckt.'
     MESSAGE_CHECK_OUT_SUCCESS: '{ticket} is succesvol uitgecheckt.'
     MESSAGE_CHECK_IN_SUCCESS: '{ticket} is succesvol ingecheckt.'
-  CurrencyExtension:
+  Broarm\EventTickets\Extensions\CurrencyExtension:
     FREE: 'Gratis'
-  SiteConfigExtension:
+  Broarm\EventTickets\Extensions\SiteConfigExtension:
     SUCCESS_MESSAGE_HELP: 'Dit bericht word getoond op de succes pagina. Hij is per evenement te overschijven onder de "tickets" tab'
     MAIL_MESSAGE_HELP: 'Dit bericht word getoond op het ticket. Hij is per evenement te overschijven onder de "tickets" tab'
-  TicketForm:
+  Broarm\EventTickets\Forms\TicketForm:
     MAKE_RESERVATION: 'Reserveer tickets'
     WAITINGLIST_INTRO: 'Het evenement is uitverkocht. U kunt zich hieronder inschrijven om op de hoogte te worden gehouden wanneer er plaatsen vrijkomen.'
     WAITINGLIST_SUCCESS: 'Bedankt voor uw inschrijving, wij houden u op de hoogte zodra er een plekken beschikbaar komen.'
     EXPIRED: 'Het evenement is afgelopen.'
     PENDING: 'Ticket verkoop begint vanaf {date}.'
-  TicketsField:
+  Broarm\EventTickets\Fields\TicketsField:
     TICKETS: 'Tickets'
     PRICE: 'Prijs'
     AMOUNT: 'Aantal'
     EMPTY: 'Tickets'
     VALIDATION_TO_MUCH: 'Er zijn {ticketCount} tickets over'
     VALIDATION_EMPTY: 'Selecteer minstens één ticket'
-  TicketExtension:
+  Broarm\EventTickets\Extensions\TicketExtension:
     Tickets: 'Tickets'
     Capacity: 'Plaatsen'
     Reservations: 'Reserveringen'
     GuestList: 'Gastenlijst'
-  TicketControllerExtension:
+  Broarm\EventTickets\Extensions\TicketControllerExtension:
     PERMISSIONS_CAT: 'Event tickets'
     HANDLE_CHECK_IN: 'Geautoriseerd voor ticket controle'
   TicketEmail:
@@ -81,21 +81,21 @@ nl:
   MainContactMail:
     TITLE: 'Uw tickets voor {event}'
     CONTENT: 'Hier zijn uw tickets voor <a href="{link}">{event}</a>.'
-  Reservation:
+  Broarm\EventTickets\Model\Reservation:
     CART: 'Winkelwagen'
     PENDING: 'Word verwerkt'
     PAID: 'Betaald'
     CANCELED: 'Geannuleerd'
     RESEND: 'Verstuur reservering'
     AgreeToTermsAndConditions: 'Akkoord met de algemene voorwaarden'
-  ReservationForm:
-    PAYMENT: 'Ga verder met betalen'
+  Broarm\EventTickets\Forms\ReservationForm:
+    ContinueToPayment: 'Ga verder met betalen'
     RESERVE: 'Reserveer tickets'
-  Attendee:
+  Broarm\EventTickets\Model\Attendee:
     Ticket: 'Ticket'
     Title: 'Naam'
     Email: 'E-mail'
-  AttendeeField:
+  Broarm\EventTickets\Fields\AttendeeField:
     FirstName: 'Voornaam'
     Surname: 'Achternaam'
     Email: 'E-mail'
@@ -104,15 +104,15 @@ nl:
   SuccessController:
     DOWNLOAD_TICKETS: 'Download uw tickets'
     BACK: 'Ga terug'
-  SummaryForm:
+  Broarm\EventTickets\Forms\SummaryForm:
     COMMENTS: 'Opmerkingen'
-  SummaryField:
+  Broarm\EventTickets\Fields\SummaryField:
     EMAIL_RECEIVER: 'Email ontvanger'
     TICKET: 'Ticket'
     PRICE: 'Prijs'
     SUBTOTAL: 'Subtotaal'
     TOTAL: 'Totaal'
     TICKET_RECEIVER_HELP: 'Verstuur tickets naar deze persoon'
-  TermsAndConditionsField:
+  Broarm\EventTickets\Fields\TermsAndConditionsField:
     TERMS_CONDITIONS: 'Ik ga akkoord met de voorwaarden die vermeld staan op de <a href="{link}" target="new" title="Lees de algemene voorwaarden">{title}</a> pagina'
     AGREE_TO_TERMS: 'U moet met de algemene voorwaarden akkoord gaan'

@@ -23,7 +23,7 @@ class AttendeeField extends CompositeField
     {
         parent::__construct();
         $this->setTag('fieldset');
-        $this->setLegend(_t('AttendeeField.VALUED', '{title} valued {price}', null, array(
+        $this->setLegend(_t(__CLASS__ . '.VALUED', '{title} valued {price}', null, array(
             'title' => $attendee->Ticket()->Title,
             'price' => $attendee->Ticket()->dbObject('Price')->NiceDecimalPoint())
         ));

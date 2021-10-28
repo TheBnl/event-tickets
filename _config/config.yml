@@ -10,6 +10,11 @@ Name: event-tickets
 #    - 'Broarm\EventTickets\RegisterStep'
 #    - 'Broarm\EventTickets\SummaryStep'
 #    - 'Broarm\EventTickets\SuccessStep'
+Broarm\EventTickets\Checkout\Steps\CheckoutSteps:
+  checkout_steps:
+    - register
+    - summary
+    - success
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - Broarm\EventTickets\Extensions\SiteConfigExtension
