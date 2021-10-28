@@ -391,8 +391,8 @@ class Reservation extends DataObject
         }
 
         // Get the mail sender or fallback to the admin email
-        if (($from = self::config()->get('mail_sender')) && empty($from)) {
-            $from = Config::inst()->get('Email', 'admin_email');
+        if (!($from = self::config()->get('mail_sender')) || empty($from)) {
+            $from = Email::config()->get('admin_email');
         }
 
         $eventName = SiteConfig::current_site_config()->getTitle();
@@ -435,12 +435,12 @@ class Reservation extends DataObject
             return true;
         }
 
-        if (($from = self::config()->get('mail_sender')) && empty($from)) {
-            $from = Config::inst()->get('Email', 'admin_email');
+        if (!($from = self::config()->get('mail_sender')) || empty($from)) {
+            $from = Email::config()->get('admin_email');
         }
 
-        if (($to = self::config()->get('mail_receiver')) && empty($to)) {
-            $to = Config::inst()->get('Email', 'admin_email');
+        if (!($to = self::config()->get('mail_receiver')) || empty($to)) {
+            $to = Email::config()->get('admin_email');
         }
 
         $eventName = SiteConfig::current_site_config()->getTitle();

@@ -1,10 +1,10 @@
 ---
 Name: event-tickets
 ---
-#CalendarEvent:
+#XD\Events\Model\EventPage:
 #  extensions:
 #    - 'Broarm\EventTickets\TicketExtension'
-#CalendarEvent_Controller:
+#XD\Events\Model\EventPageController:
 #  extensions:
 #    - 'Broarm\EventTickets\TicketControllerExtension'
 #    - 'Broarm\EventTickets\RegisterStep'
