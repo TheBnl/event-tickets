@@ -41,9 +41,11 @@ class ReservationForm extends FormStep
                     ? self::config()->get('require_all_attendees')
                     : $main;
 
-                $field = AttendeeField::create($attendee, $main, $required);
-                $fields->add($field);
-                $requiredFields = array_merge($requiredFields, $field->getRequiredFields());
+                if ($required) {
+                    $field = AttendeeField::create($attendee, $main, $required);
+                    $fields->add($field);
+                    $requiredFields = array_merge($requiredFields, $field->getRequiredFields());
+                }
             }
         }
 
