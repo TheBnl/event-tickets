@@ -1,28 +1,24 @@
 ---
 Name: event-tickets
-After: 'event_calendar/*'
 ---
-CalendarEvent:
+#XD\Events\Model\EventPage:
+#  extensions:
+#    - 'Broarm\EventTickets\TicketExtension'
+#XD\Events\Model\EventPageController:
+#  extensions:
+#    - 'Broarm\EventTickets\TicketControllerExtension'
+#    - 'Broarm\EventTickets\RegisterStep'
+#    - 'Broarm\EventTickets\SummaryStep'
+#    - 'Broarm\EventTickets\SuccessStep'
+SilverStripe\SiteConfig\SiteConfig:
   extensions:
-    - 'Broarm\EventTickets\TicketExtension'
-CalendarEvent_Controller:
+    - Broarm\EventTickets\Extensions\SiteConfigExtension
+SilverStripe\ORM\FieldType\DBCurrency:
   extensions:
-    - 'Broarm\EventTickets\TicketControllerExtension'
-    - 'Broarm\EventTickets\RegisterStep'
-    - 'Broarm\EventTickets\SummaryStep'
-    - 'Broarm\EventTickets\SuccessStep'
-SiteConfig:
+    - Broarm\EventTickets\Extensions\CurrencyExtension
+SilverStripe\Omnipay\Model\Payment:
   extensions:
-    - 'Broarm\EventTickets\SiteConfigExtension'
-Image:
+    - Broarm\EventTickets\Extensions\TicketPayment
+SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
   extensions:
-    - 'Broarm\EventTickets\ImageExtension'
-Currency:
-  extensions:
-    - 'Broarm\EventTickets\CurrencyExtension'
-Broarm\EventTickets\Reservation:
-  extensions:
-    - Payable
-Payment:
-  extensions:
-    - 'Broarm\EventTickets\TicketPayment'
+    - Broarm\EventTickets\Extensions\GridFieldDetailFormItemRequestExtension
