@@ -25,6 +25,8 @@ use SilverStripe\ORM\ValidationException;
  */
 class SummaryForm extends FormStep
 {
+    public $summaryStep;
+
     public function __construct($controller, $name, Reservation $reservation)
     {
         $fields = FieldList::create(
@@ -100,7 +102,7 @@ class SummaryForm extends FormStep
         $paymentProcessor
             ->createPayment($gateway)
             ->setSuccessUrl($this->getController()->Link($this->nextStep))
-            ->setFailureUrl($this->getController()->Link())
+            ->setFailureUrl($this->getController()->Link($this->summaryStep))
             ->write();
 
         $paymentProcessor->setGateWayData(array('transactionId' => $this->reservation->ReservationCode));
@@ -142,4 +144,8 @@ class SummaryForm extends FormStep
         return _t("{$lastErrorMessage->Gateway}.{$lastErrorMessage->Code}", $lastErrorMessage->Message);
     }
 
+    public function setSummaryStep($step)
+    {
+        $this->summaryStep = $step;
+    }
 }

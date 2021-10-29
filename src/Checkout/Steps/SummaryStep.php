@@ -36,6 +36,7 @@ class SummaryStep extends CheckoutStep
     public function SummaryForm()
     {
         $summary = new SummaryForm($this->owner, 'SummaryForm', $this->getReservation());
+        $summary->setSummaryStep($this->step);
         $summary->setNextStep(CheckoutSteps::nextStep($this->step));
         return $summary;
     }
