@@ -48,6 +48,9 @@ nl:
     EMPTY: 'Tickets'
     VALIDATION_TO_MUCH: 'Er zijn {ticketCount} tickets over'
     VALIDATION_EMPTY: 'Selecteer minstens één ticket'
+  Broarm\EventTickets\Fields\PaymentGatewayField:
+    SelectGateway: Selecteer betaalmethode
+    NoGateway: Geen betaalmethodes beschikbaar
   Broarm\EventTickets\Extensions\TicketExtension:
     Tickets: 'Tickets'
     Capacity: 'Plaatsen'
@@ -92,6 +95,7 @@ nl:
     ContinueToPayment: 'Ga verder met betalen'
     RESERVE: 'Reserveer tickets'
   Broarm\EventTickets\Model\Attendee:
+    GuestOf: 'Gast van {name}'
     Ticket: 'Ticket'
     Title: 'Naam'
     Email: 'E-mail'

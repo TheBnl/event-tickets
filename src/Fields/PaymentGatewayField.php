@@ -36,14 +36,15 @@ class PaymentGatewayField extends FieldGroup
             if (count($gateways) > 1) {
                 $children->add(OptionsetField::create(
                     'Gateway',
-                    _t('PaymentGatewayField.SELECT_GATEWAY', 'Select a gateway'),
+                    _t(__CLASS__ . '.SelectGateway', 'Select a gateway'),
                     $gateways
                 )->setValue(key($gateways)));
             } else {
                 $children->add(HiddenField::create('Gateway', 'Gateway', key($gateways)));
             }
         } else {
-            $children->add(LiteralField::create('NoGateway', "<p>No gateways configured</p>"));
+            $noGateway = _t(__CLASS__ . '.NoGateway', 'No gateways configured');
+            $children->add(LiteralField::create('NoGateway', "<p>$noGateway</p>"));
         }
 
         $this->extend('updateGatewayField');
