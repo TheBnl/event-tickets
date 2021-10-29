@@ -450,7 +450,7 @@ class Reservation extends DataObject
         $email = new Email();
         $email->setSubject(_t(
             __CLASS__ . '.NotificationSubject',
-            'Nieuwe reservering voor {event} door {name}',
+            'New reservation for {event} by {name}',
             null, [
                 'event' => $eventName,
                 'name' => $this->getName()

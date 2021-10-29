@@ -78,13 +78,13 @@ nl:
     TITLE: 'Nieuwe reservering voor {event}'
     CONTENT: 'Er is een nieuwe bestelling geplaatst door {name} voor {event}. Hieronder vindt u de gegevens van de bestelling.'
     ORDER: 'Order <strong>#{code}</strong>'
-  ReservationMail:
-    TITLE: 'Uw reservering bij {sitename}'
-    CONTENT: 'Bedankt voor uw bestelling voor <a href="{link}">{event}</a>. Uw tickets worden los verstuurd.'
+  
   MainContactMail:
     TITLE: 'Uw tickets voor {event}'
     CONTENT: 'Hier zijn uw tickets voor <a href="{link}">{event}</a>.'
   Broarm\EventTickets\Model\Reservation:
+    ReservationSubject: 'Uw tickets voor {event}'
+    NotificationSubject: 'Nieuwe reservering voor {event} door {name}'
     CART: 'Winkelwagen'
     PENDING: 'Word verwerkt'
     PAID: 'Betaald'
