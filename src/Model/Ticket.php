@@ -5,6 +5,7 @@ namespace Broarm\EventTickets\Model;
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Exception;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Forms\CurrencyField;
 use SilverStripe\Forms\DatetimeField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
@@ -96,7 +97,7 @@ class Ticket extends DataObject
 
         $fields->addFieldsToTab('Root.Main', array(
             TextField::create('Title', _t(__CLASS__ . '.TITLE_LABEL', 'Title for the ticket')),
-            NumericField::create('Price', _t(__CLASS__ . '.PRICE_LABEL', 'Ticket price')),
+            CurrencyField::create('Price', _t(__CLASS__ . '.PRICE_LABEL', 'Ticket price')),
             $saleStart = DatetimeField::create('AvailableFromDate',
                 _t(__CLASS__ . '.SALE_START_LABEL', 'Ticket sale starts from')),
             $saleEnd = DatetimeField::create('AvailableTillDate', _t(__CLASS__ . '.SALE_END_LABEL', 'Ticket sale ends on')),

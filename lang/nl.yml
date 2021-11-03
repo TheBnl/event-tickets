@@ -78,7 +78,6 @@ nl:
     TITLE: 'Nieuwe reservering voor {event}'
     CONTENT: 'Er is een nieuwe bestelling geplaatst door {name} voor {event}. Hieronder vindt u de gegevens van de bestelling.'
     ORDER: 'Order <strong>#{code}</strong>'
-  
   MainContactMail:
     TITLE: 'Uw tickets voor {event}'
     CONTENT: 'Hier zijn uw tickets voor <a href="{link}">{event}</a>.'
@@ -91,6 +90,11 @@ nl:
     CANCELED: 'Geannuleerd'
     RESEND: 'Verstuur reservering'
     AgreeToTermsAndConditions: 'Akkoord met de algemene voorwaarden'
+    Event: 'Evenement'
+    Address: 'Adres'
+    Date: 'Datum'
+    Ticket: 'Ticket'
+    Price: 'Prijs'
   Broarm\EventTickets\Forms\ReservationForm:
     ContinueToPayment: 'Ga verder met betalen'
     RESERVE: 'Reserveer tickets'

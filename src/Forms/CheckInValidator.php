@@ -58,7 +58,7 @@ class CheckInValidator
 
         // Check if a code is given to the validator
         if (!isset($ticketCode)) {
-            return $result = array(
+            return array(
                 'Code' => self::MESSAGE_NO_CODE,
                 'Message' => self::message(self::MESSAGE_NO_CODE, $ticketCode),
                 'Type' => self::MESSAGE_TYPE_BAD,
@@ -69,7 +69,7 @@ class CheckInValidator
 
         // Check if a ticket exists with the given ticket code
         if (!$this->attendee = Attendee::get()->find('TicketCode', $ticketCode)) {
-            return $result = array(
+            return array(
                 'Code' => self::MESSAGE_CODE_NOT_FOUND,
                 'Message' => self::message(self::MESSAGE_CODE_NOT_FOUND, $ticketCode),
                 'Type' => self::MESSAGE_TYPE_BAD,
@@ -80,10 +80,9 @@ class CheckInValidator
             $name = $this->attendee->getName();
         }
 
-        // todo dont depend on "event" page
         // Check if the reservation is not canceled
         if (!(bool)$this->attendee->TicketPage()->getGuestList()->find('ID', $this->attendee->ID)) {
-            return $result = array(
+            return array(
                 'Code' => self::MESSAGE_TICKET_CANCELLED,
                 'Message' => self::message(self::MESSAGE_TICKET_CANCELLED, $name),
                 'Type' => self::MESSAGE_TYPE_BAD,
@@ -94,7 +93,7 @@ class CheckInValidator
 
         // Check if the ticket is already checked in and not allowed to check out
         elseif ((bool)$this->attendee->CheckedIn && !(bool)self::config()->get('allow_checkout')) {
-            return $result = array(
+            return array(
                 'Code' => self::MESSAGE_ALREADY_CHECKED_IN,
                 'Message' => self::message(self::MESSAGE_ALREADY_CHECKED_IN, $name),
                 'Type' => self::MESSAGE_TYPE_BAD,
@@ -105,7 +104,7 @@ class CheckInValidator
 
         // Successfully checked out
         elseif ((bool)$this->attendee->CheckedIn && (bool)self::config()->get('allow_checkout')) {
-            return $result = array(
+            return array(
                 'Code' => self::MESSAGE_CHECK_OUT_SUCCESS,
                 'Message' => self::message(self::MESSAGE_CHECK_OUT_SUCCESS, $name),
                 'Type' => self::MESSAGE_TYPE_WARNING,
@@ -116,7 +115,7 @@ class CheckInValidator
 
         // Successfully checked in
         else {
-            return $result = array(
+            return array(
                 'Code' => self::MESSAGE_CHECK_IN_SUCCESS,
                 'Message' => self::message(self::MESSAGE_CHECK_IN_SUCCESS, $name),
                 'Type' => self::MESSAGE_TYPE_GOOD,
