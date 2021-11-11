@@ -9,6 +9,7 @@ use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\ValidationResult;
 
 class CheckInForm extends Form
 {
@@ -51,7 +52,7 @@ class CheckInForm extends Form
                 break;
         }
         
-        $form->sessionMessage($result['Message'], strtolower($result['Type']), false);
+        $form->sessionMessage($result['Message'], $result['Type'], ValidationResult::CAST_TEXT);
         $this->extend('onAfterCheckIn', $response, $form, $result);
         return $response ? $response : $controller->redirect($controller->Link());
     }

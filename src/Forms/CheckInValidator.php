@@ -5,6 +5,7 @@ namespace Broarm\EventTickets\Forms;
 use Broarm\EventTickets\Model\Attendee;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
+use SilverStripe\ORM\ValidationResult;
 
 /**
  * CheckInValidator.php
@@ -24,10 +25,6 @@ class CheckInValidator
     const MESSAGE_ALREADY_CHECKED_IN = 'MESSAGE_ALREADY_CHECKED_IN';
     const MESSAGE_CHECK_OUT_SUCCESS = 'MESSAGE_CHECK_OUT_SUCCESS';
     const MESSAGE_CHECK_IN_SUCCESS = 'MESSAGE_CHECK_IN_SUCCESS';
-
-    const MESSAGE_TYPE_GOOD = 'Good';
-    const MESSAGE_TYPE_WARNING = 'Warning';
-    const MESSAGE_TYPE_BAD = 'Bad';
 
     /**
      * Allow people to check in and out
@@ -61,7 +58,7 @@ class CheckInValidator
             return array(
                 'Code' => self::MESSAGE_NO_CODE,
                 'Message' => self::message(self::MESSAGE_NO_CODE, $ticketCode),
-                'Type' => self::MESSAGE_TYPE_BAD,
+                'Type' => ValidationResult::TYPE_ERROR,
                 'Ticket' => $ticketCode,
                 'Attendee' => null
             );
@@ -72,7 +69,7 @@ class CheckInValidator
             return array(
                 'Code' => self::MESSAGE_CODE_NOT_FOUND,
                 'Message' => self::message(self::MESSAGE_CODE_NOT_FOUND, $ticketCode),
-                'Type' => self::MESSAGE_TYPE_BAD,
+                'Type' => ValidationResult::TYPE_ERROR,
                 'Ticket' => $ticketCode,
                 'Attendee' => null
             );
@@ -85,7 +82,7 @@ class CheckInValidator
             return array(
                 'Code' => self::MESSAGE_TICKET_CANCELLED,
                 'Message' => self::message(self::MESSAGE_TICKET_CANCELLED, $name),
-                'Type' => self::MESSAGE_TYPE_BAD,
+                'Type' => ValidationResult::TYPE_ERROR,
                 'Ticket' => $ticketCode,
                 'Attendee' => $this->attendee
             );
@@ -96,7 +93,7 @@ class CheckInValidator
             return array(
                 'Code' => self::MESSAGE_ALREADY_CHECKED_IN,
                 'Message' => self::message(self::MESSAGE_ALREADY_CHECKED_IN, $name),
-                'Type' => self::MESSAGE_TYPE_BAD,
+                'Type' => ValidationResult::TYPE_ERROR,
                 'Ticket' => $ticketCode,
                 'Attendee' => $this->attendee
             );
@@ -107,7 +104,7 @@ class CheckInValidator
             return array(
                 'Code' => self::MESSAGE_CHECK_OUT_SUCCESS,
                 'Message' => self::message(self::MESSAGE_CHECK_OUT_SUCCESS, $name),
-                'Type' => self::MESSAGE_TYPE_WARNING,
+                'Type' => ValidationResult::TYPE_WARNING,
                 'Ticket' => $ticketCode,
                 'Attendee' => $this->attendee
             );
@@ -118,7 +115,7 @@ class CheckInValidator
             return array(
                 'Code' => self::MESSAGE_CHECK_IN_SUCCESS,
                 'Message' => self::message(self::MESSAGE_CHECK_IN_SUCCESS, $name),
-                'Type' => self::MESSAGE_TYPE_GOOD,
+                'Type' => ValidationResult::TYPE_GOOD,
                 'Ticket' => $ticketCode,
                 'Attendee' => $this->attendee
             );
