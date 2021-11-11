@@ -40,7 +40,7 @@ class CheckInForm extends Form
     {
         /** @var CheckInController $controller */
         $controller = $form->getController();
-        $validator = CheckInValidator::create();
+        $validator = new CheckInValidator();
         $result = $validator->validate($data['TicketCode']);
         switch ($result['Code']) {
             case CheckInValidator::MESSAGE_CHECK_OUT_SUCCESS:
