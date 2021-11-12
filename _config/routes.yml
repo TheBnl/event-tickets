@@ -1,0 +1,9 @@
+---
+Name: event-tickets-routes
+After: 
+  - '#rootroutes'
+  - '#coreroutes'
+---
+SilverStripe\Control\Director:
+  rules:
+    'checkin//$Action/$ID': 'Broarm\EventTickets\Controllers\CheckInController'

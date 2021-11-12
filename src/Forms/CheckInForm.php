@@ -3,6 +3,7 @@
 namespace Broarm\EventTickets\Forms;
 
 use Broarm\EventTickets\Controllers\CheckInController;
+use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
@@ -27,6 +28,7 @@ class CheckInForm extends Form
         $required = new RequiredFields(array('TicketCode'));
         parent::__construct($controller, $name, $fields, $actions, $required);
         $this->extend('onAfterConstruct');
+
     }
 
     /**
@@ -51,9 +53,14 @@ class CheckInForm extends Form
                 $validator->getAttendee()->checkIn();
                 break;
         }
-        
-        $form->sessionMessage($result['Message'], $result['Type'], ValidationResult::CAST_TEXT);
-        $this->extend('onAfterCheckIn', $response, $form, $result);
-        return $response ? $response : $controller->redirect($controller->Link());
+
+        if (Director::is_ajax()) {
+            return json_encode($result);
+        } else {
+            $form->sessionMessage($result['Message'], $result['Type'], ValidationResult::CAST_TEXT);
+            $this->extend('onAfterCheckIn', $response, $form, $result);
+            
+            return $response ? $response : $controller->redirectBack();// redirect($controller->Link());
+        }
     }
 }

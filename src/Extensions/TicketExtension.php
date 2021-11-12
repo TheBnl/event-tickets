@@ -2,6 +2,7 @@
 
 namespace Broarm\EventTickets\Extensions;
 
+use Broarm\EventTickets\Controllers\CheckInController;
 use Broarm\EventTickets\Forms\GridField\GuestListGridFieldConfig;
 use Broarm\EventTickets\Forms\GridField\ReservationGridFieldConfig;
 use Broarm\EventTickets\Forms\GridField\TicketsGridFieldConfig;
@@ -191,7 +192,8 @@ class TicketExtension extends DataExtension
     public function updateCMSActions(FieldList $actions)
     {
         if ($this->owner->Attendees()->exists()) {
-            $link = $this->owner->Link('checkin');
+            // $link = $this->owner->Link('checkin');
+            $link = CheckInController::singleton()->Link("event/{$this->owner->ID}");
             $label = _t(__CLASS__ . '.StartCheckIn', 'Start check in');
             $action = LiteralField::create(
                 'StartCheckIn',

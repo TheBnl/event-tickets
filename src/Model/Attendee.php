@@ -17,6 +17,7 @@ use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Assets\Image;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
@@ -362,7 +363,7 @@ class Attendee extends DataObject
      */
     public function getCheckInLink()
     {
-        return $this->TicketPage()->AbsoluteLink("checkin/ticket/{$this->TicketCode}");
+        return Director::absoluteURL("checkin/ticket/{$this->TicketCode}");
     }
 
     /**
