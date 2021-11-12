@@ -110,7 +110,7 @@ class CheckInController extends ContentController implements PermissionProvider
                 'allowCheckout' => CheckInValidator::config()->get('allow_checkout'),
                 '_rowVariant' => $attendee->CheckedIn ? 'success' : '',
             ];
-        }, $eventPage->getGuestList()->toArray());
+        }, $eventPage->getGuestList()->Sort('Title ASC')->toArray());
 
         return json_encode(['attendees' => $attendees]);
     }
