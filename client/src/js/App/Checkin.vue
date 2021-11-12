@@ -39,7 +39,7 @@
                                     Check in
                                 </b-button>
                                 <b-button v-if="row.item.checkedIn && row.item.allowCheckout" block size="sm" variant="danger" @click="checkin(row.item.ticket)" class="mr-1">
-                                    Check in
+                                    Check out
                                 </b-button>
                             </template>
                         </b-table>
@@ -83,13 +83,13 @@ export default {
             promise.then(data => {
                 this.formResponse = data.data;
                 console.log('validate ticket', data);
+                this.$refs.table.refresh()
+                this.$refs.ticketNr.focus();
             }).catch(err => {
                 console.error('validate ticket::error', err);
+                this.$refs.table.refresh()
+                this.$refs.ticketNr.focus();
             });
-
-            // todo only refresh item
-            this.$refs.table.refresh()
-            this.$refs.ticketNr.focus();
         },
         onSubmit(event) {
             event.preventDefault();
