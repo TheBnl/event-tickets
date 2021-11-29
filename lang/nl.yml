@@ -132,3 +132,5 @@ nl:
     Email: 'E-mail'
     Telephone: 'Telefoon'
     Register: 'Inschrijven'
+  Broarm\EventTickets\Forms\GridField\GuestListExportButton:
+    ExportGuestList: 'Exporteer gastenlijst'

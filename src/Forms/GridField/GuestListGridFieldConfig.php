@@ -3,7 +3,6 @@
 namespace Broarm\EventTickets\Forms\GridField;
 
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
-use SilverStripe\Forms\GridField\GridFieldExportButton;
 
 /**
  * Class GuestListGridFieldConfig
@@ -21,7 +20,6 @@ class GuestListGridFieldConfig extends ReservationGridFieldConfig
     {
         parent::__construct($itemsPerPage);
         $this->addComponent(new GridFieldAddNewButton('buttons-before-left'));
-        //$this->addComponent(new GuestListExportButton('buttons-before-left', $event->Fields()->map()->toArray()));
-        //$this->extend('updateGuestListConfig', $event);
+        $this->addComponent(new GuestListExportButton('buttons-before-left'));
     }
 }
