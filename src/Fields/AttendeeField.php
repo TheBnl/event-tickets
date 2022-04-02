@@ -35,13 +35,14 @@ class AttendeeField extends CompositeField
         
 
         $children = FieldList::create();
-        $savableFields = $attendee->TicketPage()->Fields();
+        $ticketPage = $attendee->TicketPage();
+        $savableFields = $ticketPage->Fields();
+        $this->extend('updateSavableFields', $savableFields, $ticketPage);
 
         /** @var UserField $field */
         foreach ($savableFields as $field) {
             // Generate a unique field name
             $fieldName = "Attendee[{$attendee->ID}][$field->ID]";
-
             // Create the field an fill with attendee data
             $hasField = $attendee->Fields()->find('ID', $field->ID);
             $value = $hasField ? $hasField->getField('Value') : null;

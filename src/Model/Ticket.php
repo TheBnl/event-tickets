@@ -92,7 +92,7 @@ class Ticket extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName(['TicketPageID']);
+        $fields->removeByName(['TicketPageID', 'Sort']);
 
         $fields->addFieldsToTab('Root.Main', array(
             TextField::create('Title', _t(__CLASS__ . '.TITLE_LABEL', 'Title for the ticket')),

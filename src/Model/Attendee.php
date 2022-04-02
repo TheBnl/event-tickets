@@ -131,7 +131,7 @@ class Attendee extends DataObject
         $fields = parent::getCMSFields();
         $fields->addFieldsToTab('Root.Main', array(
             ReadonlyField::create('TicketCode', _t(__CLASS__ . '.Ticket', 'Ticket')),
-            ReadonlyField::create('MyCheckedIn', _t(__CLASS__ . '.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
+            // ReadonlyField::create('MyCheckedIn', _t(__CLASS__ . '.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
         ));
 
         foreach ($this->Fields() as $field) {

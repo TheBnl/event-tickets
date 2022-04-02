@@ -55,23 +55,21 @@ class TicketExtension extends DataExtension
 
     private static $db = array(
         'Capacity' => 'Int',
-        'OrderMin' => 'Int',
-        'OrderMax' => 'Int',
         'SuccessMessage' => 'HTMLText',
         'SuccessMessageMail' => 'HTMLText',
         'PrintedTicketContent' => 'HTMLText',
     );
 
-    private static $has_many = array(
+    private static $has_many = [
         'Tickets' => Ticket::class . '.TicketPage',
         'Reservations' => Reservation::class . '.TicketPage',
         'Attendees' => Attendee::class . '.TicketPage',
         'WaitingList' => WaitingListRegistration::class . '.TicketPage',
-    );
+    ];
 
-    private static $many_many = array(
+    private static $many_many = [
         'Fields' => UserField::class
-    );
+    ];
 
     private static $many_many_extraFields = [
         'Fields' => [
@@ -79,14 +77,10 @@ class TicketExtension extends DataExtension
         ]
     ];
 
-    private static $defaults = array(
-        'Capacity' => 50
-    );
-
-    private static $translate = array(
+    private static $translate = [
         'SuccessMessage',
         'SuccessMessageMail'
-    );
+    ];
 
     protected $cachedGuestList;
 
