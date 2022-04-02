@@ -51,7 +51,9 @@ class TicketForm extends FormStep
      */
     public function handleTicketForm(array $data, TicketForm $form)
     {
-        $reservation = ReservationSession::start($this->getController()->data());
+        $ticketPage = $this->getController()->data();
+        $this->extend('updateTicketPage', $ticketPage);
+        $reservation = ReservationSession::start($ticketPage);
         foreach ($data['Tickets'] as $ticketID => $ticketData) {
             for ($i = 0; $i < $ticketData['Amount']; $i++) {
                 $attendee = Attendee::create();

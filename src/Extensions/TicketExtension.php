@@ -92,6 +92,7 @@ class TicketExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
+        $fields->removeByName(['Tickets', 'Reservations', 'Attendees', 'WaitingList']);
         $guestListStatusDescription = _t(__CLASS__ . '.GuestListStatusDescription', 'Tickets sold: {guestListStatus}', null, [
             'guestListStatus' => $this->owner->getGuestListStatus()
         ]);
