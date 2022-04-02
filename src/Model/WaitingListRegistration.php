@@ -3,7 +3,6 @@
 namespace Broarm\EventTickets\Model;
 
 use Broarm\EventTickets\Extensions\TicketExtension;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 
@@ -16,7 +15,7 @@ use SilverStripe\ORM\DataObject;
  * @property string Email
  * @property string Telephone
  *
- * @method TicketExtension|SiteTree TicketPage()
+ * @method TicketExtension|DataObject TicketPage()
  */
 class WaitingListRegistration extends DataObject
 {
@@ -29,7 +28,7 @@ class WaitingListRegistration extends DataObject
     );
 
     private static $has_one = array(
-        'TicketPage' => SiteTree::class,
+        'TicketPage' => DataObject::class,
     );
 
     private static $summary_fields = array(
@@ -59,25 +58,5 @@ class WaitingListRegistration extends DataObject
     {
         $name = explode('\\', parent::singular_name());
         return trim(end($name));
-    }
-
-    public function canView($member = null)
-    {
-        return $this->TicketPage()->canView($member);
-    }
-
-    public function canEdit($member = null)
-    {
-        return $this->TicketPage()->canEdit($member);
-    }
-
-    public function canDelete($member = null)
-    {
-        return $this->TicketPage()->canDelete($member);
-    }
-
-    public function canCreate($member = null, $context = [])
-    {
-        return $this->TicketPage()->canCreate($member, $context);
     }
 }

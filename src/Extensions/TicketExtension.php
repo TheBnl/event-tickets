@@ -13,17 +13,13 @@ use Broarm\EventTickets\Model\Reservation;
 use Broarm\EventTickets\Model\Ticket;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use Broarm\EventTickets\Model\WaitingListRegistration;
-use DateTime;
 use Exception;
-use SilverStripe\Assets\Image;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
-use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataList;
@@ -39,7 +35,7 @@ use SilverStripe\SiteConfig\SiteConfig;
  *
  * @package Broarm\EventTickets
  *
- * @property TicketExtension|SiteTree $owner
+ * @property TicketExtension|DataObject $owner
  * @property int Capacity
  * @property int OrderMin
  * @property int OrderMax
@@ -185,26 +181,6 @@ class TicketExtension extends DataExtension
     }
 
     /**
-     * Extend the page actions with an start check in action
-     *
-     * @param FieldList $actions
-     */
-    public function updateCMSActions(FieldList $actions)
-    {
-        if ($this->owner->Attendees()->exists()) {
-            // $link = $this->owner->Link('checkin');
-            $link = CheckInController::singleton()->Link("event/{$this->owner->ID}");
-            $label = _t(__CLASS__ . '.StartCheckIn', 'Start check in');
-            $action = LiteralField::create(
-                'StartCheckIn',
-                "<a href='$link' target='_blank' class='no-ajax btn btn-outline-secondary font-icon-checklist'>$label</a>"
-            );
-
-            $actions->push($action);
-        }
-    }
-
-    /**
      * Get the guest list status used in the summary fields
      */
     public function getGuestListStatus()
@@ -255,7 +231,7 @@ class TicketExtension extends DataExtension
         if (($tickets = $this->owner->Tickets())) {
             /** @var Ticket $ticket */
             foreach ($tickets as $ticket) {
-                if (($date = $ticket->getAvailableFrom()) && strtotime($date) < strtotime($saleStart) || $saleStart === null) {
+                if (($date = $ticket->getAvailableFrom()) && ($saleStart === null || strtotime($date) < strtotime($saleStart))) {
                     $saleStart = $date;
                 }
             }

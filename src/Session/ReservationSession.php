@@ -4,7 +4,6 @@ namespace Broarm\EventTickets\Session;
 
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Model\Reservation;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
@@ -57,7 +56,7 @@ class ReservationSession
      * @return Reservation
      * @throws ValidationException
      */
-    public static function start(SiteTree $ticketPage)
+    public static function start(DataObject $ticketPage)
     {
         // Check if we can start a reservation session on the given page
         if (!$ticketPage->hasExtension(TicketExtension::class)) {

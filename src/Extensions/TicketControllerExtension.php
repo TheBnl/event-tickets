@@ -6,6 +6,7 @@ use Broarm\EventTickets\Controllers\CheckInController;
 use Broarm\EventTickets\Checkout\Steps\CheckoutSteps;
 use Broarm\EventTickets\Forms\TicketForm;
 use Broarm\EventTickets\Forms\WaitingListRegistrationForm;
+use RuntimeException;
 use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\Core\Extension;
 
@@ -31,6 +32,10 @@ class TicketControllerExtension extends Extension
      */
     public function TicketForm()
     {
+        if (!$this->owner->hasMethod('getTicketsAvailable')) {
+            throw new RuntimeException('You should define the method getTicketsAvailable on the controller if TicketExtension is not added to the Controllers DataObject');
+        }
+
         if ($this->owner->Tickets()->count() && $this->owner->getTicketsAvailable()) {
             $ticketForm = new TicketForm($this->owner, 'TicketForm', $this->owner->Tickets(), $this->owner->data());
             $ticketForm->setNextStep(CheckoutSteps::start());

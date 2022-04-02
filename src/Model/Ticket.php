@@ -4,7 +4,6 @@ namespace Broarm\EventTickets\Model;
 
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Exception;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\CurrencyField;
 use SilverStripe\Forms\DatetimeField;
 use SilverStripe\Forms\LiteralField;
@@ -28,7 +27,7 @@ use SilverStripe\ORM\FieldType\DBField;
  * @property string AvailableTillDate
  * @property NumericField AmountField the amount field is set on the TicketForm
  *
- * @method TicketExtension|SiteTree TicketPage()
+ * @method TicketExtension|DataObject TicketPage()
  */
 class Ticket extends DataObject
 {
@@ -63,7 +62,7 @@ class Ticket extends DataObject
     private static $default_sort = 'Sort ASC, AvailableFromDate DESC';
 
     private static $has_one = array(
-        'TicketPage' => SiteTree::class
+        'TicketPage' => DataObject::class
     );
 
     private static $defaults = array(

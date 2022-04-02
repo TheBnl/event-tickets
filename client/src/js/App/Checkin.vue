@@ -52,7 +52,6 @@
 
 <script>
 import axios from 'axios';
-
 export default {
     data() {
         return {
@@ -71,8 +70,6 @@ export default {
     },
     methods: {
         checkin(ticket) {
-            console.log('checkin', ticket);
-
             const promise = axios.get(window.location.origin + '/checkin/ticket/' + ticket, {
                 headers: {
                     // request as ajax
@@ -103,7 +100,7 @@ export default {
 
             const promise = axios.get(window.location.origin + '/checkin/attendees/' + this.event.id);
             promise.then(data => {
-                console.log('data', data.data.attendees);
+                // console.log('data', data.data.attendees);
                 const items = data.data.attendees;
                 callback(items || []);
             }).catch(err => {

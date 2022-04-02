@@ -8,21 +8,19 @@ use Broarm\EventTickets\Forms\CheckInForm;
 use Broarm\EventTickets\Forms\CheckInValidator;
 use Broarm\EventTickets\Model\Attendee;
 use Exception;
-use PageController;
+use PharIo\Manifest\Requirement;
 use SilverStripe\CMS\Controllers\ContentController;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse as HTTPResponseAlias;
 use SilverStripe\Control\HTTPResponse_Exception;
-use SilverStripe\Core\Extension;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Security\Security;
 use SilverStripe\View\Requirements;
-use SilverStripe\View\SSViewer;
 
 /**
  * Class CheckInController
@@ -52,16 +50,17 @@ class CheckInController extends ContentController implements PermissionProvider
         if (!$eventId) {
             $this->redirect($this->Link());
         }
-        
-        $eventPage = SiteTree::get_by_id($eventId);
+
+        $eventPage = $this->findEventPage($eventId);
         if (!$eventPage || !$eventPage->exists()) {
             $this->httpError(404);
         }
 
         $eventData = json_encode([
-            'title'=> $eventPage->Title,
+            'title'=> $eventPage->getEventTitle(),
             'id'=> $eventPage->ID
         ]);
+
         Requirements::insertHeadTags("<script>window.event=$eventData</script>");
 
         return [];
@@ -95,7 +94,7 @@ class CheckInController extends ContentController implements PermissionProvider
             return json_encode(['attendees' => []]);
         }
         
-        $eventPage = SiteTree::get_by_id($eventId);
+        $eventPage = $this->findEventPage($eventId);
         if (!$eventPage || !$eventPage->exists()) {
             return json_encode(['attendees' => []]);
         }
@@ -141,6 +140,25 @@ class CheckInController extends ContentController implements PermissionProvider
     }
 
     /**
+     * Finds first instance of a class with the ticketextension and id.
+     * FIXME: not safe for instances when different classes hold the TicketExtension
+     */
+    public function findEventPage($id)
+    {
+        $eventPage = null;
+        $classOptions = ClassInfo::classesWithExtension(TicketExtension::class);
+        foreach ($classOptions as $eventPageClass) {
+            $eventPage = DataObject::get_by_id($eventPageClass, $id);
+            if ($eventPage && $eventPage->exists()) {
+                break;
+            }
+        }
+
+        $this->extend('updateFoundEventPage', $eventPage, $id);
+        return $eventPage;
+    }
+
+    /**
      * Provide permissions required for ticket check in
      *
      * @return array
@@ -169,9 +187,15 @@ class CheckInController extends ContentController implements PermissionProvider
             Security::permissionFailure();
         }
         
-        // tmp test lib
-        // $script = Director::baseFolder() . '/vendor/bramdeleeuw/silverstripe-event-tickets/client/dist/js/checkin.js';
-        // Requirements::customScript(file_get_contents($script));
+        // block any set javascript or css
+        $requirementsBackend = Requirements::backend();
+        foreach ($requirementsBackend->getJavascript() as $file => $config) {
+            Requirements::block($file);
+        }
+
+        foreach ($requirementsBackend->getCSS() as $file => $config) {
+            Requirements::block($file);
+        }
 
         parent::init();
     }

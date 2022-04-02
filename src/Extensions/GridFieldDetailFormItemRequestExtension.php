@@ -2,9 +2,11 @@
 
 namespace Broarm\EventTickets\Extensions;
 
+use Broarm\EventTickets\Controllers\CheckInController;
 use Broarm\EventTickets\Model\Reservation;
 use Mpdf\Output\Destination;
 use SilverStripe\Assets\FileNameFilter;
+use SilverStripe\Control\Controller;
 use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
@@ -21,14 +23,16 @@ class GridFieldDetailFormItemRequestExtension extends \SilverStripe\Core\Extensi
 {
     private static $allowed_actions = [
         'sendTicketEmail',
-        'downloadTickets'
+        'downloadTickets',
+        'checkin'
     ];
 
     public function updateItemEditForm(Form $form)
     {
+        $connectionActions = CompositeField::create()->setName('ConnectionActions');
+        $connectionActions->setFieldHolderTemplate(CompositeField::class . '_holder_buttongroup');
+
         if (($record = $this->owner->getRecord()) && $record instanceof Reservation) {
-            $connectionActions = CompositeField::create()->setName('ConnectionActions');
-            $connectionActions->setFieldHolderTemplate(CompositeField::class . '_holder_buttongroup');
 
             $sendAction = FormAction::create('sendTicketEmail', _t(__CLASS__ . '.SendTicketEmail', 'Resend ticket mail'))
                 ->addExtraClass('grid-print-button btn btn-outline-secondary font-icon-p-mail')
@@ -50,6 +54,20 @@ JS;
             );
 
             $connectionActions->push($downloadAction);
+        }
+
+        if (($record = $this->owner->getRecord()) && $record->hasExtension(TicketExtension::class)) {
+            $eventLink = Controller::join_links(['checkin', 'event', $record->ID]);
+            $checkinLink = $this->owner->Link($eventLink);
+            $checkinLabel = _t(__CLASS__ . '.StartCheckIn', 'Start check in');
+            $checkinAction = LiteralField::create(
+                'StartCheckIn',
+                "<a href='$checkinLink' target='_blank' class='no-ajax btn btn-outline-secondary font-icon-checklist'>$checkinLabel</a>"
+            );
+            $connectionActions->push($checkinAction);
+        }
+
+        if ($connectionActions->FieldList()->exists()) {
             $form->Actions()->insertBefore('MajorActions', $connectionActions);
         }
     }
@@ -74,5 +92,10 @@ JS;
             // header("Content-Disposition:attachment;filename='{$fileName}'");
             return $pdf->Output($fileName, Destination::INLINE);
         }
+    }
+
+    public function checkin()
+    {
+        return new CheckInController($this->owner->getRecord());
     }
 }

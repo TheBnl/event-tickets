@@ -3,7 +3,6 @@
 namespace Broarm\EventTickets\Model;
 
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
@@ -12,13 +11,8 @@ use Broarm\EventTickets\Forms\CheckInValidator;
 use Broarm\EventTickets\Model\UserFields\UserEmailField;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use Broarm\EventTickets\Model\UserFields\UserTextField;
-use Dompdf\Dompdf;
-use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
-use SilverStripe\Assets\Image;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
-use SilverStripe\Control\Email\Email;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\ArrayList;
@@ -27,7 +21,6 @@ use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Security\Member;
 use SilverStripe\View\ArrayData;
-use SilverStripe\View\SSViewer;
 
 /**
  * Class Attendee
@@ -49,7 +42,7 @@ use SilverStripe\View\SSViewer;
  * @method Reservation Reservation()
  * @method Ticket Ticket()
  * @method Member Member()
- * @method TicketExtension|SiteTree TicketPage()
+ * @method TicketExtension|DataObject TicketPage()
  * @method ManyManyList Fields()
  */
 class Attendee extends DataObject
@@ -108,7 +101,7 @@ class Attendee extends DataObject
     );
 
     private static $has_one = array(
-        'TicketPage' => SiteTree::class,
+        'TicketPage' => DataObject::class,
         'Reservation' => Reservation::class,
         'Ticket' => Ticket::class,
         'Member' => Member::class
@@ -216,17 +209,6 @@ class Attendee extends DataObject
         }
 
         return $valid;
-    }
-
-    /**
-     * Create the folder for the qr code and ticket file
-     *
-     * @return Folder|DataObject|null
-     * @deprecated dont store files, generate files when needed
-     */
-    public function fileFolder()
-    {
-        return Folder::find_or_make("/event-tickets/{$this->TicketPage()->URLSegment}/{$this->TicketCode}/");
     }
 
     /**

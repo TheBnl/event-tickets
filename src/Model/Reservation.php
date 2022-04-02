@@ -8,7 +8,6 @@ use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
 use SilverStripe\Assets\FileNameFilter;
 use SilverStripe\Assets\Folder;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\CheckboxField;
@@ -44,7 +43,7 @@ use SilverStripe\View\SSViewer;
  * @property int TicketPageID
  * @property int MainContactID
  *
- * @method TicketExtension|SiteTree TicketPage()
+ * @method TicketExtension|DataObject TicketPage()
  * @method Attendee MainContact()
  * @method HasManyList Payments()
  * @method HasManyList Attendees()
@@ -119,7 +118,7 @@ class Reservation extends DataObject
     private static $default_sort = 'Created DESC';
 
     private static $has_one = array(
-        'TicketPage' => SiteTree::class,
+        'TicketPage' => DataObject::class,
         'MainContact' => Attendee::class
     );
 
@@ -474,25 +473,5 @@ class Reservation extends DataObject
         $this->extend('onBeforeSend');
         $this->SentReservation = (boolean)$this->sendReservation();
         $this->SentNotification = (boolean)$this->sendNotification();
-    }
-
-    public function canView($member = null)
-    {
-        return $this->TicketPage()->canView($member);
-    }
-
-    public function canEdit($member = null)
-    {
-        return $this->TicketPage()->canEdit($member);
-    }
-
-    public function canDelete($member = null)
-    {
-        return $this->TicketPage()->canDelete($member);
-    }
-
-    public function canCreate($member = null, $context = [])
-    {
-        return $this->TicketPage()->canCreate($member, $context);
     }
 }

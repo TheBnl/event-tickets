@@ -2,11 +2,9 @@
 
 namespace Broarm\EventTickets\Forms;
 
-use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Fields\TicketsField;
 use Broarm\EventTickets\Model\Attendee;
 use Broarm\EventTickets\Session\ReservationSession;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\FieldList;
@@ -35,7 +33,7 @@ class TicketForm extends FormStep
 
         $actions = FieldList::create(
             FormAction::create('handleTicketForm', _t(__CLASS__ . '.MakeReservation', 'Make reservation'))
-                ->setDisabled($controller->getAvailability() === 0)
+                // ->setDisabled($controller->getAvailability() === 0)
         );
 
         $requiredFields = RequiredFields::create(['Tickets']);
