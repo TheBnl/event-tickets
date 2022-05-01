@@ -72,7 +72,8 @@ class TicketsField extends FormField
                 $ticket->AmountField->setValue($ticket->OrderMin);
             }
 
-            $availability = $ticket->TicketPage()->getAvailability();
+            // $availability = $ticket->TicketPage()->getAvailability();
+            $availability = $ticket->getAvailability();
             if ($availability < $ticket->OrderMax) {
                 $disabled = range($availability + 1, $ticket->OrderMax);
                 $ticket->AmountField->setDisabledItems(array_combine($disabled, $disabled));

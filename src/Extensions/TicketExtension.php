@@ -40,9 +40,6 @@ use SilverStripe\SiteConfig\SiteConfig;
  * @package Broarm\EventTickets
  *
  * @property TicketExtension|SiteTree $owner
- * @property int Capacity
- * @property int OrderMin
- * @property int OrderMax
  * @property string SuccessMessage
  * @property string SuccessMessageMail
  * @property string PrintedTicketContent
@@ -57,40 +54,29 @@ class TicketExtension extends DataExtension
 {
     protected $controller;
 
-    private static $db = array(
-        'Capacity' => 'Int',
-        'OrderMin' => 'Int',
-        'OrderMax' => 'Int',
+    private static $db = [
+        // 'Capacity' => 'Int',
         'SuccessMessage' => 'HTMLText',
         'SuccessMessageMail' => 'HTMLText',
         'PrintedTicketContent' => 'HTMLText',
-    );
+    ];
 
-    private static $has_many = array(
+    private static $has_many = [
         'Tickets' => Ticket::class . '.TicketPage',
         'Reservations' => Reservation::class . '.TicketPage',
         'Attendees' => Attendee::class . '.TicketPage',
         'WaitingList' => WaitingListRegistration::class . '.TicketPage',
-    );
+    ];
 
-    private static $many_many = array(
+    private static $many_many = [
         'Fields' => UserField::class
-    );
+    ];
 
     private static $many_many_extraFields = [
         'Fields' => [
             'Sort' => 'Int'
         ]
     ];
-
-    private static $defaults = array(
-        'Capacity' => 50
-    );
-
-    private static $translate = array(
-        'SuccessMessage',
-        'SuccessMessageMail'
-    );
 
     protected $cachedGuestList;
 
@@ -108,7 +94,7 @@ class TicketExtension extends DataExtension
         $fields->addFieldsToTab(
             "Root.$ticketLabel", array(
             GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), TicketsGridFieldConfig::create()),
-            NumericField::create('Capacity', _t(__CLASS__ . '.Capacity', 'Capacity')),
+            // NumericField::create('Capacity', _t(__CLASS__ . '.Capacity', 'Capacity')),
             HtmlEditorField::create('SuccessMessage', _t(__CLASS__ . '.SuccessMessage', 'Success message'))->addExtraClass('stacked')->setRows(4),
             HtmlEditorField::create('SuccessMessageMail', _t(__CLASS__ . '.MailMessage', 'Mail message'))->addExtraClass('stacked')->setRows(4),
             HtmlEditorField::create('PrintedTicketContent', _t(__CLASS__ . '.PrintedTicketContent', 'Ticket description'))->addExtraClass('stacked')->setRows(4)
@@ -205,12 +191,20 @@ class TicketExtension extends DataExtension
     }
 
     /**
+     * Get the sum of ticket capacity
+     */
+    public function getCapacity()
+    {
+        return $this->owner->Tickets()->sum('Capacity');
+    }
+
+    /**
      * Get the guest list status used in the summary fields
      */
     public function getGuestListStatus()
     {
         $guests = $this->owner->getGuestList()->count();
-        $capacity = $this->owner->Capacity;
+        $capacity = $this->owner->getCapacity();
         return "$guests/$capacity";
     }
 
@@ -221,7 +215,7 @@ class TicketExtension extends DataExtension
      */
     public function getAvailability()
     {
-        return $this->owner->Capacity - $this->owner->getGuestList()->count();
+        return $this->owner->getCapacity() - $this->owner->getGuestList()->count();
     }
 
     /**
@@ -255,7 +249,7 @@ class TicketExtension extends DataExtension
         if (($tickets = $this->owner->Tickets())) {
             /** @var Ticket $ticket */
             foreach ($tickets as $ticket) {
-                if (($date = $ticket->getAvailableFrom()) && strtotime($date) < strtotime($saleStart) || $saleStart === null) {
+                if ($saleStart === null || ($date = $ticket->getAvailableFrom()) && strtotime($date) < strtotime($saleStart)) {
                     $saleStart = $date;
                 }
             }
