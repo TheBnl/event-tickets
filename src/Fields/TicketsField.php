@@ -82,6 +82,7 @@ class TicketsField extends FormField
                 $ticket->AmountField->setDisabled(true);
             }
 
+            $this->extend('updateTicket', $ticket);
             $tickets->push($ticket);
         }
         return $tickets;

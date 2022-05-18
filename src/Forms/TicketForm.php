@@ -22,6 +22,10 @@ use SilverStripe\ORM\ValidationException;
  */
 class TicketForm extends FormStep
 {
+    private static $default_classes = [
+        'ticket-form'
+    ];
+    
     /**
      * @var DataList
      */

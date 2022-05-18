@@ -294,6 +294,11 @@ class Attendee extends DataObject
         return null;
     }
 
+    public function getIsMainContact()
+    {
+        return $this->ID === $this->Reservation()->MainContactID;
+    }
+
     protected function getFieldCacheKey($field)
     {
         return md5(serialize(array($this->ID, $field)));

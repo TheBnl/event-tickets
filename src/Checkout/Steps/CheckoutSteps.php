@@ -44,6 +44,24 @@ class CheckoutSteps
         }
     }
 
+     /**
+     * Return the previous step
+     *
+     * @param $step
+     *
+     * @return null
+     */
+    public static function prevStep($step)
+    {
+        $steps = self::getSteps();
+        $key = self::getStepIndex($step) - 1;
+        if (key_exists($key, $steps)) {
+            return $steps[$key];
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Return an unique array of steps
      *
@@ -72,6 +90,7 @@ class CheckoutSteps
                 'InPast' => self::inPast($step, $controller),
                 'InFuture' => self::inFuture($step, $controller),
                 'Current' => self::current($step, $controller),
+                'Step' => $step
             ]));
         }
 
@@ -85,7 +104,7 @@ class CheckoutSteps
      *
      * @return mixed
      */
-    private static function getStepIndex($step)
+    public static function getStepIndex($step)
     {
         $steps = self::getSteps();
         return array_search($step, array_unique($steps));

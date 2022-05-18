@@ -170,11 +170,12 @@ class Ticket extends DataObject
         if ($this->AvailableTillDate) {
             return $this->dbObject('AvailableTillDate');
         } elseif ($startDate = $this->getEventStartDate()) {
-            $till = strtotime(self::config()->get('sale_end_threshold'), strtotime($startDate->Nice()));
+            $till = strtotime(self::config()->get('sale_end_threshold'), strtotime($startDate->getValue()));
             $date = DBDatetime::create();
             $date->setValue(date('Y-m-d H:i:s', $till));
             return $date;
         }
+
 
         return null;
     }
