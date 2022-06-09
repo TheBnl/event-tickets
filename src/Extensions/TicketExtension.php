@@ -11,6 +11,7 @@ use Broarm\EventTickets\Forms\GridField\WaitingListGridFieldConfig;
 use Broarm\EventTickets\Model\Attendee;
 use Broarm\EventTickets\Model\Reservation;
 use Broarm\EventTickets\Model\Ticket;
+use Broarm\EventTickets\Model\Buyable;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use Broarm\EventTickets\Model\WaitingListRegistration;
 use DateTime;
@@ -29,6 +30,7 @@ use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDate;
+use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
@@ -67,7 +69,7 @@ class TicketExtension extends DataExtension
     );
 
     private static $has_many = array(
-        'Tickets' => Ticket::class . '.TicketPage',
+        'Tickets' => Buyable::class . '.TicketPage', // rename to buyables ?
         'Reservations' => Reservation::class . '.TicketPage',
         'Attendees' => Attendee::class . '.TicketPage',
         'WaitingList' => WaitingListRegistration::class . '.TicketPage',
@@ -375,6 +377,9 @@ class TicketExtension extends DataExtension
         throw new Exception("You should create a method 'getEventTitle' on {$this->owner->ClassName}");
     }
 
+    /**
+     * @return DBDatetime
+     */
     public function getEventStartDate()
     {
         throw new Exception("You should create a method 'getEventStartDate' on {$this->owner->ClassName}");
