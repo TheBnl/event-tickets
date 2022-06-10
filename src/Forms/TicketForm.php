@@ -48,6 +48,7 @@ class TicketForm extends FormStep
         $requiredFields = RequiredFields::create(['Tickets']);
 
         parent::__construct($controller, $name, $fields, $actions, $requiredFields);
+        $this->extend('updateForm');
     }
 
     /**

@@ -75,7 +75,7 @@ class Buyable extends DataObject
 
     private static $summary_fields = [
         'Title' => 'Title',
-        'Price.NiceDecimalPoint' => 'Price',
+        'Price.Nice' => 'Price',
         'AvailableFrom' => 'Available from',
         'AvailableTill' => 'Available till',
         'AvailableSummary' => 'Available'

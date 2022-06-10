@@ -69,6 +69,7 @@ class ReservationForm extends FormStep
     public function goToNextStep(array $data, ReservationForm $form)
     {
         $reservation = $form->getReservation();
+        
         foreach ($data['Attendee'] as $attendeeID => $attendeeData) {
             /** @var Attendee $attendee */
             $attendee = Attendee::get()->byID($attendeeID);

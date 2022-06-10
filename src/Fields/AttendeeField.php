@@ -27,7 +27,7 @@ class AttendeeField extends CompositeField
         if (ReservationForm::config()->get('require_all_attendees')) {
             $this->setLegend(_t(__CLASS__ . '.VALUED', '{title} valued {price}', null, array(
                 'title' => $attendee->Ticket()->Title,
-                'price' => $attendee->Ticket()->dbObject('Price')->NiceDecimalPoint())
+                'price' => $attendee->Ticket()->dbObject('Price')->Nice())
             ));
         } else {
             $this->setLegend(_t(__CLASS__ . '.YourDetails', 'Your details'));

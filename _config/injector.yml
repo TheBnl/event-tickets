@@ -1,0 +1,7 @@
+---
+Name: event-tickets-injector
+After: corefieldtypes
+---
+SilverStripe\Core\Injector\Injector:
+  Currency:
+    class: Broarm\EventTickets\ORM\DBCurrency
