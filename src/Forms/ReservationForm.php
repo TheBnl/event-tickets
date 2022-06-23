@@ -91,7 +91,7 @@ class ReservationForm extends FormStep
                 if (is_int($field)) {
                     $attendee->Fields()->add($field, array('Value' => $value));
                 } else {
-                    $attendee->setField($field, $value);
+                    $attendee->{$field} = $value;
                 }
             }
 

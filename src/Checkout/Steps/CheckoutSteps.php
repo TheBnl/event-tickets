@@ -84,14 +84,17 @@ class CheckoutSteps
         $list = new ArrayList();
         $steps = self::getSteps();
         foreach ($steps as $step) {
-            $list->add(new ArrayData([
-                'Link' => $controller->Link($step),
-                'Title' => _t(__CLASS__ . ".$step", ucfirst($step)),
-                'InPast' => self::inPast($step, $controller),
-                'InFuture' => self::inFuture($step, $controller),
-                'Current' => self::current($step, $controller),
-                'Step' => $step
-            ]));
+            $title = _t(__CLASS__ . ".$step", ucfirst($step));
+            if (!$list->count() || $list->last()->Title !== $title) {
+                $list->add(new ArrayData([
+                    'Link' => $controller->Link($step),
+                    'Title' => _t(__CLASS__ . ".$step", ucfirst($step)),
+                    'InPast' => self::inPast($step, $controller),
+                    'InFuture' => self::inFuture($step, $controller),
+                    'Current' => self::current($step, $controller), // todo check if has two steps
+                    'Step' => $step
+                ]));
+            }
         }
 
         return $list;
