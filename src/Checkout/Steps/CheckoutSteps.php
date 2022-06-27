@@ -69,7 +69,7 @@ class CheckoutSteps
      */
     public static function getSteps()
     {
-        return array_unique(self::config()->get('checkout_steps'));
+        return self::config()->get('checkout_steps');
     }
 
     /**
@@ -81,23 +81,26 @@ class CheckoutSteps
      */
     public static function get(RequestHandler $controller)
     {
-        $list = new ArrayList();
-        $steps = self::getSteps();
+        $list = [];
+        $steps = array_unique(self::getSteps());
         foreach ($steps as $step) {
             $title = _t(__CLASS__ . ".$step", ucfirst($step));
-            if (!$list->count() || $list->last()->Title !== $title) {
-                $list->add(new ArrayData([
+            $current = self::current($step, $controller);
+            if (!count($list) || !isset($list[$title])) {
+                $list[$title] = [
                     'Link' => $controller->Link($step),
                     'Title' => _t(__CLASS__ . ".$step", ucfirst($step)),
                     'InPast' => self::inPast($step, $controller),
                     'InFuture' => self::inFuture($step, $controller),
-                    'Current' => self::current($step, $controller), // todo check if has two steps
+                    'Current' => $current, // todo check if has two steps
                     'Step' => $step
-                ]));
+                ];
+            } elseif (!$list[$title]['Current']) {
+                $list[$title]['Current'] = $current;
             }
         }
 
-        return $list;
+        return new ArrayList($list);
     }
 
     /**

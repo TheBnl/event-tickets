@@ -4,7 +4,6 @@ namespace Broarm\EventTickets\Checkout\Steps;
 
 use Broarm\EventTickets\Forms\ReservationForm;
 use Broarm\EventTickets\Session\ReservationSession;
-use SilverStripe\Forms\Form;
 
 class RegisterStep extends CheckoutStep
 {
@@ -17,7 +16,7 @@ class RegisterStep extends CheckoutStep
 
     public function register()
     {
-        if (!$reservation = $this->getReservation()) {
+        if (!$this->getReservation()) {
             return $this->owner->redirect($this->owner->Link());
         }
 
