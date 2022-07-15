@@ -124,11 +124,12 @@ class TicketExtension extends DataExtension
         }
 
         // Create Attendees tab
-        if ($this->owner->Attendees()->exists()) {
+        $attendees = $this->owner->Attendees()->filter(['Reservation.Status'=>'PAID']);
+        if ($attendees->exists()) {
             $guestListLabel = _t(__CLASS__ . '.GuestList', 'GuestList');
             $fields->addFieldToTab(
                 "Root.$guestListLabel",
-                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), GuestListGridFieldConfig::create())
+                GridField::create('Attendees', $guestListLabel, $attendees, GuestListGridFieldConfig::create())
             );
         }
 
