@@ -55,7 +55,7 @@ class TicketExtension extends DataExtension
     protected $controller;
 
     private static $db = [
-        // 'Capacity' => 'Int',
+        'MaxCapacity' => 'Int',
         'SuccessMessage' => 'HTMLText',
         'SuccessMessageMail' => 'HTMLText',
         'PrintedTicketContent' => 'HTMLText',
@@ -94,7 +94,13 @@ class TicketExtension extends DataExtension
         $fields->addFieldsToTab(
             "Root.$ticketLabel", array(
             GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), TicketsGridFieldConfig::create()),
-            // NumericField::create('Capacity', _t(__CLASS__ . '.Capacity', 'Capacity')),
+            NumericField::create('MaxCapacity', _t(__CLASS__ . '.MaxCapacity', 'Maximaal beschikbare plaatsen'))
+                ->setDescription(_t(
+                    __CLASS__ . 'MaxCapacityDescription', 
+                    'Wanneer dit veld leeg is wordt de som van de beschikbare ticket capaciteit gebruikt: {sum}',
+                    null,
+                    ['sum' => $this->owner->getTicketCapacity()]
+                )),
             HtmlEditorField::create('SuccessMessage', _t(__CLASS__ . '.SuccessMessage', 'Success message'))->addExtraClass('stacked')->setRows(4),
             HtmlEditorField::create('SuccessMessageMail', _t(__CLASS__ . '.MailMessage', 'Mail message'))->addExtraClass('stacked')->setRows(4),
             HtmlEditorField::create('PrintedTicketContent', _t(__CLASS__ . '.PrintedTicketContent', 'Ticket description'))->addExtraClass('stacked')->setRows(4)
@@ -194,6 +200,15 @@ class TicketExtension extends DataExtension
      * Get the sum of ticket capacity
      */
     public function getCapacity()
+    {
+        if ($this->owner->MaxCapacity) {
+            return $this->owner->MaxCapacity;
+        }
+
+        return $this->owner->getTicketCapacity();
+    }
+
+    public function getTicketCapacity()
     {
         return $this->owner->Tickets()->sum('Capacity');
     }
