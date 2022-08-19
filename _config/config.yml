@@ -18,9 +18,6 @@ Broarm\EventTickets\Checkout\Steps\CheckoutSteps:
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - Broarm\EventTickets\Extensions\SiteConfigExtension
-SilverStripe\ORM\FieldType\DBCurrency:
-  extensions:
-    - Broarm\EventTickets\Extensions\CurrencyExtension
 SilverStripe\Omnipay\Model\Payment:
   extensions:
     - Broarm\EventTickets\Extensions\TicketPayment

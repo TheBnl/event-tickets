@@ -17,7 +17,7 @@
             <% loop $TableFields %>
                 <td class="summary-table__body-col summary-table__body-col--{$Header}">$Value</td>
             <% end_loop %>
-            <td class="summary-table__body-col summary-table__body-col--price">$Ticket.Price.NiceDecimalPoint</td>
+            <td class="summary-table__body-col summary-table__body-col--price">$Ticket.Price.Nice</td>
         </tr>
         <% end_loop %>
     </tbody>
@@ -25,21 +25,21 @@
         <tr class="summary-table__footer-row summary-table__footer-row--sub-total">
             <td class="summary-table__footer-col summary-table__footer-col--total-label" colspan="{$Attendees.First.TableFields.Count}"><%t Broarm\EventTickets\Fields\SummaryField.Subtotal 'Subtotal' %></td>
             <td class="summary-table__footer-col summary-table__footer-col--spacer">&nbsp;</td>
-            <td class="summary-table__footer-col summary-table__footer-col--total-value">$Reservation.Subtotal.NiceDecimalPoint</td>
+            <td class="summary-table__footer-col summary-table__footer-col--total-value">$Reservation.Subtotal.Nice</td>
         </tr>
         <% if $Reservation.PriceModifiers %>
             <% loop $Reservation.PriceModifiers %>
             <tr class="summary-table__footer-row summary-table__footer-row--modifier">
                 <td class="summary-table__footer-col summary-table__footer-col--modifier-title" colspan="{$Top.Attendees.First.TableFields.Count}">$TableTitle</td>
                 <td class="summary-table__footer-col summary-table__footer-col--spacer">&nbsp;</td>
-                <td class="summary-table__footer-col summary-table__footer-col--modifier-value">$TableValue.NiceDecimalPoint</td>
+                <td class="summary-table__footer-col summary-table__footer-col--modifier-value">$TableValue.Nice</td>
             </tr>
             <% end_loop %>
         <% end_if %>
         <tr class="summary-table__footer-row summary-table__footer-row--total">
             <td class="summary-table__footer-col summary-table__footer-col--total-label" colspan="{$Attendees.First.TableFields.Count}"><%t Broarm\EventTickets\Fields\SummaryField.Total 'Total' %></td>
             <td class="summary-table__footer-col summary-table__footer-col--spacer">&nbsp;</td>
-            <td class="summary-table__footer-col summary-table__footer-col--total-value">$Reservation.Total.NiceDecimalPoint</td>
+            <td class="summary-table__footer-col summary-table__footer-col--total-value">$Reservation.Total.Nice</td>
         </tr>
     </tfoot>
 </table>

@@ -2,7 +2,7 @@
 
 namespace Broarm\EventTickets\Fields;
 
-
+use Broarm\EventTickets\Forms\ReservationForm;
 use Broarm\EventTickets\Model\Attendee;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use SilverStripe\Forms\CompositeField;
@@ -24,10 +24,10 @@ class AttendeeField extends CompositeField
         parent::__construct();
         $this->setTag('fieldset');
 
-        if (self::config()->get('require_all_attendees')) {
+        if (ReservationForm::config()->get('require_all_attendees')) {
             $this->setLegend(_t(__CLASS__ . '.VALUED', '{title} valued {price}', null, array(
                 'title' => $attendee->Ticket()->Title,
-                'price' => $attendee->Ticket()->dbObject('Price')->NiceDecimalPoint())
+                'price' => $attendee->Ticket()->dbObject('Price')->Nice())
             ));
         } else {
             $this->setLegend(_t(__CLASS__ . '.YourDetails', 'Your details'));

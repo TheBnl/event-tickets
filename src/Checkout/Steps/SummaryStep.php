@@ -19,6 +19,7 @@ class SummaryStep extends CheckoutStep
      */
     public function summary()
     {
+        
         if (!$reservation = $this->getReservation()) {
             return $this->owner->redirect($this->owner->Link());
         }

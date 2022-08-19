@@ -1,16 +1,15 @@
 <?php
 
-namespace Broarm\EventTickets\Extensions;
+namespace Broarm\EventTickets\ORM;
 
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\ORM\FieldType\DBCurrency;
+use SilverStripe\ORM\FieldType\DBCurrency as SSDBCurrency;
 
 /**
  * Class CurrencyExtension
  *
  * @property CurrencyExtension|DBCurrency $owner
  */
-class CurrencyExtension extends DataExtension
+class DBCurrency extends SSDBCurrency
 {
     private static $decimal_point = '.';
 
@@ -22,7 +21,7 @@ class CurrencyExtension extends DataExtension
      *
      * @return string
      */
-    public function NiceDecimalPoint()
+    public function Nice()
     {
         $value = $this->owner->getValue();
         $currencySymbol = DBCurrency::config()->get('currency_symbol');

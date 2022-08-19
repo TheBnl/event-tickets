@@ -58,6 +58,7 @@ class PriceModifier extends DataObject implements PriceModifierInterface
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->removeByName('Sort');
         $fields->addFieldsToTab('Root.Main', array(
             TextField::create('Title', _t(__CLASS__ . '.Title', 'Title'))
         ));

@@ -83,6 +83,7 @@ class TicketsField extends FormField
                 $ticket->AmountField->setDisabled(true);
             }
 
+            $this->extend('updateTicket', $ticket);
             $tickets->push($ticket);
         }
         return $tickets;
@@ -104,7 +105,7 @@ class TicketsField extends FormField
             $context = $context->customise($properties);
         }
 
-        $this->extend('onBeforeRender', $this);
+        $this->extend('onBeforeRender', $context);
         $result = $context->renderWith($this->getTemplates());
 
         if (is_string($result)) {

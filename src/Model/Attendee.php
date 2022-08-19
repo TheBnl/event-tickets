@@ -266,14 +266,16 @@ class Attendee extends DataObject
      */
     public function getName()
     {
+        $name = null;
         $mainContact = $this->Reservation()->MainContact();
         if ($this->getSurname()) {
-            return trim("{$this->getFirstName()} {$this->getSurname()}");
+            $name = trim("{$this->getFirstName()} {$this->getSurname()}");
         } elseif ($mainContact->exists() && $mainContact->getSurname()) {
-            return _t(__CLASS__ . '.GuestOf', 'Guest of {name}', null, array('name' => $mainContact->getName()));
-        } else {
-            return null;
+            $name = _t(__CLASS__ . '.GuestOf', 'Guest of {name}', null, array('name' => $mainContact->getName()));
         }
+
+        $this->extend('updateName', $name);
+        return $name;
     }
 
     /**
@@ -292,6 +294,11 @@ class Attendee extends DataObject
         }
 
         return null;
+    }
+
+    public function getIsMainContact()
+    {
+        return $this->ID === $this->Reservation()->MainContactID;
     }
 
     protected function getFieldCacheKey($field)

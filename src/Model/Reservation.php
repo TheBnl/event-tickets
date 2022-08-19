@@ -6,6 +6,7 @@ use Broarm\EventTickets\Extensions\TicketExtension;
 use Exception;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
+use OrderItem;
 use SilverStripe\Assets\FileNameFilter;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\SiteTree;
@@ -124,7 +125,8 @@ class Reservation extends DataObject
     );
 
     private static $has_many = array(
-        'Attendees' => Attendee::class . '.Reservation'
+        'Attendees' => Attendee::class . '.Reservation',
+        'OrderItems' => OrderItem::class . '.Reservation'
     );
 
     private static $extensions = [
@@ -250,11 +252,13 @@ class Reservation extends DataObject
     public function getName()
     {
         /** @var Attendee $attendee */
-        if (($mainContact = $this->MainContact()) && $mainContact->exists() && $name = $mainContact->getName()) {
-            return $name;
-        } else {
-            return 'new reservation';
+        if (!($mainContact = $this->MainContact()) || !$mainContact->exists() || !($name = $mainContact->getName())) {
+            $name = _t(__CLASS__ . '.NewReservation', 'new reservation');
         }
+
+        $this->extend('updateName', $name);
+
+        return $name;
     }
 
     /**
@@ -290,12 +294,15 @@ class Reservation extends DataObject
      */
     public function calculateTotal()
     {
-        $ticket = DataObject::getSchema()->tableName(Ticket::class);
-        $attendee = DataObject::getSchema()->tableName(Attendee::class);
-        $total = $this->Subtotal = $this->Attendees()->leftJoin(
-            $ticket,
-            "`$attendee`.`TicketID` = `$ticket`.`ID`"
-        )->sum('Price');
+        // $ticket = DataObject::getSchema()->tableName(Ticket::class);
+        // $attendee = DataObject::getSchema()->tableName(Attendee::class);
+
+        // TODO change to order item sum price
+        $total = $this->Subtotal = $this->OrderItems()->sum('Total');
+        // $total = $this->Subtotal = $this->Attendees()->leftJoin(
+        //     $ticket,
+        //     "`$attendee`.`TicketID` = `$ticket`.`ID`"
+        // )->sum('Price');
 
         // Calculate any price modifications if added
         if ($this->PriceModifiers()->exists()) {

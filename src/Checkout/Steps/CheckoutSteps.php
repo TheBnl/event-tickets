@@ -44,6 +44,24 @@ class CheckoutSteps
         }
     }
 
+     /**
+     * Return the previous step
+     *
+     * @param $step
+     *
+     * @return null
+     */
+    public static function prevStep($step)
+    {
+        $steps = self::getSteps();
+        $key = self::getStepIndex($step) - 1;
+        if (key_exists($key, $steps)) {
+            return $steps[$key];
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Return an unique array of steps
      *
@@ -51,7 +69,7 @@ class CheckoutSteps
      */
     public static function getSteps()
     {
-        return array_unique(self::config()->get('checkout_steps'));
+        return self::config()->get('checkout_steps');
     }
 
     /**
@@ -63,19 +81,26 @@ class CheckoutSteps
      */
     public static function get(RequestHandler $controller)
     {
-        $list = new ArrayList();
-        $steps = self::getSteps();
+        $list = [];
+        $steps = array_unique(self::getSteps());
         foreach ($steps as $step) {
-            $list->add(new ArrayData([
-                'Link' => $controller->Link($step),
-                'Title' => _t(__CLASS__ . ".$step", ucfirst($step)),
-                'InPast' => self::inPast($step, $controller),
-                'InFuture' => self::inFuture($step, $controller),
-                'Current' => self::current($step, $controller),
-            ]));
+            $title = _t(__CLASS__ . ".$step", ucfirst($step));
+            $current = self::current($step, $controller);
+            if (!count($list) || !isset($list[$title])) {
+                $list[$title] = [
+                    'Link' => $controller->Link($step),
+                    'Title' => _t(__CLASS__ . ".$step", ucfirst($step)),
+                    'InPast' => self::inPast($step, $controller),
+                    'InFuture' => self::inFuture($step, $controller),
+                    'Current' => $current, // todo check if has two steps
+                    'Step' => $step
+                ];
+            } elseif (!$list[$title]['Current']) {
+                $list[$title]['Current'] = $current;
+            }
         }
 
-        return $list;
+        return new ArrayList($list);
     }
 
     /**
@@ -85,7 +110,7 @@ class CheckoutSteps
      *
      * @return mixed
      */
-    private static function getStepIndex($step)
+    public static function getStepIndex($step)
     {
         $steps = self::getSteps();
         return array_search($step, array_unique($steps));

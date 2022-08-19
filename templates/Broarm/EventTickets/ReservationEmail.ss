@@ -66,7 +66,7 @@
                 <% loop $TableFields %>
                     <td class="align-left" valign="baseline" align="left">$Value</td>
                 <% end_loop %>
-                <td class="align-right" valign="baseline" align="right">$Ticket.Price.NiceDecimalPoint</td>
+                <td class="align-right" valign="baseline" align="right">$Ticket.Price.Nice</td>
             </tr>
         <% end_loop %>
         <% if $PriceModifiers %>
@@ -74,14 +74,14 @@
                 <tr valign="baseline" class="divider">
                     <td class="align-left" colspan="{$Top.Attendees.First.TableFields.Count}" valign="baseline" align="left">$TableTitle</td>
                     <td class="align-left" valign="baseline" align="left">&nbsp;</td>
-                    <td class="align-right" valign="baseline" align="right">$TableValue.NiceDecimalPoint</td>
+                    <td class="align-right" valign="baseline" align="right">$TableValue.Nice</td>
                 </tr>
             <% end_loop %>
         <% end_if %>
         <tr valign="baseline" class="divider">
             <td class="align-left" colspan="{$Top.Attendees.First.TableFields.Count}" valign="baseline" align="left"><strong><%t Broarm\EventTickets\Fields\SummaryField.Total 'Total' %></strong></td>
             <td class="align-left" valign="baseline" align="left">&nbsp;</td>
-            <td class="align-right" valign="baseline" align="right"><strong>$Total.NiceDecimalPoint</strong></td>
+            <td class="align-right" valign="baseline" align="right"><strong>$Total.Nice</strong></td>
         </tr>
     </table>
 

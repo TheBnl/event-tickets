@@ -113,7 +113,7 @@
                         </tr>
                         <tr>
                             <td><%t Broarm\EventTickets\Model\Reservation.Price 'Price' %></td>
-                            <td>$Ticket.Price.NiceDecimalPoint.RAW</td>
+                            <td>$Ticket.Price.Nice.RAW</td>
                         </tr>
                     </table>
                 </td>

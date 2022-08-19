@@ -5,7 +5,9 @@ namespace Broarm\EventTickets\Forms;
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Fields\TicketsField;
 use Broarm\EventTickets\Model\Attendee;
+use Broarm\EventTickets\Model\Buyable;
 use Broarm\EventTickets\Session\ReservationSession;
+use OrderItem;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
@@ -13,6 +15,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ValidationException;
 
 /**
@@ -22,6 +25,10 @@ use SilverStripe\ORM\ValidationException;
  */
 class TicketForm extends FormStep
 {
+    private static $default_classes = [
+        'ticket-form'
+    ];
+    
     /**
      * @var DataList
      */
@@ -41,6 +48,7 @@ class TicketForm extends FormStep
         $requiredFields = RequiredFields::create(['Tickets']);
 
         parent::__construct($controller, $name, $fields, $actions, $requiredFields);
+        $this->extend('updateForm');
     }
 
     /**
@@ -54,15 +62,36 @@ class TicketForm extends FormStep
     public function handleTicketForm(array $data, TicketForm $form)
     {
         $reservation = ReservationSession::start($this->getController()->data());
-        foreach ($data['Tickets'] as $ticketID => $ticketData) {
-            for ($i = 0; $i < $ticketData['Amount']; $i++) {
-                $attendee = Attendee::create();
-                $attendee->TicketID = $ticketID;
-                $attendee->ReservationID = $reservation->ID;
-                $attendee->TicketPageID = $reservation->TicketPageID;
-                $attendee->write();
-                $reservation->Attendees()->add($attendee);
+        // $reservation->OrderItems()->removeAll();
+        foreach ($data['Tickets'] as $buyableID => $buyableData) {
+            $buyable = Buyable::get_by_id($buyableID);
+            $amount = $buyableData['Amount'];
+
+            if ($amount) {
+                // add order item to the order
+                $item = OrderItem::create([
+                    'BuyableID' => $buyableID,
+                    'ReservationID' => $reservation->ID,
+                    'Price' => $buyable->Price,
+                    'Amount' => $amount
+                ]);
+                $reservation->OrderItems()->add($item);
+
+                // create an attendee
+                $attendees = $buyable->createAttendees($buyableData['Amount']);
+                $reservation->Attendees()->addMany($attendees);
             }
+        
+            
+
+            // for ($i = 0; $i < $ticketData['Amount']; $i++) {
+            //     $attendee = Attendee::create();
+            //     $attendee->TicketID = $ticketID;
+            //     $attendee->ReservationID = $reservation->ID;
+            //     $attendee->TicketPageID = $reservation->TicketPageID;
+            //     $attendee->write();
+            //     $reservation->Attendees()->add($attendee);
+            // }
         }
 
         $reservation->calculateTotal();
