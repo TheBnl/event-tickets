@@ -104,7 +104,7 @@ class TicketsField extends FormField
             $context = $context->customise($properties);
         }
 
-        $this->extend('onBeforeRender', $this);
+        $this->extend('onBeforeRender', $context);
         $result = $context->renderWith($this->getTemplates());
 
         if (is_string($result)) {

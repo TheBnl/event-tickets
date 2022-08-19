@@ -27,7 +27,6 @@ class PaymentGatewayField extends FieldGroup
      */
     public function __construct()
     {
-        parent::__construct();
         $children = FieldList::create();
 
         if ($gateways = GatewayInfo::getSupportedGateways(true)) {
@@ -46,8 +45,8 @@ class PaymentGatewayField extends FieldGroup
             $noGateway = _t(__CLASS__ . '.NoGateway', 'No gateways configured');
             $children->add(LiteralField::create('NoGateway', "<p>$noGateway</p>"));
         }
-
+        
+        parent::__construct($children);
         $this->extend('updateGatewayField');
-        $this->setChildren($children);
     }
 }
