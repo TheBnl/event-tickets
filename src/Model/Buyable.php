@@ -97,12 +97,14 @@ class Buyable extends DataObject
         $fields->addFieldsToTab('Root.Main', array(
             TextField::create('Title', _t(__CLASS__ . '.TITLE_LABEL', 'Title for the ticket')),
             CurrencyField::create('Price', _t(__CLASS__ . '.PRICE_LABEL', 'Ticket price')),
-            NumericField::create('Capacity', _t(__CLASS__ . '.Capacity', 'Maximum amount of tickets (from this type) to be sold')),
+            NumericField::create('Capacity', _t(__CLASS__ . '.Capacity', 'Amount of tickets available (from this type)')),
             $saleStart = DatetimeField::create('AvailableFromDate',
                 _t(__CLASS__ . '.SALE_START_LABEL', 'Ticket sale starts from')),
             $saleEnd = DatetimeField::create('AvailableTillDate', _t(__CLASS__ . '.SALE_END_LABEL', 'Ticket sale ends on')),
-            NumericField::create('OrderMin', _t(__CLASS__ . '.OrderMin', 'Minimum allowed amount of tickets from this type')),
-            NumericField::create('OrderMax', _t(__CLASS__ . '.OrderMax', 'Maximum allowed amount of tickets from this type'))
+            NumericField::create('OrderMin', _t(__CLASS__ . '.OrderMin', 'Order minimum'))
+                ->setDescription(_t(__CLASS__ . '.OrderMinDescription', 'Minimum allowed amount of tickets from this type to be sold at once')),
+            NumericField::create('OrderMax', _t(__CLASS__ . '.OrderMax', 'Order maximum'))
+                ->setDescription(_t(__CLASS__ . '.OrderMaxDescription', 'Maximum allowed amount of tickets from this type to be sold at once'))
         ));
 
         //$saleStart->getDateField()->setConfig('showcalendar', true);
