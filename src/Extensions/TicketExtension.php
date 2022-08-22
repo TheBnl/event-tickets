@@ -262,6 +262,7 @@ class TicketExtension extends DataExtension
      */
     public function getTicketSaleStartDate()
     {
+        $date = null;
         $saleStart = null;
         if (($tickets = $this->owner->Tickets())) {
             /** @var Ticket $ticket */
@@ -317,6 +318,7 @@ class TicketExtension extends DataExtension
         return Attendee::get()
             ->leftJoin($reservation, "`$attendee`.`ReservationID` = `$reservation`.`ID`")
             ->filter(array(
+                'TicketStatus' => 'Active',
                 'TicketPageID' => $this->owner->ID
             ))
             ->filterAny(array(

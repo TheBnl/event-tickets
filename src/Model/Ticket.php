@@ -35,9 +35,31 @@ class Ticket extends Buyable
      *
      * @return bool
      */
-    private function validateAvailability()
+    protected function validateAvailability()
     {
-        return $this->TicketPage()->getAvailability() > 0;
+        $available = parent::validateAvailability();
+        if ($available) {
+            // Tickets also count towards total availability
+            return $this->TicketPage()->getAvailability() > 0;
+        }
+
+        return $available;
+    }
+
+    /**
+     * Get the ticket availability for this type
+     * A ticket always checks if places are available
+     */
+    public function getAvailability()
+    {
+        $placesAvailable = $this->TicketPage()->getAvailability();
+        if ($placesAvailable > 0 && $this->Capacity !== 0) {
+            $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->count();
+            $available = $this->Capacity - $sold;
+            return $available < 0 ? 0 : $available;
+        }
+
+        return $placesAvailable;
     }
 
     public function createAttendees($amount)

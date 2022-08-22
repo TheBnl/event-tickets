@@ -65,81 +65,82 @@ class Attendee extends DataObject
      */
     private static $qr_as_link = false;
 
-    private static $default_fields = array(
-        'FirstName' => array(
+    private static $default_fields = [
+        'FirstName' => [
             'Title' => 'First name',
             'FieldType' => UserTextField::class,
             'Required' => true,
             'Editable' => false
-        ),
-        'Surname' => array(
+        ],
+        'Surname' => [
             'Title' => 'Surname',
             'FieldType' => UserTextField::class,
             'Required' => true,
             'Editable' => false
-        ),
-        'Email' => array(
+        ],
+        'Email' => [
             'Title' => 'Email',
             'FieldType' => UserEmailField::class,
             'Required' => true,
             'Editable' => false
-        )
-    );
+        ]
+    ];
 
-    private static $table_fields = array(
+    private static $table_fields = [
         'Title',
         'Email'
-    );
+    ];
 
-    private static $db = array(
+    private static $db = [
+        'TicketStatus' => 'Enum("Active,Cancelled","Active")',
         'Title' => 'Varchar',
         'TicketReceiver' => 'Boolean',
         'TicketCode' => 'Varchar',
         'CheckedIn' => 'Boolean'
-    );
+    ];
 
     private static $default_sort = 'Created DESC';
 
-    private static $indexes = array(
+    private static $indexes = [
         'TicketCode' => [
             'type' => 'unique',
             'columns' => ['TicketCode']
         ]
-    );
+    ];
 
-    private static $has_one = array(
+    private static $has_one = [
         'TicketPage' => SiteTree::class,
         'Reservation' => Reservation::class,
         'Ticket' => Ticket::class,
         'Member' => Member::class
-    );
+    ];
 
-    private static $many_many = array(
+    private static $many_many = [
         'Fields' => UserField::class
-    );
+    ];
 
-    private static $many_many_extraFields = array(
-        'Fields' => array(
+    private static $many_many_extraFields = [
+        'Fields' => [
             'Value' => 'Varchar'
-        )
-    );
+        ]
+    ];
 
-    private static $summary_fields = array(
+    private static $summary_fields = [
         'Title' => 'Name',
         'Ticket.Title' => 'Ticket',
         'TicketCode' => 'Ticket #',
         'CheckedIn.Nice' => 'Checked in',
-    );
+    ];
 
-    protected static $cachedFields = array();
+    protected static $cachedFields = [];
 
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->addFieldsToTab('Root.Main', array(
+        $fields->addFieldsToTab('Root.Main', [
             ReadonlyField::create('TicketCode', _t(__CLASS__ . '.Ticket', 'Ticket')),
             ReadonlyField::create('MyCheckedIn', _t(__CLASS__ . '.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
-        ));
+        ]);
 
         foreach ($this->Fields() as $field) {
             $fieldType = $field->getFieldType();
@@ -168,7 +169,7 @@ class Attendee extends DataObject
         if ($fields = $this->Fields()) {
             foreach ($fields as $field) {
                 if ($value = $this->{"$field->Name[$field->ID]"}) {
-                    $fields->add($field->ID, array('Value' => $value));
+                    $fields->add($field->ID, ['Value' => $value]);
                 }
             }
         }
@@ -271,7 +272,7 @@ class Attendee extends DataObject
         if ($this->getSurname()) {
             $name = trim("{$this->getFirstName()} {$this->getSurname()}");
         } elseif ($mainContact->exists() && $mainContact->getSurname()) {
-            $name = _t(__CLASS__ . '.GuestOf', 'Guest of {name}', null, array('name' => $mainContact->getName()));
+            $name = _t(__CLASS__ . '.GuestOf', 'Guest of {name}', null, ['name' => $mainContact->getName()]);
         }
 
         $this->extend('updateName', $name);
@@ -303,7 +304,7 @@ class Attendee extends DataObject
 
     protected function getFieldCacheKey($field)
     {
-        return md5(serialize(array($this->ID, $field)));
+        return md5(serialize([$this->ID, $field]));
     }
 
     /**

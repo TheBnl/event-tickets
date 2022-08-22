@@ -1,5 +1,7 @@
 <?php
 
+namespace Broarm\EventTickets\Model;
+
 use Broarm\EventTickets\Model\Buyable;
 use Broarm\EventTickets\Model\Reservation;
 use SilverStripe\ORM\DataObject;

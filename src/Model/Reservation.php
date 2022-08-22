@@ -6,7 +6,6 @@ use Broarm\EventTickets\Extensions\TicketExtension;
 use Exception;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
-use OrderItem;
 use SilverStripe\Assets\FileNameFilter;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\SiteTree;
@@ -156,7 +155,7 @@ class Reservation extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName(['Attendees', 'Payments', 'PriceModifiers', 'Subtotal', 'Gateway', 'SentTickets', 'SentReservation', 'SentNotification', 'TicketPageID']);
+        $fields->removeByName(['Attendees', 'OrderItems', 'Payments', 'PriceModifiers', 'Subtotal', 'Gateway', 'SentTickets', 'SentReservation', 'SentNotification', 'TicketPageID']);
         $gridFieldConfig = GridFieldConfig_RecordViewer::create();
         $fields->addFieldsToTab('Root.Main', array(
             ReadonlyField::create('ReservationCode', _t(__CLASS__ . '.Code', 'Code')),
@@ -168,6 +167,7 @@ class Reservation extends DataObject
             ReadonlyField::create('Comments', _t(__CLASS__ . '.Comments', 'Comments')),
             CheckboxField::create('AgreeToTermsAndConditions', _t(__CLASS__ . '.AgreeToTermsAndConditions', 'Agreed to terms and conditions'))->performReadonlyTransformation(),
             GridField::create('Attendees', 'Attendees', $this->Attendees(), $gridFieldConfig),
+            GridField::create('OrderItems', 'OrderItems', $this->OrderItems(), $gridFieldConfig),
             GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig),
             GridField::create('PriceModifiers', 'PriceModifiers', $this->PriceModifiers(), $gridFieldConfig)
         ));
@@ -201,6 +201,14 @@ class Reservation extends DataObject
             /** @var Attendee $attendee */
             if ($attendee->exists()) {
                 $attendee->delete();
+            }
+        }
+
+        // If a reservation is deleted remove order items
+        foreach ($this->OrderItems() as $orderItem) {
+            /** @var OrderItem $attendee */
+            if ($orderItem->exists()) {
+                $orderItem->delete();
             }
         }
 

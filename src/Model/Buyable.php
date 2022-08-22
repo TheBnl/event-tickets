@@ -207,20 +207,29 @@ class Buyable extends DataObject
      *
      * @return bool
      */
-    private function validateAvailability()
+    protected function validateAvailability()
     {
-        // TODO: a buyable with capacity should count the sold order items
+        if ($this->Capacity !== 0) {
+            return $this->getAvailability() > 0;
+        }
+     
         return true;
     }
 
     /**
      * Get the ticket availability for this type
+     * A buyable always checks own capacity before event capacity
      */
     public function getAvailability()
     {
-        // TODO: count order items instead of guest list
-        $sold = $this->TicketPage()->getGuestList()->filter(['TicketID' => $this->ID])->count();
-        return $this->Capacity - $sold;
+        if ($this->Capacity !== 0) {
+            $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->count();
+            $available = $this->Capacity - $sold;
+            return $available < 0 ? 0 : $available;
+        }
+
+        // fallback to page availability if capacity is not set
+        return $this->TicketPage()->getAvailability();
     }
 
     /**

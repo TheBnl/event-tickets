@@ -3,6 +3,7 @@
 namespace Broarm\EventTickets\Fields;
 
 use Broarm\EventTickets\Model\Ticket;
+use Composer\Installers\PPIInstaller;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\Validator;
