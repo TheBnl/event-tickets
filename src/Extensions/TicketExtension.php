@@ -318,7 +318,7 @@ class TicketExtension extends DataExtension
         return Attendee::get()
             ->leftJoin($reservation, "`$attendee`.`ReservationID` = `$reservation`.`ID`")
             ->filter(array(
-                'TicketStatus' => 'Active',
+                'TicketStatus' => Attendee::STATUS_ACTIVE,
                 'TicketPageID' => $this->owner->ID
             ))
             ->filterAny(array(

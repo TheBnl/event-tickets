@@ -54,6 +54,9 @@ use SilverStripe\View\SSViewer;
  */
 class Attendee extends DataObject
 {
+    const STATUS_ACTIVE = 'Active';
+    const STATUS_CANCELLED = 'Cancelled';
+    
     private static $table_name = 'EventTickets_Attendee';
 
     /**
