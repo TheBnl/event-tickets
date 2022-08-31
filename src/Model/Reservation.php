@@ -288,7 +288,7 @@ class Reservation extends DataObject
      *
      * @return array
      */
-    private function getStates()
+    public function getStates()
     {
         return array_map(function ($state) {
             return _t(__CLASS__ . ".$state", $state);

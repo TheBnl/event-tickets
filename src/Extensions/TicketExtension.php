@@ -168,6 +168,7 @@ class TicketExtension extends DataExtension
     public function createDefaultFields()
     {
         $fields = Attendee::config()->get('default_fields');
+        
         if (!$this->owner->Fields()->exists()) {
             $sort = 0;
             foreach ($fields as $fieldName => $config) {
