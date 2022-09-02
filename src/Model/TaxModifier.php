@@ -53,12 +53,10 @@ class TaxModifier extends PriceModifier
             $tax = $total - ($total / 1 + $rate);
         } else {
             $tax = $total * $rate;
+            $total += $tax;
         }
 
         $this->setPriceModification($tax);
-        if (!(bool)self::config()->get('inclusive')) {
-            $total += $tax;
-        }
     }
 
     /**
