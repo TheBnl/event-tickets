@@ -213,7 +213,8 @@ class TicketExtension extends DataExtension
 
     public function getTicketCapacity()
     {
-        return $this->owner->Tickets()->sum('Capacity');
+        $tickets = $this->owner->Tickets();
+        return $tickets->exists() ? $tickets->sum('Capacity') : 0;
     }
 
     /**
