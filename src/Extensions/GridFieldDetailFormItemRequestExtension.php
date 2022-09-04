@@ -2,6 +2,7 @@
 
 namespace Broarm\EventTickets\Extensions;
 
+use Broarm\EventTickets\Model\Attendee;
 use Broarm\EventTickets\Model\Reservation;
 use Mpdf\Output\Destination;
 use SilverStripe\Assets\FileNameFilter;
@@ -20,17 +21,19 @@ use SilverStripe\Forms\LiteralField;
 class GridFieldDetailFormItemRequestExtension extends \SilverStripe\Core\Extension
 {
     private static $allowed_actions = [
-        'sendTicketEmail',
+        'sendReservation',
+        'sendTicket',
         'downloadTickets'
     ];
 
     public function updateItemEditForm(Form $form)
     {
-        if (($record = $this->owner->getRecord()) && $record instanceof Reservation) {
+        if (($record = $this->owner->getRecord()) && ($record instanceof Reservation || $record instanceof Attendee)) {
             $connectionActions = CompositeField::create()->setName('ConnectionActions');
             $connectionActions->setFieldHolderTemplate(CompositeField::class . '_holder_buttongroup');
 
-            $sendAction = FormAction::create('sendTicketEmail', _t(__CLASS__ . '.SendTicketEmail', 'Resend ticket mail'))
+            $sendType = $record instanceof Reservation ? 'sendReservation' : 'sendTicket';
+            $sendAction = FormAction::create($sendType, _t(__CLASS__ . '.SendTicketEmail', 'Resend ticket mail'))
                 ->addExtraClass('grid-print-button btn btn-outline-secondary font-icon-p-mail')
                 ->setAttribute('data-icon', 'p-mail')
                 ->setUseButtonTag(true);
@@ -53,19 +56,27 @@ JS;
             $form->Actions()->insertBefore('MajorActions', $connectionActions);
         }
     }
+    
+    public function sendTicket()
+    {
+        /** @var Attendee $record */
+        if (($record = $this->owner->getRecord()) && $record instanceof Attendee) {
+            $record->sendTicket();
+        }
+    }
 
-    public function sendTicketEmail()
+    public function sendReservation()
     {
         /** @var Reservation $record */
         if (($record = $this->owner->getRecord()) && $record instanceof Reservation) {
-            $record->send();
+            $record->sendReservation();
         }
     }
 
     public function downloadTickets()
     {
         /** @var Reservation $record */
-        if (($record = $this->owner->getRecord()) && $record instanceof Reservation) {
+        if (($record = $this->owner->getRecord()) && ($record instanceof Reservation || $record instanceof Attendee)) {
             $eventName = $record->TicketPage()->getTitle();
             $pdf = $record->createTicketFile();
             $fileName = FileNameFilter::create()->filter("Tickets {$eventName}.pdf");

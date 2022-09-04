@@ -107,7 +107,7 @@ class TicketExtension extends DataExtension
         ));
 
         // Create Reservations tab
-        if ($this->owner->Reservations()->exists()) {
+        if ($this->owner->exists()) {
             $reservationLabel = _t(__CLASS__ . '.Reservations', 'Reservations');
             $fields->addFieldToTab(
                 "Root.$reservationLabel",
@@ -116,7 +116,7 @@ class TicketExtension extends DataExtension
         }
 
         // Create Attendees tab
-        if ($this->owner->Attendees()->exists()) {
+        if ($this->owner->exists()) {
             $guestListLabel = _t(__CLASS__ . '.GuestList', 'GuestList');
             $fields->addFieldToTab(
                 "Root.$guestListLabel",
@@ -125,7 +125,7 @@ class TicketExtension extends DataExtension
         }
 
         // Create WaitingList tab
-        if ($this->owner->WaitingList()->exists()) {
+        if ($this->owner->exists()) {
             $waitingListLabel = _t(__CLASS__ . '.WaitingList', 'WaitingList');
             $fields->addFieldToTab(
                 "Root.$waitingListLabel",

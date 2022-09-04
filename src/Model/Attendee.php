@@ -13,12 +13,16 @@ use Broarm\EventTickets\Model\UserFields\UserEmailField;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use Broarm\EventTickets\Model\UserFields\UserTextField;
 use Dompdf\Dompdf;
+use Mpdf\Mpdf;
+use Mpdf\Output\Destination;
 use SilverStripe\Assets\File;
+use SilverStripe\Assets\FileNameFilter;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Assets\Image;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\ArrayList;
@@ -26,6 +30,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Security\Member;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
 
@@ -93,7 +98,7 @@ class Attendee extends DataObject
 
     private static $db = array(
         'Title' => 'Varchar',
-        'TicketReceiver' => 'Boolean',
+        // 'TicketReceiver' => 'Boolean',
         'TicketCode' => 'Varchar',
         'CheckedIn' => 'Boolean'
     );
@@ -136,10 +141,22 @@ class Attendee extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->removeByName(['ReservationID', 'MemberID', 'TicketID']); 
         $fields->addFieldsToTab('Root.Main', array(
-            ReadonlyField::create('TicketCode', _t(__CLASS__ . '.Ticket', 'Ticket')),
+            ReadonlyField::create('TicketCode', _t(__CLASS__ . '.Ticket', 'Ticket nr.')),
+            ReadonlyField::create('Reservation.ReservationCode', _t(__CLASS__ . '.ReservationCode', 'Reservation nr.')),
             ReadonlyField::create('MyCheckedIn', _t(__CLASS__ . '.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
         ));
+
+        if (!$this->owner->TicketID && $this->TicketPageID) {
+            $fields->addFieldsToTab('Root.Main', [
+                DropdownField::create(
+                    'TicketID', 
+                    _t(__CLASS__ . '.TicketType', 'Ticket type'), 
+                    $this->TicketPage()->Tickets()->map()->toArray()
+                )
+            ]);
+        }
 
         foreach ($this->Fields() as $field) {
             $fieldType = $field->getFieldType();
@@ -394,21 +411,91 @@ class Attendee extends DataObject
 
     public function canView($member = null)
     {
-        return $this->Reservation()->canView($member);
+        if (($reservation = $this->Reservation()) && $reservation->exists()) {
+            return $reservation->canView($member);    
+        }
+        
+        return true;
     }
 
     public function canEdit($member = null)
     {
-        return $this->Reservation()->canEdit($member);
+        if (($reservation = $this->Reservation()) && $reservation->exists()) {
+            return $reservation->canEdit($member);    
+        }
+        
+        return true;
     }
 
     public function canDelete($member = null)
     {
-        return $this->Reservation()->canDelete($member);
+        if (($reservation = $this->Reservation()) && $reservation->exists()) {
+            return $reservation->canDelete($member);    
+        }
+        
+        return true;
     }
 
     public function canCreate($member = null, $context = [])
     {
-        return $this->Reservation()->canCreate($member, $context);
+        if (($reservation = $this->Reservation()) && $reservation->exists()) {
+            return $reservation->canCreate($member, $context);    
+        }
+
+        return true;
+    }
+
+
+    public function sendTicket()
+    {
+        if (!$this->getEmail()) {
+            // we need a valid email address
+            return false;
+        }
+
+        // Get the mail sender or fallback to the admin email
+        if (!($from = self::config()->get('mail_sender')) || empty($from)) {
+            $from = Email::config()->get('admin_email');
+        }
+
+        $eventName = SiteConfig::current_site_config()->getTitle();
+        if (($event = $this->TicketPage()) && $event->hasMethod('getEventTitle')) {
+            $eventName = $event->getEventTitle();
+        }
+
+        // Create the email with given template and reservation data
+        $email = new Email();
+        $email->setSubject(_t(
+            __CLASS__ .'.TicketSubject',
+            'Your ticket for {event}',
+            null,
+            array(
+                'event' => $eventName
+            )
+        ));
+        $email->setFrom($from);
+        $email->setTo($this->getEmail());
+        $email->setHTMLTemplate('Broarm\\EventTickets\\TicketEmail');
+
+        $pdf = $this->createTicketFile();
+        $fileName = FileNameFilter::create()->filter("Ticket {$this->TicketCode} {$eventName}.pdf");
+        $email->addAttachmentFromData($pdf->Output($fileName, Destination::STRING_RETURN), $fileName, 'application/pdf');
+
+        $email->setData($this);
+        $this->extend('updateTicketMail', $email);
+        return $email->send();
+    }
+
+    public function createTicketFile()
+    {
+        // Set the template and parse the data
+        $html = SSViewer::execute_template('Broarm\\EventTickets\\ReservationPrintable', new ArrayData([
+            'TicketCode' => $this->TicketCode,
+            'Attendees' => new ArrayList([$this])
+        ]));
+
+        $pdf = new Mpdf();
+        $pdf->WriteHTML($html);
+        return $pdf;
     }
 }
