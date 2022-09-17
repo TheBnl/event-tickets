@@ -11,6 +11,7 @@ use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\Forms\LiteralField;
+use SilverStripe\ORM\ValidationResult;
 
 /**
  * Class GridFieldDetailFormItemRequestExtension
@@ -57,12 +58,26 @@ JS;
         }
     }
     
-    public function sendTicket()
+    public function sendTicket($data, Form $form)
     {
         /** @var Attendee $record */
         if (($record = $this->owner->getRecord()) && $record instanceof Attendee) {
-            $record->sendTicket();
+            if ($record->sendTicket()) {
+                $form->sessionMessage(_t(__CLASS__ . '.SentTickets', 'De tickets zijn verstuurd naar {email}', null, [
+                    'email' => $record->getEmail()
+                ]), ValidationResult::TYPE_GOOD);
+            } else {
+                $form->sessionMessage(_t(__CLASS__ . '.SentTicketsError', 'De tickets konden niet verstuurd worden naar {email}', null, [
+                    'email' => $record->getEmail()
+                ]), ValidationResult::TYPE_ERROR);
+            }
         }
+
+        $controller = $this->owner->getController();
+        $url = $this->owner->getEditLink($record->ID);
+
+        $controller->getRequest()->addHeader('X-Pjax', 'Content');
+        return $controller->redirect($url . "?sent=" . uniqid() , 302);
     }
 
     public function sendReservation()
