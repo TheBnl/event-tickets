@@ -50,7 +50,7 @@ class TaxModifier extends PriceModifier
         $rate = (float)self::config()->get('tax_rate') / 100;
 
         if ((bool)self::config()->get('inclusive')) {
-            $tax = $total - ($total / 1 + $rate);
+            $tax = $total - ($total / (1 + $rate));
         } else {
             $tax = $total * $rate;
             $total += $tax;
