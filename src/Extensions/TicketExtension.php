@@ -264,7 +264,8 @@ class TicketExtension extends DataExtension
         if (($tickets = $this->owner->Tickets())) {
             /** @var Ticket $ticket */
             foreach ($tickets as $ticket) {
-                if ($saleStart === null || ($date = $ticket->getAvailableFrom()) && strtotime($date) < strtotime($saleStart)) {
+                $date = $ticket->getAvailableFrom();
+                if ($saleStart === null || $date && strtotime($date) < strtotime($saleStart)) {
                     $saleStart = $date;
                 }
             }
