@@ -23,7 +23,7 @@ class DBCurrency extends SSDBCurrency
      */
     public function Nice()
     {
-        $value = $this->owner->getValue();
+        $value = $this->getValue();
         $currencySymbol = DBCurrency::config()->get('currency_symbol');
         $decimalPoint = DBCurrency::config()->get('decimal_point');
         $thousandSeparator = DBCurrency::config()->get('thousand_seperator');
