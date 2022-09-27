@@ -70,36 +70,38 @@ class ReservationForm extends FormStep
     {
         $reservation = $form->getReservation();
         
-        foreach ($data['Attendee'] as $attendeeID => $attendeeData) {
-            /** @var Attendee $attendee */
-            $attendee = Attendee::get()->byID($attendeeID);
+        if (isset($data['Attendee'])) {
+            foreach ($data['Attendee'] as $attendeeID => $attendeeData) {
+                /** @var Attendee $attendee */
+                $attendee = Attendee::get()->byID($attendeeID);
 
-            // populate the attendees
-            foreach ($attendeeData as $field => $value) {
-                // Array value means we have a composite field.
-                // This is used by the email field, main attendee to check if we have a correct mail address set.
-                // todo, should be moved somewhere in the field classes.
-                if (is_array($value)) {
-                    if (count(array_unique($value)) !== 1) {
-                        $form->sessionFieldError(_t(__CLASS__ . '.EmailError', 'Make sure your email address is spelled correctly'), $field);
-                        return $form->getController()->redirectBack();
+                // populate the attendees
+                foreach ($attendeeData as $field => $value) {
+                    // Array value means we have a composite field.
+                    // This is used by the email field, main attendee to check if we have a correct mail address set.
+                    // todo, should be moved somewhere in the field classes.
+                    if (is_array($value)) {
+                        if (count(array_unique($value)) !== 1) {
+                            $form->sessionFieldError(_t(__CLASS__ . '.EmailError', 'Make sure your email address is spelled correctly'), $field);
+                            return $form->getController()->redirectBack();
+                        } else {
+                            $value = array_shift($value);
+                        }
+                    }
+
+                    if (is_int($field)) {
+                        $attendee->Fields()->add($field, array('Value' => $value));
                     } else {
-                        $value = array_shift($value);
+                        $attendee->{$field} = $value;
                     }
                 }
 
-                if (is_int($field)) {
-                    $attendee->Fields()->add($field, array('Value' => $value));
-                } else {
-                    $attendee->{$field} = $value;
+                $attendee->write();
+
+                // Set the main contact
+                if (isset($attendeeData['Main']) && (bool)$attendeeData['Main']) {
+                    $reservation->setMainContact($attendeeID);
                 }
-            }
-
-            $attendee->write();
-
-            // Set the main contact
-            if (isset($attendeeData['Main']) && (bool)$attendeeData['Main']) {
-                $reservation->setMainContact($attendeeID);
             }
         }
 
