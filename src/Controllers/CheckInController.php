@@ -2,13 +2,11 @@
 
 namespace Broarm\EventTickets\Controllers;
 
-
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Forms\CheckInForm;
 use Broarm\EventTickets\Forms\CheckInValidator;
 use Broarm\EventTickets\Model\Attendee;
 use Exception;
-use PageController;
 use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
@@ -16,13 +14,10 @@ use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse as HTTPResponseAlias;
 use SilverStripe\Control\HTTPResponse_Exception;
-use SilverStripe\Core\Extension;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Security\Security;
 use SilverStripe\View\Requirements;
-use SilverStripe\View\SSViewer;
 
 /**
  * Class CheckInController
@@ -38,6 +33,13 @@ class CheckInController extends ContentController implements PermissionProvider
     const CODE_NOT_FOUND = -1;
     const ALREADY_CHECKED_IN = 0;
     const SUCCESS = 1;
+
+    private static $checkin_table_fields = [
+        'TicketCode' => 'Ticket',
+        'Name' =>'Name',
+        'CheckedIn.Nice' => 'Checked In',
+        'CheckinLink' => '',
+    ];
 
     private static $allowed_actions = array(
         'CheckInForm',
@@ -63,6 +65,17 @@ class CheckInController extends ContentController implements PermissionProvider
             'id'=> $eventPage->ID
         ]);
         Requirements::insertHeadTags("<script>window.event=$eventData</script>");
+
+        $tableFields = self::config()->get('checkin_table_fields') ?? [];
+        array_walk($tableFields, function(&$value, $key) {
+            $value = [
+                'key' => lcfirst(str_replace('.', '', $key)),
+                'label' => $value
+            ];
+        });
+        $tableFields = json_encode(array_values($tableFields));
+        
+        Requirements::insertHeadTags("<script>window.tableFields=$tableFields</script>");
 
         return [];
     }
@@ -100,16 +113,24 @@ class CheckInController extends ContentController implements PermissionProvider
             return json_encode(['attendees' => []]);
         }
 
-        $attendees = array_map(function(Attendee $attendee) {
-            return [
-                'ticket' => $attendee->TicketCode,
-                'name' => $attendee->getName(),
-                'checkedIn' => $attendee->CheckedIn,
-                'checkedInNice' => $attendee->dbObject('CheckedIn')->Nice(),
-                'checkinLink' => $attendee->getCheckInLink(),
-                'allowCheckout' => CheckInValidator::config()->get('allow_checkout'),
-                '_rowVariant' => $attendee->CheckedIn ? 'success' : '',
-            ];
+        $tableFields = self::config()->get('checkin_table_fields');
+        $attendees = array_map(function(Attendee $attendee) use ($tableFields) {
+            $data = [];
+            foreach ($tableFields as $field => $label) {
+                $key = lcfirst(str_replace('.', '', $field));
+                if (strpos($field, '.') !== false) {
+                    $fieldParts = explode('.', $field);
+                    $field = $fieldParts[0];
+                    $method = $fieldParts[1];
+                    $data[$key] = $attendee->dbObject($field)->{$method}();
+                } else {
+                    $data[$key] = $attendee->{$field};
+                }
+            }
+
+            $data['allowCheckout'] = CheckInValidator::config()->get('allow_checkout');
+            $data['_rowVariant'] = $attendee->CheckedIn ? 'success' : '';
+            return $data;
         }, $eventPage->getGuestList()->Sort('Title ASC')->toArray());
 
         return json_encode(['attendees' => $attendees]);

@@ -27,7 +27,6 @@ class OrderItem extends DataObject
         'Amount' => 'Amount',
         'Total.Nice' => 'Total',
     ];
-
     
     public function onBeforeWrite()
     {

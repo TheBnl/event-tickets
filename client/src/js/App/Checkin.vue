@@ -61,12 +61,7 @@ export default {
                 ticket: '',
             },
             formResponse: {},
-            fields: [
-                { key: 'ticket', label: 'Ticket' },
-                { key: 'name', label: 'Name' },
-                { key: 'checkedInNice', label: 'Checked In' },
-                { key: 'checkinLink', label: '' },
-            ],
+            fields: [],
         }
     },
     methods: {
@@ -101,7 +96,8 @@ export default {
                 callback([]);
             }
 
-            const promise = axios.get(window.location.origin + '/checkin/attendees/' + this.event.id);
+            const time = new Date().valueOf();
+            const promise = axios.get(window.location.origin + '/checkin/attendees/' + this.event.id + '?cb=' + time);
             promise.then(data => {
                 console.log('data', data.data.attendees);
                 const items = data.data.attendees;
@@ -141,6 +137,18 @@ export default {
         }
     },
     mounted() {
+        let tableFields = window.tableFields;
+        if (!tableFields) {
+            tableFields = [
+                { key: 'ticket', label: 'Ticket' },
+                { key: 'name', label: 'Name' },
+                { key: 'checkedInNice', label: 'Checked In' },
+                { key: 'checkinLink', label: '' },
+            ]
+        }
+
+        this.fields = tableFields;
+        console.log('this.fields', this.fields);
         this.$refs.ticketNr.focus();
     },
     components: {},
