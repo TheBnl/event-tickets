@@ -113,6 +113,23 @@ class CheckInController extends ContentController implements PermissionProvider
             return json_encode(['attendees' => []]);
         }
 
+        $attendees =  $eventPage->getGuestList()->Sort('Title ASC');
+        if ($filter = $request->getVar('filter')) {
+            $filterFields = [];
+            $tableFields = self::config()->get('checkin_table_fields') ?? [];
+            foreach ($tableFields as $key => $value) {
+                if (strpos($key, '.') !== false) {
+                    $key = explode('.', $key)[0];
+                }
+
+                if (Attendee::singleton()->hasDatabaseField($key)) {
+                    $filterFields["$key:PartialMatch"] = $filter;
+                }
+            }
+
+            $attendees = $attendees->filterAny($filterFields);
+        }
+
         $tableFields = self::config()->get('checkin_table_fields');
         $attendees = array_map(function(Attendee $attendee) use ($tableFields) {
             $data = [];
@@ -131,7 +148,7 @@ class CheckInController extends ContentController implements PermissionProvider
             $data['allowCheckout'] = CheckInValidator::config()->get('allow_checkout');
             $data['_rowVariant'] = $attendee->CheckedIn ? 'success' : '';
             return $data;
-        }, $eventPage->getGuestList()->Sort('Title ASC')->toArray());
+        }, $attendees->toArray());
 
         return json_encode(['attendees' => $attendees]);
     }

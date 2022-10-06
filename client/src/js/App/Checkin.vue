@@ -25,9 +25,23 @@
                                     </b-input-group-append>
                                 </b-input-group>
                         </b-form>
+
+                        <b-form-group
+                            label="Zoeken"
+                            label-for="filter-input"
+                            class="mt-3"
+                            >
+                            <b-form-input
+                                id="filter-input"
+                                v-model="filter"
+                                type="search"
+                                placeholder="Zoek op naam of ticket"
+                                >
+                            </b-form-input>
+                        </b-form-group>
                     </section>
                     <section class="checkin__section checkin__section--table" v-if="event">
-                        <b-table :fields="fields" :items="attendees" ref="table">
+                        <b-table :fields="fields" :items="attendees" :filter="filter" ref="table">
                             <template #table-busy>
                                 <div class="text-center my-2">
                                     <b-spinner class="align-middle"></b-spinner>
@@ -62,6 +76,7 @@ export default {
             },
             formResponse: {},
             fields: [],
+            filter: null
         }
     },
     methods: {
@@ -91,14 +106,31 @@ export default {
             this.checkin(this.form.ticket);
             this.form.ticket = '';
         },
+        handleFilter(row, filter) {
+            console.log('handleFilter:', filter, 'row', row);
+        },
         attendees(ctx, callback) {
             if (!this.event) {
                 callback([]);
             }
 
+            console.log('ctx', ctx);
+
+            const url = new URL(window.location.origin);
+            url.pathname = '/checkin/attendees/' + this.event.id;
+            
+            // add the filter
+            if (ctx.filter) {
+                url.searchParams.append('filter', ctx.filter);
+            }
+            
+            // add the cachebuster
             const time = new Date().valueOf();
-            const promise = axios.get(window.location.origin + '/checkin/attendees/' + this.event.id + '?cb=' + time);
-            promise.then(data => {
+            url.searchParams.append('cb', time);
+
+            console.log('build url', url.href);
+
+            axios.get(url.href).then(data => {
                 console.log('data', data.data.attendees);
                 const items = data.data.attendees;
                 callback(items || []);
