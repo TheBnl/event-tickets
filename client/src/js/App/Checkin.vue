@@ -49,10 +49,10 @@
                                 </div>
                             </template>
                             <template #cell(checkinLink)="row">
-                                <b-button v-if="!row.item.checkedIn" block size="sm" variant="success" @click="checkin(row.item.ticket)" class="mr-1">
+                                <b-button v-if="!row.item.checkedIn" block size="sm" variant="success" @click="checkin(row.item.ticketCode)" class="mr-1">
                                     Check in
                                 </b-button>
-                                <b-button v-if="row.item.checkedIn && row.item.allowCheckout" block size="sm" variant="danger" @click="checkin(row.item.ticket)" class="mr-1">
+                                <b-button v-if="row.item.checkedIn && row.item.allowCheckout" block size="sm" variant="danger" @click="checkin(row.item.ticketCode)" class="mr-1">
                                     Check out
                                 </b-button>
                             </template>
@@ -172,7 +172,7 @@ export default {
         let tableFields = window.tableFields;
         if (!tableFields) {
             tableFields = [
-                { key: 'ticket', label: 'Ticket' },
+                { key: 'ticketCode', label: 'Ticket' },
                 { key: 'name', label: 'Name' },
                 { key: 'checkedInNice', label: 'Checked In' },
                 { key: 'checkinLink', label: '' },
