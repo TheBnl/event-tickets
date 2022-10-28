@@ -59,15 +59,6 @@ class Attendee extends DataObject
     
     private static $table_name = 'EventTickets_Attendee';
 
-    /**
-     * Set this to true when you want to have a QR code that opens the check in page and validates the code.
-     * The validation is only done with proper authorisation so guest cannot check themselves in by mistake.
-     * By default only the ticket number is translated to an QR code. (for use with USB QR scanners)
-     *
-     * @var bool
-     */
-    private static $qr_as_link = false;
-
     private static $default_fields = [
         'FirstName' => [
             'Title' => 'First name',

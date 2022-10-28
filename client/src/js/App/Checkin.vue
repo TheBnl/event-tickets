@@ -41,7 +41,8 @@
                         </b-form-group>
                     </section>
                     <section class="checkin__section checkin__section--table" v-if="event">
-                        <b-table :fields="fields" :items="attendees" :filter="filter" ref="table">
+                        <p>Checked in: {{ checkedinCount }}/{{ attendeesCount }}</p>
+                        <b-table :fields="fields" :items="getAttendees" :filter="filter" ref="table">
                             <template #table-busy>
                                 <div class="text-center my-2">
                                     <b-spinner class="align-middle"></b-spinner>
@@ -76,7 +77,8 @@ export default {
             },
             formResponse: {},
             fields: [],
-            filter: null
+            filter: null,
+            attendees: []
         }
     },
     methods: {
@@ -109,7 +111,7 @@ export default {
         handleFilter(row, filter) {
             console.log('handleFilter:', filter, 'row', row);
         },
-        attendees(ctx, callback) {
+        getAttendees(ctx, callback) {
             if (!this.event) {
                 callback([]);
             }
@@ -131,9 +133,8 @@ export default {
             console.log('build url', url.href);
 
             axios.get(url.href).then(data => {
-                console.log('data', data.data.attendees);
-                const items = data.data.attendees;
-                callback(items || []);
+                this.attendees = data.data.attendees;
+                callback(this.attendees || []);
             }).catch(err => {
                 console.error('attendees::error', err);
                 callback([]);
@@ -141,6 +142,12 @@ export default {
         }
     },
     computed: {
+        attendeesCount() {
+            return this.attendees.length;
+        },
+        checkedinCount() {
+            return this.attendees.filter(attedee => Boolean(attedee?.checkedIn) === true).length
+        },
         event() {
             return window.hasOwnProperty('event') ? window.event : null;
         },

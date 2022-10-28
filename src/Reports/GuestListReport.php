@@ -121,6 +121,7 @@ class GuestListReport extends Report
 
         return $fields;
     }
+    
     public function parameterFields()
     {
         $ticketPages = Attendee::get()->column('TicketPageID');

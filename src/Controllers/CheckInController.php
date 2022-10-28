@@ -146,6 +146,7 @@ class CheckInController extends ContentController implements PermissionProvider
             }
 
             $data['allowCheckout'] = CheckInValidator::config()->get('allow_checkout');
+            $data['checkedIn'] = $attendee->CheckedIn;
             $data['_rowVariant'] = $attendee->CheckedIn ? 'success' : '';
             return $data;
         }, $attendees->toArray());
