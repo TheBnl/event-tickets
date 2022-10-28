@@ -39,24 +39,16 @@ class TicketSalesReport extends Report
         switch($groupParam) {
             default:
             case 'Day':
-                // $groupBy = 'FORMAT(Created, ‘yyyy-MM-dd’ )';
-                // $groupBy = 'CONCAT(DAY(Created) MONTH(Created))';
                 $groupBy = "DATE_FORMAT(Created, '%Y-%m-%d')";
-                // filter past 30 days
                 break;
             case 'Week':
-                // $groupBy = 'WEEK(Created)';
                 $groupBy = "DATE_FORMAT(Created, '%Y-%u')";
-                // filter this year
                 break;
             case 'Month':
-                // $groupBy = 'MONTH(Created)';
                 $groupBy = "DATE_FORMAT(Created, '%Y-%m')";
-                // filter this year
                 break;
             case 'Year':
                 $groupBy = 'YEAR(Created)';
-                // $groupBy = "DATE_FORMAT(Created, '%Y')";
                 break;
         }
 
