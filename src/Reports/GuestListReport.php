@@ -9,6 +9,8 @@ use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\Reports\Report;
 
 class GuestListReport extends Report
@@ -82,16 +84,27 @@ class GuestListReport extends Report
             $till = $params['CustomPeriodTill'];
         }
 
-        if ($from) {
-            $attendees = $attendees->filter([
-                'Created:GreaterThanOrEqual' => $from
-            ]);
-        }
+        if ($from && $till) {
+            $ticketPage = $this->getTicketPages();
+            $eventDates = $ticketPage->map('ID', 'EventStartDate')->toArray();
+            $events = [];
+            foreach ($eventDates as $id => $startDate) {
+                /** @var DBDate $startDate */
+                $startTime = $startDate->getTimestamp();
+                
+                if (
+                    ($fromTime = strtotime($from)) && $fromTime <= $startTime &&
+                    ($tillTime = strtotime($till)) && $tillTime >= $startTime
+                ) {
+                    $events[] = $id;
+                }
+            }
 
-        if ($till) {
-            $attendees = $attendees->filter([
-                'Created:LessThanOrEqual' => $till
-            ]);
+            if (count($events)) {
+                $attendees = $attendees->filter(['TicketPageID' => $events]);
+            } else {
+                $attendees = new ArrayList();
+            }
         }
 
         if ($sort) {
@@ -122,20 +135,24 @@ class GuestListReport extends Report
         return $fields;
     }
     
-    public function parameterFields()
+    public function getTicketPages()
     {
         $ticketPages = Attendee::get()->column('TicketPageID');
         if (count($ticketPages)) {
-            $ticketPages = SiteTree::get()->filter(['ID' => $ticketPages])->sort('ID DESC')->map()->toArray();
+            return SiteTree::get()->filter(['ID' => $ticketPages])->sort('ID DESC');//->map()->toArray();
         } else {
-            $ticketPages = [];
+            return new ArrayList();
         }
-        
+    }
+
+    public function parameterFields()
+    {
+        $ticketPages = $this->getTicketPages();
         $fields = FieldList::create(
             DropdownField::create(
                 'TicketPage', 
                 _t('Broarm\EventTickets\Reports.TicketPage', 'All tickets for event'), 
-                $ticketPages
+                $ticketPages->map()->toArray()
             )->setEmptyString(_t('Broarm\EventTickets\Reports.TicketPageEmpty', 'Select event')),
             DropdownField::create(
                 'TicketStatus', 
@@ -160,10 +177,8 @@ class GuestListReport extends Report
                     'Other' => _t('Broarm\EventTickets\Reports.Other', 'Custom period'),
                 ]
             )->setEmptyString(_t('Broarm\EventTickets\Reports.FilterPeriod', 'Filter on period')),
-            FieldGroup::create([
-                DateField::create('CustomPeriodFrom',  _t('Broarm\EventTickets\Reports.CustomPeriodFrom', 'From date')),
-                DateField::create('CustomPeriodTill',  _t('Broarm\EventTickets\Reports.CustomPeriodTill', 'Till date')),
-            ])  
+            DateField::create('CustomPeriodFrom',  _t('Broarm\EventTickets\Reports.CustomPeriodFrom', 'From date')),
+            DateField::create('CustomPeriodTill',  _t('Broarm\EventTickets\Reports.CustomPeriodTill', 'Till date')),
         );
 
         $this->extend('updateParameterFields', $fields);
