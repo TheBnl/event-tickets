@@ -54,92 +54,87 @@ use SilverStripe\View\SSViewer;
  */
 class Attendee extends DataObject
 {
+    const STATUS_ACTIVE = 'Active';
+    const STATUS_CANCELLED = 'Cancelled';
+    
     private static $table_name = 'EventTickets_Attendee';
 
-    /**
-     * Set this to true when you want to have a QR code that opens the check in page and validates the code.
-     * The validation is only done with proper authorisation so guest cannot check themselves in by mistake.
-     * By default only the ticket number is translated to an QR code. (for use with USB QR scanners)
-     *
-     * @var bool
-     */
-    private static $qr_as_link = false;
-
-    private static $default_fields = array(
-        'FirstName' => array(
+    private static $default_fields = [
+        'FirstName' => [
             'Title' => 'First name',
             'FieldType' => UserTextField::class,
             'Required' => true,
             'Editable' => false
-        ),
-        'Surname' => array(
+        ],
+        'Surname' => [
             'Title' => 'Surname',
             'FieldType' => UserTextField::class,
             'Required' => true,
             'Editable' => false
-        ),
-        'Email' => array(
+        ],
+        'Email' => [
             'Title' => 'Email',
             'FieldType' => UserEmailField::class,
             'Required' => true,
             'Editable' => false
-        )
-    );
+        ]
+    ];
 
-    private static $table_fields = array(
+    private static $table_fields = [
         'Title',
         'Email'
-    );
+    ];
 
-    private static $db = array(
+    private static $db = [
+        'TicketStatus' => 'Enum("Active,Cancelled","Active")',
         'Title' => 'Varchar',
         'TicketReceiver' => 'Boolean',
         'TicketCode' => 'Varchar',
         'CheckedIn' => 'Boolean'
-    );
+    ];
 
     private static $default_sort = 'Created DESC';
 
-    private static $indexes = array(
+    private static $indexes = [
         'TicketCode' => [
             'type' => 'unique',
             'columns' => ['TicketCode']
         ]
-    );
+    ];
 
-    private static $has_one = array(
+    private static $has_one = [
         'TicketPage' => SiteTree::class,
         'Reservation' => Reservation::class,
         'Ticket' => Ticket::class,
         'Member' => Member::class
-    );
+    ];
 
-    private static $many_many = array(
+    private static $many_many = [
         'Fields' => UserField::class
-    );
+    ];
 
-    private static $many_many_extraFields = array(
-        'Fields' => array(
+    private static $many_many_extraFields = [
+        'Fields' => [
             'Value' => 'Varchar'
-        )
-    );
+        ]
+    ];
 
-    private static $summary_fields = array(
+    private static $summary_fields = [
         'Title' => 'Name',
         'Ticket.Title' => 'Ticket',
         'TicketCode' => 'Ticket #',
         'CheckedIn.Nice' => 'Checked in',
-    );
+    ];
 
-    protected static $cachedFields = array();
+    protected static $cachedFields = [];
 
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->addFieldsToTab('Root.Main', array(
+        $fields->addFieldsToTab('Root.Main', [
             ReadonlyField::create('TicketCode', _t(__CLASS__ . '.Ticket', 'Ticket')),
             ReadonlyField::create('MyCheckedIn', _t(__CLASS__ . '.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
-        ));
+        ]);
 
         foreach ($this->Fields() as $field) {
             $fieldType = $field->getFieldType();
@@ -168,7 +163,7 @@ class Attendee extends DataObject
         if ($fields = $this->Fields()) {
             foreach ($fields as $field) {
                 if ($value = $this->{"$field->Name[$field->ID]"}) {
-                    $fields->add($field->ID, array('Value' => $value));
+                    $fields->add($field->ID, ['Value' => $value]);
                 }
             }
         }
@@ -266,14 +261,16 @@ class Attendee extends DataObject
      */
     public function getName()
     {
+        $name = null;
         $mainContact = $this->Reservation()->MainContact();
         if ($this->getSurname()) {
-            return trim("{$this->getFirstName()} {$this->getSurname()}");
+            $name = trim("{$this->getFirstName()} {$this->getSurname()}");
         } elseif ($mainContact->exists() && $mainContact->getSurname()) {
-            return _t(__CLASS__ . '.GuestOf', 'Guest of {name}', null, array('name' => $mainContact->getName()));
-        } else {
-            return null;
+            $name = _t(__CLASS__ . '.GuestOf', 'Guest of {name}', null, ['name' => $mainContact->getName()]);
         }
+
+        $this->extend('updateName', $name);
+        return $name;
     }
 
     /**
@@ -294,9 +291,14 @@ class Attendee extends DataObject
         return null;
     }
 
+    public function getIsMainContact()
+    {
+        return $this->ID === $this->Reservation()->MainContactID;
+    }
+
     protected function getFieldCacheKey($field)
     {
-        return md5(serialize(array($this->ID, $field)));
+        return md5(serialize([$this->ID, $field]));
     }
 
     /**

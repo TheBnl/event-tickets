@@ -25,9 +25,24 @@
                                     </b-input-group-append>
                                 </b-input-group>
                         </b-form>
+
+                        <b-form-group
+                            label="Zoeken"
+                            label-for="filter-input"
+                            class="mt-3"
+                            >
+                            <b-form-input
+                                id="filter-input"
+                                v-model="filter"
+                                type="search"
+                                placeholder="Zoek op naam of ticket"
+                                >
+                            </b-form-input>
+                        </b-form-group>
                     </section>
                     <section class="checkin__section checkin__section--table" v-if="event">
-                        <b-table :fields="fields" :items="attendees" ref="table">
+                        <p>Checked in: {{ checkedinCount }}/{{ attendeesCount }}</p>
+                        <b-table :fields="fields" :items="getAttendees" :filter="filter" ref="table">
                             <template #table-busy>
                                 <div class="text-center my-2">
                                     <b-spinner class="align-middle"></b-spinner>
@@ -35,10 +50,10 @@
                                 </div>
                             </template>
                             <template #cell(checkinLink)="row">
-                                <b-button v-if="!row.item.checkedIn" block size="sm" variant="success" @click="checkin(row.item.ticket)" class="mr-1">
+                                <b-button v-if="!row.item.checkedIn" block size="sm" variant="success" @click="checkin(row.item.ticketCode)" class="mr-1">
                                     Check in
                                 </b-button>
-                                <b-button v-if="row.item.checkedIn && row.item.allowCheckout" block size="sm" variant="danger" @click="checkin(row.item.ticket)" class="mr-1">
+                                <b-button v-if="row.item.checkedIn && row.item.allowCheckout" block size="sm" variant="danger" @click="checkin(row.item.ticketCode)" class="mr-1">
                                     Check out
                                 </b-button>
                             </template>
@@ -61,12 +76,9 @@ export default {
                 ticket: '',
             },
             formResponse: {},
-            fields: [
-                { key: 'ticket', label: 'Ticket' },
-                { key: 'name', label: 'Name' },
-                { key: 'checkedInNice', label: 'Checked In' },
-                { key: 'checkinLink', label: '' },
-            ],
+            fields: [],
+            filter: null,
+            attendees: []
         }
     },
     methods: {
@@ -96,16 +108,33 @@ export default {
             this.checkin(this.form.ticket);
             this.form.ticket = '';
         },
-        attendees(ctx, callback) {
+        handleFilter(row, filter) {
+            console.log('handleFilter:', filter, 'row', row);
+        },
+        getAttendees(ctx, callback) {
             if (!this.event) {
                 callback([]);
             }
 
-            const promise = axios.get(window.location.origin + '/checkin/attendees/' + this.event.id);
-            promise.then(data => {
-                console.log('data', data.data.attendees);
-                const items = data.data.attendees;
-                callback(items || []);
+            console.log('ctx', ctx);
+
+            const url = new URL(window.location.origin);
+            url.pathname = '/checkin/attendees/' + this.event.id;
+            
+            // add the filter
+            if (ctx.filter) {
+                url.searchParams.append('filter', ctx.filter);
+            }
+            
+            // add the cachebuster
+            const time = new Date().valueOf();
+            url.searchParams.append('cb', time);
+
+            console.log('build url', url.href);
+
+            axios.get(url.href).then(data => {
+                this.attendees = data.data.attendees;
+                callback(this.attendees || []);
             }).catch(err => {
                 console.error('attendees::error', err);
                 callback([]);
@@ -113,6 +142,12 @@ export default {
         }
     },
     computed: {
+        attendeesCount() {
+            return this.attendees.length;
+        },
+        checkedinCount() {
+            return this.attendees.filter(attedee => Boolean(attedee?.checkedIn) === true).length
+        },
         event() {
             return window.hasOwnProperty('event') ? window.event : null;
         },
@@ -141,6 +176,18 @@ export default {
         }
     },
     mounted() {
+        let tableFields = window.tableFields;
+        if (!tableFields) {
+            tableFields = [
+                { key: 'ticketCode', label: 'Ticket' },
+                { key: 'name', label: 'Name' },
+                { key: 'checkedInNice', label: 'Checked In' },
+                { key: 'checkinLink', label: '' },
+            ]
+        }
+
+        this.fields = tableFields;
+        console.log('this.fields', this.fields);
         this.$refs.ticketNr.focus();
     },
     components: {},

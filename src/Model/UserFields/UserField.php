@@ -5,7 +5,6 @@ namespace Broarm\EventTickets;
 namespace Broarm\EventTickets\Model\UserFields;
 
 use Broarm\EventTickets\Model\Attendee;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;

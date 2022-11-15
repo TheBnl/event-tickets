@@ -28,7 +28,7 @@ class CleanCartTask extends BuildTask
         echo "Start cleaning\n\n";
 
         /** @var Reservation $reservation */
-        foreach (Reservation::get() as $reservation) {
+        foreach (Reservation::get()->filter(['Status' => Reservation::STATUS_CART]) as $reservation) {
             if ($reservation->isDiscarded()) {
                 echo "Delete reservation {$reservation->ID}\n";
                 $reservation->delete();

@@ -124,7 +124,8 @@ class Reservation extends DataObject
     );
 
     private static $has_many = array(
-        'Attendees' => Attendee::class . '.Reservation'
+        'Attendees' => Attendee::class . '.Reservation',
+        'OrderItems' => OrderItem::class . '.Reservation'
     );
 
     private static $extensions = [
@@ -154,7 +155,7 @@ class Reservation extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName(['Attendees', 'Payments', 'PriceModifiers', 'Subtotal', 'Gateway', 'SentTickets', 'SentReservation', 'SentNotification', 'TicketPageID']);
+        $fields->removeByName(['Attendees', 'OrderItems', 'Payments', 'PriceModifiers', 'Subtotal', 'Gateway', 'SentTickets', 'SentReservation', 'SentNotification', 'TicketPageID']);
         $gridFieldConfig = GridFieldConfig_RecordViewer::create();
         $fields->addFieldsToTab('Root.Main', array(
             ReadonlyField::create('ReservationCode', _t(__CLASS__ . '.Code', 'Code')),
@@ -166,6 +167,7 @@ class Reservation extends DataObject
             ReadonlyField::create('Comments', _t(__CLASS__ . '.Comments', 'Comments')),
             CheckboxField::create('AgreeToTermsAndConditions', _t(__CLASS__ . '.AgreeToTermsAndConditions', 'Agreed to terms and conditions'))->performReadonlyTransformation(),
             GridField::create('Attendees', 'Attendees', $this->Attendees(), $gridFieldConfig),
+            GridField::create('OrderItems', 'OrderItems', $this->OrderItems(), $gridFieldConfig),
             GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig),
             GridField::create('PriceModifiers', 'PriceModifiers', $this->PriceModifiers(), $gridFieldConfig)
         ));
@@ -199,6 +201,14 @@ class Reservation extends DataObject
             /** @var Attendee $attendee */
             if ($attendee->exists()) {
                 $attendee->delete();
+            }
+        }
+
+        // If a reservation is deleted remove order items
+        foreach ($this->OrderItems() as $orderItem) {
+            /** @var OrderItem $attendee */
+            if ($orderItem->exists()) {
+                $orderItem->delete();
             }
         }
 
@@ -250,11 +260,13 @@ class Reservation extends DataObject
     public function getName()
     {
         /** @var Attendee $attendee */
-        if (($mainContact = $this->MainContact()) && $mainContact->exists() && $name = $mainContact->getName()) {
-            return $name;
-        } else {
-            return 'new reservation';
+        if (!($mainContact = $this->MainContact()) || !$mainContact->exists() || !($name = $mainContact->getName())) {
+            $name = _t(__CLASS__ . '.NewReservation', 'new reservation');
         }
+
+        $this->extend('updateName', $name);
+
+        return $name;
     }
 
     /**
@@ -276,7 +288,7 @@ class Reservation extends DataObject
      *
      * @return array
      */
-    private function getStates()
+    public function getStates()
     {
         return array_map(function ($state) {
             return _t(__CLASS__ . ".$state", $state);
@@ -290,12 +302,15 @@ class Reservation extends DataObject
      */
     public function calculateTotal()
     {
-        $ticket = DataObject::getSchema()->tableName(Ticket::class);
-        $attendee = DataObject::getSchema()->tableName(Attendee::class);
-        $total = $this->Subtotal = $this->Attendees()->leftJoin(
-            $ticket,
-            "`$attendee`.`TicketID` = `$ticket`.`ID`"
-        )->sum('Price');
+        // $ticket = DataObject::getSchema()->tableName(Ticket::class);
+        // $attendee = DataObject::getSchema()->tableName(Attendee::class);
+
+        // TODO change to order item sum price
+        $total = $this->Subtotal = $this->OrderItems()->sum('Total');
+        // $total = $this->Subtotal = $this->Attendees()->leftJoin(
+        //     $ticket,
+        //     "`$attendee`.`TicketID` = `$ticket`.`ID`"
+        // )->sum('Price');
 
         // Calculate any price modifications if added
         if ($this->PriceModifiers()->exists()) {

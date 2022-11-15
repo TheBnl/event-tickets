@@ -4,7 +4,10 @@ namespace Broarm\EventTickets\Forms;
 
 use Broarm\EventTickets\Model\Reservation;
 use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Control\RequestHandler;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
+use SilverStripe\Forms\Validator;
 
 /**
  * Class FormStep
@@ -23,6 +26,17 @@ abstract class FormStep extends Form
      */
     protected $nextStep;
 
+    public function __construct(
+        RequestHandler $controller = null,
+        $name = self::DEFAULT_NAME,
+        FieldList $fields = null,
+        FieldList $actions = null,
+        Validator $validator = null
+    )
+    {
+        parent::__construct($controller, $name, $fields, $actions, $validator);
+        $this->extend('updateForm');
+    }
     /**
      * Get the next step
      *

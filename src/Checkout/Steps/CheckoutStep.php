@@ -33,6 +33,11 @@ abstract class CheckoutStep extends Extension
         return $this->reservation;
     }
 
+    public function getCurrentStep()
+    {
+        return $this->step;
+    }
+
     /**
      * Get a link to the next step
      *

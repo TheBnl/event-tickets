@@ -3,6 +3,7 @@
 namespace Broarm\EventTickets\Fields;
 
 use Broarm\EventTickets\Model\Ticket;
+use Composer\Installers\PPIInstaller;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\Validator;
@@ -72,7 +73,8 @@ class TicketsField extends FormField
                 $ticket->AmountField->setValue($ticket->OrderMin);
             }
 
-            $availability = $ticket->TicketPage()->getAvailability();
+            // $availability = $ticket->TicketPage()->getAvailability();
+            $availability = $ticket->getAvailability();
             if ($availability < $ticket->OrderMax) {
                 $disabled = range($availability + 1, $ticket->OrderMax);
                 $ticket->AmountField->setDisabledItems(array_combine($disabled, $disabled));
@@ -82,6 +84,7 @@ class TicketsField extends FormField
                 $ticket->AmountField->setDisabled(true);
             }
 
+            $this->extend('updateTicket', $ticket);
             $tickets->push($ticket);
         }
         return $tickets;
@@ -103,7 +106,7 @@ class TicketsField extends FormField
             $context = $context->customise($properties);
         }
 
-        $this->extend('onBeforeRender', $this);
+        $this->extend('onBeforeRender', $context);
         $result = $context->renderWith($this->getTemplates());
 
         if (is_string($result)) {
