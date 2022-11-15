@@ -491,23 +491,13 @@ class Reservation extends DataObject
         $this->SentNotification = (boolean)$this->sendNotification();
     }
 
-    public function canView($member = null)
+    public function canCreate($member = null, $context = [])
     {
-        return $this->TicketPage()->canView($member);
-    }
-
-    public function canEdit($member = null)
-    {
-        return $this->TicketPage()->canEdit($member);
+        return false;
     }
 
     public function canDelete($member = null)
     {
-        return $this->TicketPage()->canDelete($member);
-    }
-
-    public function canCreate($member = null, $context = [])
-    {
-        return $this->TicketPage()->canCreate($member, $context);
+        return $member && $member->isDefaultAdmin();
     }
 }

@@ -7,3 +7,4 @@ After:
 SilverStripe\Control\Director:
   rules:
     'checkin//$Action/$ID': 'Broarm\EventTickets\Controllers\CheckInController'
+    'importguestlist': 'Broarm\EventTickets\Controllers\GuestListImportController'

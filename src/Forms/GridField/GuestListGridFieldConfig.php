@@ -2,7 +2,7 @@
 
 namespace Broarm\EventTickets\Forms\GridField;
 
-use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 
 /**
  * Class GuestListGridFieldConfig
@@ -10,7 +10,7 @@ use SilverStripe\Forms\GridField\GridFieldAddNewButton;
  * @author Bram de Leeuw
  * @package Broarm\EventTickets
  */
-class GuestListGridFieldConfig extends ReservationGridFieldConfig
+class GuestListGridFieldConfig extends GridFieldConfig_RecordEditor
 {
     /**
      * GuestListGridFieldConfig constructor.
@@ -19,7 +19,6 @@ class GuestListGridFieldConfig extends ReservationGridFieldConfig
     public function __construct($itemsPerPage = null)
     {
         parent::__construct($itemsPerPage);
-        $this->addComponent(new GridFieldAddNewButton('buttons-before-left'));
         $this->addComponent(new GuestListExportButton('buttons-before-left'));
     }
 }

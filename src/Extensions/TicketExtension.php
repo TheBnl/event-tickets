@@ -3,6 +3,7 @@
 namespace Broarm\EventTickets\Extensions;
 
 use Broarm\EventTickets\Controllers\CheckInController;
+use Broarm\EventTickets\Controllers\GuestListImportController;
 use Broarm\EventTickets\Forms\GridField\GuestListGridFieldConfig;
 use Broarm\EventTickets\Forms\GridField\ReservationGridFieldConfig;
 use Broarm\EventTickets\Forms\GridField\TicketsGridFieldConfig;
@@ -21,6 +22,7 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldImportButton;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
@@ -109,22 +111,27 @@ class TicketExtension extends DataExtension
         ));
 
         // Create Reservations tab
-        if ($this->owner->Reservations()->exists()) {
-            $reservationLabel = _t(__CLASS__ . '.Reservations', 'Reservations');
-            $fields->addFieldToTab(
-                "Root.$reservationLabel",
-                GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), ReservationGridFieldConfig::create())
-            );
-        }
-
+        $reservationLabel = _t(__CLASS__ . '.Reservations', 'Reservations');
+        $fields->addFieldToTab(
+            "Root.$reservationLabel",
+            GridField::create('Reservations', $reservationLabel, $this->owner->Reservations(), ReservationGridFieldConfig::create())
+        );
+        
         // Create Attendees tab
-        if ($this->owner->Attendees()->exists()) {
-            $guestListLabel = _t(__CLASS__ . '.GuestList', 'GuestList');
-            $fields->addFieldToTab(
-                "Root.$guestListLabel",
-                GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), GuestListGridFieldConfig::create())
-            );
-        }
+        $guestListConfig = GuestListGridFieldConfig::create();
+        $guestListConfig->addComponent(
+            $importButton = new GridFieldImportButton('buttons-before-left'),
+        );
+        $importButton->setModalTitle(_t(__CLASS__ . '.ImportGuestList', 'Import guestlist'));
+        $importButton->setImportForm(
+            GuestListImportController::singleton()->GuestListUploadForm($this->owner->ID)
+        );
+
+        $guestListLabel = _t(__CLASS__ . '.GuestList', 'GuestList');
+        $fields->addFieldToTab(
+            "Root.$guestListLabel",
+            GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), $guestListConfig)
+        );
 
         // Create WaitingList tab
         if ($this->owner->WaitingList()->exists()) {

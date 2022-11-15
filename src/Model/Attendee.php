@@ -284,7 +284,7 @@ class Attendee extends DataObject
     {
         if (isset(self::$cachedFields[$this->ID][$field])) {
             return self::$cachedFields[$this->ID][$field];
-        } elseif ($userField = $this->Fields()->find('Name', $field)) {
+        } elseif (($userField = $this->Fields()->find('Name', $field)) && !is_int($userField)) {
             return self::$cachedFields[$this->ID][$field] = (string)$userField->getField('Value');
         }
 
@@ -394,23 +394,8 @@ class Attendee extends DataObject
         }
     }
 
-    public function canView($member = null)
-    {
-        return $this->Reservation()->canView($member);
-    }
-
-    public function canEdit($member = null)
-    {
-        return $this->Reservation()->canEdit($member);
-    }
-
     public function canDelete($member = null)
     {
-        return $this->Reservation()->canDelete($member);
-    }
-
-    public function canCreate($member = null, $context = [])
-    {
-        return $this->Reservation()->canCreate($member, $context);
+        return $member && $member->isDefaultAdmin();
     }
 }
