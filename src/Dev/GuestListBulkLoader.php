@@ -9,7 +9,7 @@ use LeKoala\ExcelImportExport\ExcelBulkLoader;
 
 class GuestListBulkLoader extends ExcelBulkLoader
 {
-    private $ticket_page_id = null;
+    private $ticketPageId = null;
     
     private $sendTickets = false;
 
@@ -33,7 +33,7 @@ class GuestListBulkLoader extends ExcelBulkLoader
     public function __construct($objectClass, $ticketPageID, $sendTickets = false)
     {
         $this->sendTickets = $sendTickets;
-        $this->ticket_page_id = $ticketPageID;
+        $this->ticketPageId = $ticketPageID;
         parent::__construct($objectClass);
     }
 
@@ -48,7 +48,7 @@ class GuestListBulkLoader extends ExcelBulkLoader
             }
         }
 
-        $record['TicketPageID'] = $this->ticket_page_id;
+        $record['TicketPageID'] = $this->ticketPageId;
         $objId = parent::processRecord($record, $columnMap, $results, $preview, $makeRelations);
         
         // make sure we have an TicketCode
