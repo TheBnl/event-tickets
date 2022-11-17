@@ -128,9 +128,15 @@ class TicketExtension extends DataExtension
         );
 
         $guestListLabel = _t(__CLASS__ . '.GuestList', 'GuestList');
+        
+        // hide carts in CMS
+        $guestList = $this->owner->Attendees()->exclude([
+            'Reservation.Status' => Reservation::STATUS_CART
+        ]);
+
         $fields->addFieldToTab(
             "Root.$guestListLabel",
-            GridField::create('Attendees', $guestListLabel, $this->owner->Attendees(), $guestListConfig)
+            GridField::create('Attendees', $guestListLabel, $guestList, $guestListConfig)
         );
 
         // Create WaitingList tab
