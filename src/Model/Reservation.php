@@ -498,6 +498,6 @@ class Reservation extends DataObject
 
     public function canDelete($member = null)
     {
-        return $member && $member->isDefaultAdmin();
+        return $this->exists() && $this->Status !== self::STATUS_PAID;
     }
 }
