@@ -11,6 +11,8 @@ use SilverStripe\Forms\FileField;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\LiteralField;
 
 class GuestListImportController extends Controller
 {
@@ -31,11 +33,17 @@ class GuestListImportController extends Controller
      */
     public function GuestListUploadForm($target = null)
     {
+        $description = _t(__CLASS__ . '.Description', 'Use the fields: {fields}', null, [
+            'fields' => implode(', ', GuestListBulkLoader::config()->get('required_columns') ?? [])
+        ]);
+
         $fields = FieldList::create([
             FileField::create('File', false),
+            LiteralField::create('Description', "<p>$description</p>"),
+            CheckboxField::create('SendTickets', _t(__CLASS__ . '.SendTickets', 'Send tickets after import')),
             HiddenField::create(
-                'target',
-                'target'
+                'Target',
+                'Target'
             )->setValue($target)
         ]);
 
@@ -56,7 +64,8 @@ class GuestListImportController extends Controller
      */
     public function doUpload($data, $form)
     {
-        $loader = new GuestListBulkLoader(Attendee::class, $data['target']);
+        $sendTickets = isset($data['SendTickets']) ? $data['SendTickets'] : false;
+        $loader = new GuestListBulkLoader(Attendee::class, $data['Target'], $sendTickets);
         $results = $loader->load($_FILES['File']['tmp_name']);
 
         $messages = [];

@@ -10,6 +10,8 @@ use LeKoala\ExcelImportExport\ExcelBulkLoader;
 class GuestListBulkLoader extends ExcelBulkLoader
 {
     private $ticket_page_id = null;
+    
+    private $sendTickets = false;
 
     public $columnMap = [
         'Email' => '->setEmail',
@@ -18,7 +20,7 @@ class GuestListBulkLoader extends ExcelBulkLoader
         'TicketPageID' => 'TicketPageID'
     ];
 
-    public $requiredColumns = [
+    private static $required_columns = [
         'Email',
         'FirstName',
         'Surname' 
@@ -28,8 +30,9 @@ class GuestListBulkLoader extends ExcelBulkLoader
         'TicketCode' => 'TicketCode'
     ];
 
-    public function __construct($objectClass, $ticketPageID)
+    public function __construct($objectClass, $ticketPageID, $sendTickets = false)
     {
+        $this->sendTickets = $sendTickets;
         $this->ticket_page_id = $ticketPageID;
         parent::__construct($objectClass);
     }
@@ -37,7 +40,7 @@ class GuestListBulkLoader extends ExcelBulkLoader
     protected function processRecord($record, $columnMap, &$results, $preview = false, $makeRelations = false)
     {
         // check if all required columns are present
-        if ($requiredColumns = $this->requiredColumns) {
+        if ($requiredColumns = $this->config()->get('required_columns')) {
             foreach ($requiredColumns as $required) {
                 if (!isset($record[$required])) {
                     return null;
@@ -51,6 +54,10 @@ class GuestListBulkLoader extends ExcelBulkLoader
         // make sure we have an TicketCode
         $attendee = Attendee::get_by_id($objId);
         $attendee->write();
+
+        if ($this->sendTickets) {
+            $attendee->sendTicket();
+        }
 
         return $objId;
     }

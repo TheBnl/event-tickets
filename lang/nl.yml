@@ -56,6 +56,7 @@ nl:
     Capacity: 'Plaatsen'
     Reservations: 'Reserveringen'
     GuestList: 'Gastenlijst'
+    ImportGuestList: 'Importeer gastenlijst'
   Broarm\EventTickets\Extensions\TicketControllerExtension:
     PERMISSIONS_CAT: 'Event tickets'
     HANDLE_CHECK_IN: 'Geautoriseerd voor ticket controle'
@@ -156,3 +157,6 @@ nl:
     Title: 'Gastenlijst'
     TicketStatus: 'Tickets with status'
     ReservationStatus: 'Tickets with reservation status'
+  Broarm\EventTickets\Controllers\GuestListImportController:
+    SendTickets: 'Verstuur tickets na import'
+    Description: 'Gebruik de velden: {fields}'
