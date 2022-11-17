@@ -53,33 +53,27 @@
     <table class="order-content" width="100%" valign="baseline">
         <tr valign="baseline">
             <th class="align-left" valign="baseline" align="left"><%t Broarm\EventTickets\Fields\SummaryField.Ticket 'Ticket' %></th>
-            <% with $Attendees.First %>
-                <% loop $TableFields %>
-                    <th class="align-left" valign="baseline" align="left">$Header</th>
-                <% end_loop %>
-            <% end_with %>
+            <th class="align-left" valign="baseline" align="left"><%t Broarm\EventTickets\Fields\SummaryField.Amount 'Amount' %></th>
             <th class="align-right" valign="baseline" align="right"><%t Broarm\EventTickets\Fields\SummaryField.Price 'Price' %></th>
         </tr>
-        <% loop $Attendees %>
+        <% loop $OrderItems %>
             <tr valign="baseline">
-                <td class="align-left" valign="baseline" align="left">$Ticket.Title</td>
-                <% loop $TableFields %>
-                    <td class="align-left" valign="baseline" align="left">$Value</td>
-                <% end_loop %>
-                <td class="align-right" valign="baseline" align="right">$Ticket.Price.Nice</td>
+                <td class="align-left" valign="baseline" align="left">$Buyable.Title</td>
+                <td class="align-left" valign="baseline" align="left">$Amount</td>
+                <td class="align-right" valign="baseline" align="right">$Total.Nice</td>
             </tr>
         <% end_loop %>
         <% if $PriceModifiers %>
             <% loop $PriceModifiers %>
                 <tr valign="baseline" class="divider">
-                    <td class="align-left" colspan="{$Top.Attendees.First.TableFields.Count}" valign="baseline" align="left">$TableTitle</td>
+                    <td class="align-left" valign="baseline" align="left">$TableTitle</td>
                     <td class="align-left" valign="baseline" align="left">&nbsp;</td>
                     <td class="align-right" valign="baseline" align="right">$TableValue.Nice</td>
                 </tr>
             <% end_loop %>
         <% end_if %>
         <tr valign="baseline" class="divider">
-            <td class="align-left" colspan="{$Top.Attendees.First.TableFields.Count}" valign="baseline" align="left"><strong><%t Broarm\EventTickets\Fields\SummaryField.Total 'Total' %></strong></td>
+            <td class="align-left" valign="baseline" align="left"><strong><%t Broarm\EventTickets\Fields\SummaryField.Total 'Total' %></strong></td>
             <td class="align-left" valign="baseline" align="left">&nbsp;</td>
             <td class="align-right" valign="baseline" align="right"><strong>$Total.Nice</strong></td>
         </tr>

@@ -120,6 +120,7 @@ nl:
   Broarm\EventTickets\Fields\SummaryField:
     Ticket: 'Ticket'
     Price: 'Prijs'
+    Amount: 'Aantal'
     Subtotal: 'Subtotaal'
     Total: 'Totaal'
   Broarm\EventTickets\Model\UserFields\UserEmailField:
