@@ -46,7 +46,8 @@ class TaxModifier extends PriceModifier
      * @param float $total
      * @param Reservation $reservation
      */
-    public function updateTotal(&$total, Reservation $reservation) {
+    public function updateTotal(&$total, Reservation $reservation) 
+    {
         $rate = (float)self::config()->get('tax_rate') / 100;
 
         if ((bool)self::config()->get('inclusive')) {

@@ -146,7 +146,7 @@ class TicketExtension extends DataExtension
         );
 
         // Create WaitingList tab
-        if ($this->owner->WaitingList()->exists()) {
+        if ($this->owner->exists()) {
             $waitingListLabel = _t(__CLASS__ . '.WaitingList', 'WaitingList');
             $fields->addFieldToTab(
                 "Root.$waitingListLabel",
@@ -288,7 +288,8 @@ class TicketExtension extends DataExtension
         if (($tickets = $this->owner->Tickets())) {
             /** @var Ticket $ticket */
             foreach ($tickets as $ticket) {
-                if ($saleStart === null || ($date = $ticket->getAvailableFrom()) && strtotime($date) < strtotime($saleStart)) {
+                $date = $ticket->getAvailableFrom();
+                if ($saleStart === null || $date && strtotime($date) < strtotime($saleStart)) {
                     $saleStart = $date;
                 }
             }

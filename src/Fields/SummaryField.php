@@ -52,14 +52,14 @@ class SummaryField extends FormField
         $attendees = ArrayList::create();
         /** @var Attendee $attendee */
         foreach ($this->getReservation()->Attendees() as $key => $attendee) {
-            $fieldName = $this->name . "[{$attendee->ID}][TicketReceiver]";
-            $attendee->TicketReceiverField = CheckboxField::create($fieldName)
-                ->setAttribute('Title', _t(__CLASS__ . '.TICKET_RECEIVER_HELP', 'Send tickets to this person'))
-                ->setDisabled(empty($attendee->Email));
+            // $fieldName = $this->name . "[{$attendee->ID}][TicketReceiver]";
+            // $attendee->TicketReceiverField = CheckboxField::create($fieldName)
+            //     ->setAttribute('Title', _t(__CLASS__ . '.TICKET_RECEIVER_HELP', 'Send tickets to this person'))
+            //     ->setDisabled(empty($attendee->Email));
             // Select the first by default
-            if ($this->getReservation()->MainContact()->ID === $attendee->ID) {
-                $attendee->TicketReceiverField->setValue(1);
-            }
+            // if ($this->getReservation()->MainContact()->ID === $attendee->ID) {
+            //     $attendee->TicketReceiverField->setValue(1);
+            // }
             $attendees->push($attendee);
         }
         return $attendees;
