@@ -237,7 +237,7 @@ class Attendee extends DataObject
 
     public function getTicketStatusNice()
     {
-        $state = $this->TicketStatus ?? self::STATUS_ACTIVE;
+        $state = !empty($this->TicketStatus) ? $this->TicketStatus : self::STATUS_ACTIVE;
         return _t(__CLASS__ . ".Status_{$state}", $state);
     }
 

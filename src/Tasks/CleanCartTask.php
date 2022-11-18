@@ -3,6 +3,7 @@
 namespace Broarm\EventTickets\Tasks;
 
 use Broarm\EventTickets\Model\Reservation;
+use Psr\Log\LoggerInterface;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\BuildTask;
@@ -19,23 +20,42 @@ class CleanCartTask extends BuildTask
 
     protected $description = 'Cleanup discarded ticket shop carts';
 
+    private static $dependencies = [
+        'Logger' => '%$' . LoggerInterface::class,
+    ];
+    
     /**
      * @param HTTPRequest $request
      */
     public function run($request)
     {
         if (!Director::is_cli()) echo '<pre>';
-        echo "Start cleaning\n\n";
+        $this->logger->debug("Start cleaning");
 
         /** @var Reservation $reservation */
         foreach (Reservation::get()->filter(['Status' => Reservation::STATUS_CART]) as $reservation) {
             if ($reservation->isDiscarded()) {
-                echo "Delete reservation {$reservation->ID}\n";
+                $this->logger->debug("Delete reservation #{$reservation->ID}");
                 $reservation->delete();
             }
         }
 
-        echo "\n\nDone cleaning";
+        // Update status on stalled payments
+        foreach (Reservation::get()->filter(['Status' => Reservation::STATUS_PENDING]) as $reservation) {
+            if ($reservation->isStalledPayment()) {
+                $this->logger->debug("Set reservation #{$reservation->ID} to payment failed ");
+                $reservation->Status = Reservation::STATUS_PAYMENT_FAILED;
+                $reservation->write();
+            }
+        }
+
+        $this->logger->debug("Done cleaning");
         if (!Director::is_cli()) echo '</pre>';
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        return $this;
     }
 }

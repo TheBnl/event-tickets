@@ -61,6 +61,7 @@ class Reservation extends DataObject
 
     const STATUS_CART = 'CART';
     const STATUS_PENDING = 'PENDING';
+    const STATUS_PAYMENT_FAILED = 'PAYMENT_FAILED';
     const STATUS_PAID = 'PAID';
     const STATUS_CANCELED = 'CANCELED';
 
@@ -99,7 +100,7 @@ class Reservation extends DataObject
     private static $send_admin_notification = true;
 
     private static $db = array(
-        'Status' => 'Enum("CART,PENDING,PAID,CANCELED","CART")',
+        'Status' => 'Enum("CART,PENDING,PAYMENT_FAILED,PAID,CANCELED","CART")',
         'Title' => 'Varchar',
         'Subtotal' => 'Currency',
         'Total' => 'Currency',
@@ -271,7 +272,24 @@ class Reservation extends DataObject
     public function isDiscarded()
     {
         $deleteAfter = strtotime(self::config()->get('delete_after'), strtotime($this->Created));
-        return ($this->Status === 'CART') && (time() > $deleteAfter);
+        return ($this->Status === self::STATUS_CART) && (time() > $deleteAfter);
+    }
+
+    /**
+     * Check if the cart is still in pending state and the delete_after time period has been exceeded 
+     *
+     * @return bool
+     */
+    public function isStalledPayment()
+    {
+        $checkTime = $this->owner->Created;
+        // if a payment has been made, use the latest time from the payment
+        if (($payments = $this->owner->Payments()) && $payments->exists()) {
+            $checkTime = $payments->max('Created');
+        }
+        
+        $stalledAfter = strtotime(Reservation::config()->get('delete_after'), strtotime($checkTime));
+        return ($this->owner->Status === Reservation::STATUS_PENDING) && (time() > $stalledAfter);
     }
 
     /**
@@ -298,11 +316,8 @@ class Reservation extends DataObject
      */
     public function getState()
     {
-        if ($this->exists()) {
-            return _t(__CLASS__ . ".{$this->Status}", $this->Status);
-        }
-
-        return null;
+        $state = !empty($this->Status) ? $this->Status : self::STATUS_CART;
+        return _t(__CLASS__ . ".Status_{$state}", $state);
     }
 
     /**
@@ -313,7 +328,7 @@ class Reservation extends DataObject
     public function getStatusOptions()
     {
         return array_map(function ($state) {
-            return _t(__CLASS__ . ".$state", $state);
+            return _t(__CLASS__ . ".Status_{$state}", $state);
         }, $this->dbObject('Status')->enumValues());
     }
 
