@@ -3,6 +3,7 @@
 namespace Broarm\EventTickets\Model;
 
 use Broarm\EventTickets\Extensions\TicketExtension;
+use Broarm\EventTickets\Forms\GridField\GridFieldConfig_ReservationViewer;
 use Exception;
 use LeKoala\CmsActions\CustomAction;
 use LeKoala\CmsActions\CustomLink;
@@ -15,9 +16,11 @@ use SilverStripe\Control\Email\Email;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldGroup;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\TabSet;
 use SilverStripe\Omnipay\Extensions\Payable;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\ORM\DataObject;
@@ -146,24 +149,33 @@ class Reservation extends DataObject
 
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
-        $fields->removeByName(['Attendees', 'OrderItems', 'Payments', 'PriceModifiers', 'Subtotal', 'Gateway', 'SentTickets', 'SentReservation', 'SentNotification', 'TicketPageID']);
-        $gridFieldConfig = GridFieldConfig_RecordViewer::create();
-        $fields->addFieldsToTab('Root.Main', array(
-            ReadonlyField::create('ReservationCode', _t(__CLASS__ . '.Code', 'Code')),
-            ReadonlyField::create('Created', _t(__CLASS__ . '.Created', 'Date')),
-            DropdownField::create('Status', _t(__CLASS__ . '.Status', 'Status'), $this->getStates()),
+        $fields = new FieldList();
+        $fields->add(new TabSet('Root'));
+        $gridFieldConfig = GridFieldConfig_ReservationViewer::create();
+        
+        $fields->addFieldsToTab('Root.Main', [
+            DropdownField::create('Status', _t(__CLASS__ . '.Status', 'Status'), $this->getStatusOptions()),
+            ReadonlyField::create('TicketPage.Title', _t(__CLASS__ . '.Event', 'Evenement')),
+            FieldGroup::create('Reservation', [
+                ReadonlyField::create('ReservationCode', _t(__CLASS__ . '.Code', 'Code')),
+                ReadonlyField::create('Created', _t(__CLASS__ . '.Created', 'Date')),
+                CheckboxField::create('AgreeToTermsAndConditions', _t(__CLASS__ . '.AgreeToTermsAndConditions', 'Agreed to terms and conditions'))->performReadonlyTransformation(),
+            ]),
             ReadonlyField::create('Title', _t(__CLASS__ . '.MainContact', 'Main contact')),
-            ReadonlyField::create('GateWayNice', _t(__CLASS__ . '.Gateway', 'Gateway')),
-            ReadonlyField::create('Total', _t(__CLASS__ . '.Total', 'Total')),
+            ReadonlyField::create('MainContact.Email', _t(__CLASS__ . '.Email', 'Email')),
             ReadonlyField::create('Comments', _t(__CLASS__ . '.Comments', 'Comments')),
-            CheckboxField::create('AgreeToTermsAndConditions', _t(__CLASS__ . '.AgreeToTermsAndConditions', 'Agreed to terms and conditions'))->performReadonlyTransformation(),
             GridField::create('Attendees', 'Attendees', $this->Attendees(), $gridFieldConfig),
-            GridField::create('OrderItems', 'OrderItems', $this->OrderItems(), $gridFieldConfig),
-            GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig),
-            GridField::create('PriceModifiers', 'PriceModifiers', $this->PriceModifiers(), $gridFieldConfig)
-        ));
+        ]);
 
+        $fields->addFieldsToTab('Root.Bestelling', [
+            ReadonlyField::create('GateWayNice', _t(__CLASS__ . '.Gateway', 'Gateway')),
+            ReadonlyField::create('Total.Nice', _t(__CLASS__ . '.Total', 'Total')),
+            GridField::create('OrderItems', 'OrderItems', $this->OrderItems(), $gridFieldConfig),
+            GridField::create('PriceModifiers', 'PriceModifiers', $this->PriceModifiers(), $gridFieldConfig),
+            GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig),
+        ]);
+
+        $this->extend('updateCMSFields', $fields);
         return $fields;
     }
 
@@ -298,7 +310,7 @@ class Reservation extends DataObject
      *
      * @return array
      */
-    public function getStates()
+    public function getStatusOptions()
     {
         return array_map(function ($state) {
             return _t(__CLASS__ . ".$state", $state);
@@ -312,15 +324,7 @@ class Reservation extends DataObject
      */
     public function calculateTotal()
     {
-        // $ticket = DataObject::getSchema()->tableName(Ticket::class);
-        // $attendee = DataObject::getSchema()->tableName(Attendee::class);
-
-        // TODO change to order item sum price
         $total = $this->Subtotal = $this->OrderItems()->sum('Total');
-        // $total = $this->Subtotal = $this->Attendees()->leftJoin(
-        //     $ticket,
-        //     "`$attendee`.`TicketID` = `$ticket`.`ID`"
-        // )->sum('Price');
 
         // Calculate any price modifications if added
         if ($this->PriceModifiers()->exists()) {

@@ -22,9 +22,12 @@ use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\TabSet;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ManyManyList;
@@ -134,13 +137,18 @@ class Attendee extends DataObject
 
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
+        $fields = new FieldList();
+        $fields->add(new TabSet('Root'));
 
-        $fields->removeByName(['ReservationID', 'MemberID', 'TicketID']); 
         $fields->addFieldsToTab('Root.Main', [
-            ReadonlyField::create('TicketCode', _t(__CLASS__ . '.Ticket', 'Ticket nr.')),
-            ReadonlyField::create('Reservation.ReservationCode', _t(__CLASS__ . '.ReservationCode', 'Reservation nr.')),
-            ReadonlyField::create('MyCheckedIn', _t(__CLASS__ . '.CheckedIn', 'Checked in'), $this->dbObject('CheckedIn')->Nice())
+            DropdownField::create('Status', _t(__CLASS__ . '.Status', 'Status'), $this->getStatusOptions()),
+            ReadonlyField::create('TicketPage.Title', _t(__CLASS__ . '.Event', 'Evenement')),
+            FieldGroup::create([
+                ReadonlyField::create('TicketCode', _t(__CLASS__ . '.TicketNr', 'Ticket nr.')),
+                ReadonlyField::create('Ticket.Title', _t(__CLASS__ . '.Ticket', 'Ticket type')),
+                ReadonlyField::create('Reservation.ReservationCode', _t(__CLASS__ . '.ReservationCode', 'Reservation nr.')),
+            ]),
+            CheckboxField::create('CheckedIn', _t(__CLASS__ . '.CheckedIn', 'Checked in'))->performReadonlyTransformation(),
         ]);
 
         if (!$this->owner->TicketID && $this->TicketPageID) {
@@ -161,6 +169,7 @@ class Attendee extends DataObject
             );
         }
 
+        $this->extend('updateCMSFields', $fields);
         return $fields;
     }
 
@@ -224,6 +233,13 @@ class Attendee extends DataObject
         }
 
         parent::onBeforeDelete();
+    }
+
+    public function getStatusOptions()
+    {
+        return array_map(function ($state) {
+            return _t(__CLASS__ . ".$state", $state);
+        }, $this->dbObject('TicketStatus')->enumValues());
     }
 
     /**

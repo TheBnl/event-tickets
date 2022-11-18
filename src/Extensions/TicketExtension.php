@@ -148,11 +148,12 @@ class TicketExtension extends DataExtension
         );
 
         // Create WaitingList tab
-        if ($this->owner->exists()) {
+        $waitingList = $this->owner->WaitingList();
+        if ($this->owner->exists() && $waitingList->exists()) {
             $waitingListLabel = _t(__CLASS__ . '.WaitingList', 'WaitingList');
             $fields->addFieldToTab(
                 "Root.$waitingListLabel",
-                GridField::create('WaitingList', $waitingListLabel, $this->owner->WaitingList(), WaitingListGridFieldConfig::create())
+                GridField::create('WaitingList', $waitingListLabel, $waitingList, WaitingListGridFieldConfig::create())
             );
         }
 
