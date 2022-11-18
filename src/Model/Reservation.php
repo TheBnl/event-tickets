@@ -4,6 +4,8 @@ namespace Broarm\EventTickets\Model;
 
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Exception;
+use LeKoala\CmsActions\CustomAction;
+use LeKoala\CmsActions\CustomLink;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
 use SilverStripe\Assets\FileNameFilter;
@@ -173,6 +175,24 @@ class Reservation extends DataObject
         ));
 
         return $fields;
+    }
+
+    public function getCMSActions()
+    {
+        $actions = parent::getCMSActions();
+
+        // Send ticket action
+        $actions->push($sendTicket = new CustomAction('sendReservation', _t(__CLASS__ . '.sendReservation', 'Send reservation')));
+        $sendTicket->setButtonType('outline-secondary');
+        $sendTicket->setButtonIcon('p-mail');
+
+        // Download ticket action
+        $actions->push($downloadTicket = new CustomLink('downloadTickets', _t(__CLASS__ . '.DownloadTickets', 'Download tickets')));
+        $downloadTicket->setButtonType('outline-secondary');
+        $downloadTicket->setButtonIcon('p-download');
+        $downloadTicket->setNewWindow(true);
+
+        return $actions;
     }
 
     /**
@@ -489,6 +509,14 @@ class Reservation extends DataObject
         $this->extend('onBeforeSend');
         $this->SentReservation = (boolean)$this->sendReservation();
         $this->SentNotification = (boolean)$this->sendNotification();
+    }
+
+    public function downloadTickets()
+    {
+        $eventName = $this->TicketPage()->getTitle();
+        $pdf = $this->createTicketFile();
+        $fileName = FileNameFilter::create()->filter("Tickets {$eventName}.pdf");
+        return $pdf->Output($fileName, Destination::INLINE);
     }
 
     public function canCreate($member = null, $context = [])

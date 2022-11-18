@@ -3,7 +3,6 @@
 namespace Broarm\EventTickets\Model;
 
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
@@ -12,13 +11,14 @@ use Broarm\EventTickets\Forms\CheckInValidator;
 use Broarm\EventTickets\Model\UserFields\UserEmailField;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use Broarm\EventTickets\Model\UserFields\UserTextField;
-use Dompdf\Dompdf;
+use Exception;
+use LeKoala\CmsActions\CustomAction;
+use LeKoala\CmsActions\CustomLink;
+use LeKoala\CmsActions\SilverStripeIcons;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
-use SilverStripe\Assets\File;
 use SilverStripe\Assets\FileNameFilter;
 use SilverStripe\Assets\Folder;
-use SilverStripe\Assets\Image;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
@@ -93,7 +93,6 @@ class Attendee extends DataObject
     private static $db = [
         'TicketStatus' => 'Enum("Active,Cancelled","Active")',
         'Title' => 'Varchar',
-        // 'TicketReceiver' => 'Boolean',
         'TicketCode' => 'Varchar',
         'CheckedIn' => 'Boolean'
     ];
@@ -163,6 +162,24 @@ class Attendee extends DataObject
         }
 
         return $fields;
+    }
+
+    public function getCMSActions()
+    {
+        $actions = parent::getCMSActions();
+
+        // Send ticket action
+        $actions->push($sendTicket = new CustomAction('sendTicket', _t(__CLASS__ . '.SendTicket', 'Send ticket')));
+        $sendTicket->setButtonType('outline-secondary');
+        $sendTicket->setButtonIcon('p-mail');
+
+        // Download ticket action
+        $actions->push($downloadTicket = new CustomLink('downloadTicket', _t(__CLASS__ . '.DownloadTicket', 'Download ticket')));
+        $downloadTicket->setButtonType('outline-secondary');
+        $downloadTicket->setButtonIcon('p-download');
+        $downloadTicket->setNewWindow(true);
+
+        return $actions;
     }
 
     /**
@@ -419,8 +436,10 @@ class Attendee extends DataObject
 
     public function sendTicket()
     {
-        if (!$this->getEmail()) {
+        $to = $this->getEmail();
+        if (!$to) {
             // we need a valid email address
+            throw new Exception(_t(__CLASS__ . '.NoEmail', 'No email to send ticket to'));
             return false;
         }
 
@@ -445,7 +464,7 @@ class Attendee extends DataObject
             )
         ));
         $email->setFrom($from);
-        $email->setTo($this->getEmail());
+        $email->setTo($to);
         $email->setHTMLTemplate('Broarm\\EventTickets\\TicketEmail');
 
         $pdf = $this->createTicketFile();
@@ -454,7 +473,15 @@ class Attendee extends DataObject
 
         $email->setData($this);
         $this->extend('updateTicketMail', $email);
-        return $email->send();
+
+        $sent = $email->send();
+        if (!$sent) {
+            throw new Exception(_t(__CLASS__ . '.SendFailed', 'Failed to send ticket to {email}', null, [
+                'email' => $to
+            ]));
+        }
+
+        return $sent;
     }
 
     public function createTicketFile()
@@ -468,5 +495,13 @@ class Attendee extends DataObject
         $pdf = new Mpdf();
         $pdf->WriteHTML($html);
         return $pdf;
+    }
+
+    public function downloadTicket()
+    {
+        $eventName = $this->TicketPage()->getTitle();
+        $pdf = $this->createTicketFile();
+        $fileName = FileNameFilter::create()->filter("Tickets {$eventName}.pdf");
+        return $pdf->Output($fileName, Destination::INLINE);
     }
 }

@@ -15,9 +15,7 @@ use Broarm\EventTickets\Model\Ticket;
 use Broarm\EventTickets\Model\Buyable;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use Broarm\EventTickets\Model\WaitingListRegistration;
-use DateTime;
 use Exception;
-use SilverStripe\Assets\Image;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
@@ -26,11 +24,9 @@ use SilverStripe\Forms\GridField\GridFieldImportButton;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
-use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
@@ -80,6 +76,12 @@ class TicketExtension extends DataExtension
         'Fields' => [
             'Sort' => 'Int'
         ]
+    ];
+
+    private static $summary_fields = [
+        'Title',
+        'GuestListStatus',
+        'StartDate'
     ];
 
     protected $cachedGuestList;
@@ -396,6 +398,12 @@ class TicketExtension extends DataExtension
         } else {
             return SiteConfig::current_site_config()->dbObject('PrintedTicketContent');
         }
+    }
+
+    public function updateFieldLabels(&$labels)
+    {
+        $labels['GuestListStatus'] = _t(__CLASS__ . '.GuestListStatus', 'Gastenlijst');
+        $labels['StartDate'] = _t(__CLASS__ . '.StartDate', 'Datum');
     }
 
     /**

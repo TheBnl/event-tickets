@@ -12,6 +12,7 @@ class TicketsStep extends CheckoutStep
     protected $step = 'tickets';
 
     private static $allowed_actions = [
+        'SteppedTicketForm',
         'ticketaction',
         'goBack'
     ];
