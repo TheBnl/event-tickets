@@ -88,16 +88,6 @@ class Reservation extends DataObject
     private static $mail_receiver;
 
     /**
-     * Send the receipt mail
-     * For organisations that only do free events you can configure
-     * this to hold back the receipt and only send the tickets
-     *
-     * @config
-     * @var bool
-     */
-    private static $send_receipt_mail = true;
-
-    /**
      * Send the admin notification
      *
      * @config
@@ -420,10 +410,6 @@ class Reservation extends DataObject
      */
     public function sendReservation()
     {
-        if (!self::config()->get('send_receipt_mail')) {
-            return true;
-        }
-
         // Get the mail sender or fallback to the admin email
         if (!($from = self::config()->get('mail_sender')) || empty($from)) {
             $from = Email::config()->get('admin_email');
