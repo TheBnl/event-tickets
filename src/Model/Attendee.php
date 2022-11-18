@@ -127,9 +127,10 @@ class Attendee extends DataObject
     ];
 
     private static $summary_fields = [
+        'TicketCode' => 'Ticket #',
         'Title' => 'Name',
         'Ticket.Title' => 'Ticket',
-        'TicketCode' => 'Ticket #',
+        'TicketStatusNice' => 'Status',
         'CheckedIn.Nice' => 'Checked in',
     ];
 
@@ -139,9 +140,8 @@ class Attendee extends DataObject
     {
         $fields = new FieldList();
         $fields->add(new TabSet('Root'));
-
         $fields->addFieldsToTab('Root.Main', [
-            DropdownField::create('Status', _t(__CLASS__ . '.Status', 'Status'), $this->getStatusOptions()),
+            DropdownField::create('TicketStatus', _t(__CLASS__ . '.Status', 'Status'), $this->getStatusOptions()),
             ReadonlyField::create('TicketPage.Title', _t(__CLASS__ . '.Event', 'Evenement')),
             FieldGroup::create([
                 ReadonlyField::create('TicketCode', _t(__CLASS__ . '.TicketNr', 'Ticket nr.')),
@@ -235,10 +235,16 @@ class Attendee extends DataObject
         parent::onBeforeDelete();
     }
 
+    public function getTicketStatusNice()
+    {
+        $state = $this->TicketStatus ?? self::STATUS_ACTIVE;
+        return _t(__CLASS__ . ".Status_{$state}", $state);
+    }
+
     public function getStatusOptions()
     {
         return array_map(function ($state) {
-            return _t(__CLASS__ . ".$state", $state);
+            return _t(__CLASS__ . ".Status_{$state}", $state);
         }, $this->dbObject('TicketStatus')->enumValues());
     }
 

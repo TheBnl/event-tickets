@@ -104,6 +104,8 @@ nl:
     Ticket: 'Ticket'
     Title: 'Naam'
     Email: 'E-mail'
+    Status_Active: 'Actief'
+    Status_Cancelled: 'Geannuleerd'
   Broarm\EventTickets\Fields\AttendeeField:
     FirstName: 'Voornaam'
     Surname: 'Achternaam'
