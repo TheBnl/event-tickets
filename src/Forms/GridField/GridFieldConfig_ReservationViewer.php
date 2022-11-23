@@ -15,12 +15,12 @@ class GridFieldConfig_ReservationViewer extends GridFieldConfig
     public function __construct($itemsPerPage = null)
     {
         parent::__construct();
-        $this->addComponent(GridFieldToolbarHeader::create());
-        $this->addComponent(GridFieldButtonRow::create('before'));
-        $this->addComponent(GridFieldTitleHeader::create());
-        $this->addComponent(GridFieldDataColumns::create());
-        $this->addComponent(GridFieldEditButton::create());
-        $this->addComponent(GridFieldDetailForm::create());
+        $this->addComponent(new GridFieldToolbarHeader());
+        $this->addComponent(new GridFieldButtonRow('before'));
+        $this->addComponent(new GridFieldTitleHeader());
+        $this->addComponent(new GridFieldDataColumns());
+        $this->addComponent(new GridFieldEditButton());
+        $this->addComponent(new GridFieldDetailForm());
 
         $this->extend('updateConfig');
     }
