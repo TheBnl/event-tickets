@@ -54,7 +54,7 @@ class Ticket extends Buyable
     {
         $placesAvailable = $this->TicketPage()->getAvailability();
         if ($placesAvailable > 0 && $this->Capacity !== 0) {
-            $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->count();
+            $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->sum('Amount');
             $available = $this->Capacity - $sold;
             return $available < 0 ? 0 : $available;
         }
