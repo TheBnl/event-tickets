@@ -15,10 +15,11 @@ use Broarm\EventTickets\Model\Ticket;
 use Broarm\EventTickets\Model\Buyable;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use Broarm\EventTickets\Model\WaitingListRegistration;
-use DateTime;
 use Exception;
-use SilverStripe\Assets\Image;
+use LeKoala\CmsActions\CustomLink;
+use LeKoala\CmsActions\SilverStripeIcons;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\Controller;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
@@ -26,11 +27,9 @@ use SilverStripe\Forms\GridField\GridFieldImportButton;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
-use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
@@ -80,6 +79,12 @@ class TicketExtension extends DataExtension
         'Fields' => [
             'Sort' => 'Int'
         ]
+    ];
+
+    private static $summary_fields = [
+        'Title',
+        'GuestListStatus',
+        'StartDate'
     ];
 
     protected $cachedGuestList;
@@ -146,11 +151,12 @@ class TicketExtension extends DataExtension
         );
 
         // Create WaitingList tab
-        if ($this->owner->exists()) {
+        $waitingList = $this->owner->WaitingList();
+        if ($this->owner->exists() && $waitingList->exists()) {
             $waitingListLabel = _t(__CLASS__ . '.WaitingList', 'WaitingList');
             $fields->addFieldToTab(
                 "Root.$waitingListLabel",
-                GridField::create('WaitingList', $waitingListLabel, $this->owner->WaitingList(), WaitingListGridFieldConfig::create())
+                GridField::create('WaitingList', $waitingListLabel, $waitingList, WaitingListGridFieldConfig::create())
             );
         }
 
@@ -206,16 +212,18 @@ class TicketExtension extends DataExtension
     public function updateCMSActions(FieldList $actions)
     {
         if ($this->owner->Attendees()->exists()) {
-            // $link = $this->owner->Link('checkin');
-            $link = CheckInController::singleton()->Link("event/{$this->owner->ID}");
-            $label = _t(__CLASS__ . '.StartCheckIn', 'Start check in');
-            $action = LiteralField::create(
-                'StartCheckIn',
-                "<a href='$link' target='_blank' class='no-ajax btn btn-outline-secondary font-icon-checklist'>$label</a>"
-            );
-
-            $actions->push($action);
+            $downloadTicket = new CustomLink('startCheckIn', _t(__CLASS__ . '.StartCheckIn', 'Start check in'));
+            $downloadTicket->setButtonType('outline-secondary');
+            $downloadTicket->setButtonIcon(SilverStripeIcons::ICON_CHECKLIST);
+            $downloadTicket->setNewWindow(true);
+            $actions->insertAfter('MajorActions', $downloadTicket);
         }
+    }
+
+    public function startCheckIn()
+    {
+        $link = CheckInController::singleton()->Link("event/{$this->owner->ID}");
+        return Controller::curr()->redirect($link);
     }
 
     /**
@@ -396,6 +404,12 @@ class TicketExtension extends DataExtension
         } else {
             return SiteConfig::current_site_config()->dbObject('PrintedTicketContent');
         }
+    }
+
+    public function updateFieldLabels(&$labels)
+    {
+        $labels['GuestListStatus'] = _t(__CLASS__ . '.GuestListStatus', 'Gastenlijst');
+        $labels['StartDate'] = _t(__CLASS__ . '.StartDate', 'Datum');
     }
 
     /**

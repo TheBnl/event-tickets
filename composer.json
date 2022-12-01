@@ -24,6 +24,7 @@
         "silverstripe/cms": "^4",
         "silverstripe/silverstripe-omnipay": "*",
         "symbiote/silverstripe-gridfieldextensions": "*",
+        "lekoala/silverstripe-cms-actions": "*",
         "omnipay/manual": "*",
         "bacon/bacon-qr-code": "*",
         "mpdf/mpdf": "*"

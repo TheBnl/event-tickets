@@ -3,7 +3,10 @@
 namespace Broarm\EventTickets\Model;
 
 use Broarm\EventTickets\Extensions\TicketExtension;
+use Broarm\EventTickets\Forms\GridField\GridFieldConfig_ReservationViewer;
 use Exception;
+use LeKoala\CmsActions\CustomAction;
+use LeKoala\CmsActions\CustomLink;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
 use SilverStripe\Assets\FileNameFilter;
@@ -13,9 +16,11 @@ use SilverStripe\Control\Email\Email;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldGroup;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\TabSet;
 use SilverStripe\Omnipay\Extensions\Payable;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\ORM\DataObject;
@@ -56,6 +61,7 @@ class Reservation extends DataObject
 
     const STATUS_CART = 'CART';
     const STATUS_PENDING = 'PENDING';
+    const STATUS_PAYMENT_FAILED = 'PAYMENT_FAILED';
     const STATUS_PAID = 'PAID';
     const STATUS_CANCELED = 'CANCELED';
 
@@ -86,16 +92,6 @@ class Reservation extends DataObject
     private static $mail_receiver;
 
     /**
-     * Send the receipt mail
-     * For organisations that only do free events you can configure
-     * this to hold back the receipt and only send the tickets
-     *
-     * @config
-     * @var bool
-     */
-    private static $send_receipt_mail = true;
-
-    /**
      * Send the admin notification
      *
      * @config
@@ -104,7 +100,7 @@ class Reservation extends DataObject
     private static $send_admin_notification = true;
 
     private static $db = array(
-        'Status' => 'Enum("CART,PENDING,PAID,CANCELED","CART")',
+        'Status' => 'Enum("CART,PENDING,PAYMENT_FAILED,PAID,CANCELED","CART")',
         'Title' => 'Varchar',
         'Subtotal' => 'Currency',
         'Total' => 'Currency',
@@ -154,25 +150,52 @@ class Reservation extends DataObject
 
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
-        $fields->removeByName(['Attendees', 'OrderItems', 'Payments', 'PriceModifiers', 'Subtotal', 'Gateway', 'SentTickets', 'SentReservation', 'SentNotification', 'TicketPageID']);
-        $gridFieldConfig = GridFieldConfig_RecordViewer::create();
-        $fields->addFieldsToTab('Root.Main', array(
-            ReadonlyField::create('ReservationCode', _t(__CLASS__ . '.Code', 'Code')),
-            ReadonlyField::create('Created', _t(__CLASS__ . '.Created', 'Date')),
-            DropdownField::create('Status', _t(__CLASS__ . '.Status', 'Status'), $this->getStates()),
+        $fields = new FieldList();
+        $fields->add(new TabSet('Root'));
+        $gridFieldConfig = GridFieldConfig_ReservationViewer::create();
+        
+        $fields->addFieldsToTab('Root.Main', [
+            DropdownField::create('Status', _t(__CLASS__ . '.Status', 'Status'), $this->getStatusOptions()),
+            ReadonlyField::create('TicketPage.Title', _t(__CLASS__ . '.Event', 'Evenement')),
+            FieldGroup::create('Reservation', [
+                ReadonlyField::create('ReservationCode', _t(__CLASS__ . '.Code', 'Code')),
+                ReadonlyField::create('Created', _t(__CLASS__ . '.Created', 'Date')),
+                CheckboxField::create('AgreeToTermsAndConditions', _t(__CLASS__ . '.AgreeToTermsAndConditions', 'Agreed to terms and conditions'))->performReadonlyTransformation(),
+            ]),
             ReadonlyField::create('Title', _t(__CLASS__ . '.MainContact', 'Main contact')),
-            ReadonlyField::create('GateWayNice', _t(__CLASS__ . '.Gateway', 'Gateway')),
-            ReadonlyField::create('Total', _t(__CLASS__ . '.Total', 'Total')),
+            ReadonlyField::create('MainContact.Email', _t(__CLASS__ . '.Email', 'Email')),
             ReadonlyField::create('Comments', _t(__CLASS__ . '.Comments', 'Comments')),
-            CheckboxField::create('AgreeToTermsAndConditions', _t(__CLASS__ . '.AgreeToTermsAndConditions', 'Agreed to terms and conditions'))->performReadonlyTransformation(),
             GridField::create('Attendees', 'Attendees', $this->Attendees(), $gridFieldConfig),
-            GridField::create('OrderItems', 'OrderItems', $this->OrderItems(), $gridFieldConfig),
-            GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig),
-            GridField::create('PriceModifiers', 'PriceModifiers', $this->PriceModifiers(), $gridFieldConfig)
-        ));
+        ]);
 
+        $fields->addFieldsToTab('Root.Bestelling', [
+            ReadonlyField::create('GateWayNice', _t(__CLASS__ . '.Gateway', 'Gateway')),
+            ReadonlyField::create('Total.Nice', _t(__CLASS__ . '.Total', 'Total')),
+            GridField::create('OrderItems', 'OrderItems', $this->OrderItems(), $gridFieldConfig),
+            GridField::create('PriceModifiers', 'PriceModifiers', $this->PriceModifiers(), $gridFieldConfig),
+            GridField::create('Payments', 'Payments', $this->Payments(), $gridFieldConfig),
+        ]);
+
+        $this->extend('updateCMSFields', $fields);
         return $fields;
+    }
+
+    public function getCMSActions()
+    {
+        $actions = parent::getCMSActions();
+
+        // Send ticket action
+        $actions->push($sendTicket = new CustomAction('sendReservation', _t(__CLASS__ . '.sendReservation', 'Send reservation')));
+        $sendTicket->setButtonType('outline-secondary');
+        $sendTicket->setButtonIcon('p-mail');
+
+        // Download ticket action
+        $actions->push($downloadTicket = new CustomLink('downloadTickets', _t(__CLASS__ . '.DownloadTickets', 'Download tickets')));
+        $downloadTicket->setButtonType('outline-secondary');
+        $downloadTicket->setButtonIcon('p-download');
+        $downloadTicket->setNewWindow(true);
+
+        return $actions;
     }
 
     /**
@@ -249,7 +272,24 @@ class Reservation extends DataObject
     public function isDiscarded()
     {
         $deleteAfter = strtotime(self::config()->get('delete_after'), strtotime($this->Created));
-        return ($this->Status === 'CART') && (time() > $deleteAfter);
+        return ($this->Status === self::STATUS_CART) && (time() > $deleteAfter);
+    }
+
+    /**
+     * Check if the cart is still in pending state and the delete_after time period has been exceeded 
+     *
+     * @return bool
+     */
+    public function isStalledPayment()
+    {
+        $checkTime = $this->owner->Created;
+        // if a payment has been made, use the latest time from the payment
+        if (($payments = $this->owner->Payments()) && $payments->exists()) {
+            $checkTime = $payments->max('Created');
+        }
+        
+        $stalledAfter = strtotime(Reservation::config()->get('delete_after'), strtotime($checkTime));
+        return ($this->owner->Status === Reservation::STATUS_PENDING) && (time() > $stalledAfter);
     }
 
     /**
@@ -276,11 +316,8 @@ class Reservation extends DataObject
      */
     public function getState()
     {
-        if ($this->exists()) {
-            return _t(__CLASS__ . ".{$this->Status}", $this->Status);
-        }
-
-        return null;
+        $state = !empty($this->Status) ? $this->Status : self::STATUS_CART;
+        return _t(__CLASS__ . ".Status_{$state}", $state);
     }
 
     /**
@@ -288,10 +325,10 @@ class Reservation extends DataObject
      *
      * @return array
      */
-    public function getStates()
+    public function getStatusOptions()
     {
         return array_map(function ($state) {
-            return _t(__CLASS__ . ".$state", $state);
+            return _t(__CLASS__ . ".Status_{$state}", $state);
         }, $this->dbObject('Status')->enumValues());
     }
 
@@ -302,15 +339,7 @@ class Reservation extends DataObject
      */
     public function calculateTotal()
     {
-        // $ticket = DataObject::getSchema()->tableName(Ticket::class);
-        // $attendee = DataObject::getSchema()->tableName(Attendee::class);
-
-        // TODO change to order item sum price
         $total = $this->Subtotal = $this->OrderItems()->sum('Total');
-        // $total = $this->Subtotal = $this->Attendees()->leftJoin(
-        //     $ticket,
-        //     "`$attendee`.`TicketID` = `$ticket`.`ID`"
-        // )->sum('Price');
 
         // Calculate any price modifications if added
         if ($this->PriceModifiers()->exists()) {
@@ -400,10 +429,6 @@ class Reservation extends DataObject
      */
     public function sendReservation()
     {
-        if (!self::config()->get('send_receipt_mail')) {
-            return true;
-        }
-
         // Get the mail sender or fallback to the admin email
         if (!($from = self::config()->get('mail_sender')) || empty($from)) {
             $from = Email::config()->get('admin_email');
@@ -489,6 +514,14 @@ class Reservation extends DataObject
         $this->extend('onBeforeSend');
         $this->SentReservation = (boolean)$this->sendReservation();
         $this->SentNotification = (boolean)$this->sendNotification();
+    }
+
+    public function downloadTickets()
+    {
+        $eventName = $this->TicketPage()->getTitle();
+        $pdf = $this->createTicketFile();
+        $fileName = FileNameFilter::create()->filter("Tickets {$eventName}.pdf");
+        return $pdf->Output($fileName, Destination::INLINE);
     }
 
     public function canCreate($member = null, $context = [])

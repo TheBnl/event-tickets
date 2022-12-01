@@ -21,6 +21,3 @@ SilverStripe\SiteConfig\SiteConfig:
 SilverStripe\Omnipay\Model\Payment:
   extensions:
     - Broarm\EventTickets\Extensions\TicketPayment
-SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
-  extensions:
-    - Broarm\EventTickets\Extensions\GridFieldDetailFormItemRequestExtension

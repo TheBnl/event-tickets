@@ -5,12 +5,13 @@ namespace Broarm\EventTickets\Model;
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Exception;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\CurrencyField;
 use SilverStripe\Forms\DatetimeField;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
@@ -92,36 +93,37 @@ class Buyable extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName(['TicketPageID', 'Sort']);
+        $fields->removeByName(['TicketPageID', 'Sort', 'OrderMin', 'OrderMax', 'AvailableFromDate', 'AvailableTillDate']);
 
         $fields->addFieldsToTab('Root.Main', array(
-            TextField::create('Title', _t(__CLASS__ . '.TITLE_LABEL', 'Title for the ticket')),
-            CurrencyField::create('Price', _t(__CLASS__ . '.PRICE_LABEL', 'Ticket price')),
-            NumericField::create('Capacity', _t(__CLASS__ . '.Capacity', 'Amount of tickets available (from this type)')),
-            $saleStart = DatetimeField::create('AvailableFromDate',
-                _t(__CLASS__ . '.SALE_START_LABEL', 'Ticket sale starts from')),
-            $saleEnd = DatetimeField::create('AvailableTillDate', _t(__CLASS__ . '.SALE_END_LABEL', 'Ticket sale ends on')),
-            NumericField::create('OrderMin', _t(__CLASS__ . '.OrderMin', 'Order minimum'))
-                ->setDescription(_t(__CLASS__ . '.OrderMinDescription', 'Minimum allowed amount of tickets from this type to be sold at once')),
-            NumericField::create('OrderMax', _t(__CLASS__ . '.OrderMax', 'Order maximum'))
-                ->setDescription(_t(__CLASS__ . '.OrderMaxDescription', 'Maximum allowed amount of tickets from this type to be sold at once'))
+            TextField::create('Title', _t(__CLASS__ . '.TitleForTicket', 'Title for the ticket')),
+            CurrencyField::create('Price', _t(__CLASS__ . '.Price', 'Ticket price')),
+            CheckboxField::create('IsAvailable', _t(__CLASS__ . '.IsAvailable', 'Is available')),
+            NumericField::create('Capacity', _t(__CLASS__ . '.Capacity', 'Amount available'))
+                ->setDescription(_t(__CLASS__ . '.CapacityDescription', 'Amount of tickets available (from this type)')),
+            
+            $saleStartGroup = FieldGroup::create(_t(__CLASS__ . '.TicetSaleStarts', 'Ticket sale starts'), [
+                DatetimeField::create('AvailableFromDate', _t(__CLASS__ . '.AvailableOn', 'Available on')),
+                DatetimeField::create('AvailableTillDate', _t(__CLASS__ . '.AvailableTill', 'Available till')),
+            ]),
+            
+            FieldGroup::create(_t(__CLASS__ . '.TicketsPerOrder', 'Allowed tickets per order'), [
+                NumericField::create('OrderMin', _t(__CLASS__ . '.OrderMin', 'Minimum')),
+                NumericField::create('OrderMax', _t(__CLASS__ . '.OrderMax', 'Maximum'))
+            ])->setDescription(_t(__CLASS__ . '.TicketsPerOrderDescription', 'Allowed amount of tickets from this type to be sold at once')),
         ));
 
-        //$saleStart->getDateField()->setConfig('showcalendar', true);
-        if ($availableFrom = $this->getAvailableFrom()) {
-            $saleStart->setDescription(_t(
-                __CLASS__ . '.SALE_START_DESCRIPTION',
-                'If no date is given the following date will be used: {date}', null,
-                array('date' => $availableFrom ->Nice())
-            ));
-        }
-
-        //$saleEnd->getDateField()->setConfig('showcalendar', true);
-        if ($eventStart = $this->getEventStartDate()) {
-            $saleEnd->setDescription(_t(
-                __CLASS__ . '.SALE_END_DESCRIPTION',
-                'If no date is given the event start date will be used: {date}', null,
-                array('date' => $eventStart->Nice())
+        $availableFrom = $this->getAvailableFrom();
+        $eventStart = $this->getEventStartDate();
+        if ($availableFrom || $eventStart) {
+            $saleStartGroup->setDescription(_t(
+                __CLASS__ . '.SaleStartDescription', 
+                'If no dates are given the ticket will be made avalable from {from} until {till}', 
+                null, 
+                [
+                    'from' => $availableFrom->Nice(),
+                    'till' => $eventStart->Nice(),
+                ]
             ));
         }
 
