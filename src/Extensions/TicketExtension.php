@@ -16,6 +16,7 @@ use Broarm\EventTickets\Model\Buyable;
 use Broarm\EventTickets\Model\UserFields\UserField;
 use Broarm\EventTickets\Model\WaitingListRegistration;
 use Exception;
+use LeKoala\CmsActions\CustomAction;
 use LeKoala\CmsActions\CustomLink;
 use LeKoala\CmsActions\SilverStripeIcons;
 use SilverStripe\CMS\Model\SiteTree;
@@ -212,7 +213,9 @@ class TicketExtension extends DataExtension
     public function updateCMSActions(FieldList $actions)
     {
         if ($this->owner->Attendees()->exists()) {
+            $link = CheckInController::singleton()->Link("event/{$this->owner->ID}");
             $downloadTicket = new CustomLink('startCheckIn', _t(__CLASS__ . '.StartCheckIn', 'Start check in'));
+            $downloadTicket->setLink($link);
             $downloadTicket->setButtonType('outline-secondary');
             $downloadTicket->setButtonIcon(SilverStripeIcons::ICON_CHECKLIST);
             $downloadTicket->setNewWindow(true);
