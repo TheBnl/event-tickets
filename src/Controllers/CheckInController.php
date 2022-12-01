@@ -36,7 +36,7 @@ class CheckInController extends ContentController implements PermissionProvider
 
     private static $checkin_table_fields = [
         'TicketCode' => 'Ticket',
-        'Name' =>'Name',
+        'Title' =>'Name',
         'CheckedIn.Nice' => 'Checked In',
         'CheckinLink' => '',
     ];
@@ -126,6 +126,10 @@ class CheckInController extends ContentController implements PermissionProvider
                     $filterFields["$key:PartialMatch"] = $filter;
                 }
             }
+
+            // filter on attendee relation fields ...
+
+
 
             $attendees = $attendees->filterAny($filterFields);
         }
