@@ -130,15 +130,7 @@ class TicketExtension extends DataExtension
         );
         
         // Create Attendees tab
-        $guestListConfig = GuestListGridFieldConfig::create();
-        $guestListConfig->addComponent(
-            $importButton = new GridFieldImportButton('buttons-before-left'),
-        );
-        $importButton->setModalTitle(_t(__CLASS__ . '.ImportGuestList', 'Import guestlist'));
-        $importButton->setImportForm(
-            GuestListImportController::singleton()->GuestListUploadForm($this->owner->ID)
-        );
-
+        $guestListConfig = GuestListGridFieldConfig::create($this->owner);
         $guestListLabel = _t(__CLASS__ . '.GuestList', 'GuestList');
         
         // hide carts in CMS
@@ -148,8 +140,19 @@ class TicketExtension extends DataExtension
 
         $fields->addFieldToTab(
             "Root.$guestListLabel",
-            GridField::create('Attendees', $guestListLabel, $guestList, $guestListConfig)
+            $guestListGridField = GridField::create('Attendees', $guestListLabel, $guestList, $guestListConfig)
         );
+
+        // Register any extra Fields on the gridfield so we can access them in the export
+        $dataFields = $this->owner->Fields()->map('Name', 'Title')->toArray();
+        if (!empty($dataFields)) {
+            foreach ($dataFields as $name => $title) {
+                $dataFields[$name] = function(Attendee $record) use ($name) {
+                    return $record->getUserField($name);
+                };
+            }
+            $guestListGridField->addDataFields($dataFields);
+        }
 
         // Create WaitingList tab
         $waitingList = $this->owner->WaitingList();
