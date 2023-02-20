@@ -12,9 +12,11 @@ use SilverStripe\Forms\GridField\GridFieldExportButton;
 class GuestListExportButton extends GridFieldExportButton
 {
     private static $default_export_columns = [
+        'Reservation.ReservationCode' => 'Reserverings #',
         'TicketCode' => 'Ticket #',
-        'Title' => 'Naam',
-        'Email' => 'Email',
+        'FirstName' => 'Voornaam',
+        'Surname' => 'Achternaam',
+        'Email' => 'E-mail',
         'Ticket.Title' => 'Ticket',
         'CheckedIn.Nice' => 'Checked in',
     ];

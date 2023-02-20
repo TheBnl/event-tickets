@@ -26,39 +26,11 @@ class GuestListGridFieldConfig extends GridFieldConfig_RecordEditor
     {
         parent::__construct($itemsPerPage);
 
-        
-        
-        
-
         $columns = Config::inst()->get(GuestListExportButton::class, 'default_export_columns');
         $fields = $event->Fields()->map('Name', 'Title')->toArray();
-        // if (!empty($fields)) {
-        //     foreach ($fields as $name => $title) {
-        //         $fields[$name] = function($relObj) use ($name, $title) {
-        //             if ($name == 'Organisatie') {
-        //                 echo '<pre>';
-        //                 print_r($relObj);
-        //                 echo '</pre>';
-        //                 exit();
-        //             }
-
-        //             return $relObj;
-        //         };
-        //     }
-        // }
-
-        $columns = array_merge($columns, $fields);
-        // $columns += $fields;
-
-
-        // echo '<pre>';
-        // print_r($fields);
-        // echo '</pre>';
-        // exit();
-
-        /** @var GridFieldDataColumns $dataColumns */
-        // $dataColumns = $this->getComponentByType(GridFieldDataColumns::class);
-        // $dataColumns->setDisplayFields($fields);
+        if (!empty($fields)) {
+            $columns = array_merge($columns, $fields);
+        }
 
         $this->addComponent(new GuestListExportButton('buttons-before-left', $columns));
         $this->addComponent($importButton = new GridFieldImportButton('buttons-before-left'));
