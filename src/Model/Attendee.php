@@ -65,6 +65,8 @@ class Attendee extends DataObject
     const STATUS_ACTIVE = 'Active';
     const STATUS_CANCELLED = 'Cancelled';
     
+    private static $code_length = 13;
+
     private static $table_name = 'EventTickets_Attendee';
 
     private static $default_fields = [
@@ -201,7 +203,7 @@ class Attendee extends DataObject
 
         // Generate the ticket code
         if ($this->exists() && empty($this->TicketCode)) {
-            $this->TicketCode = $this->generateTicketCode();
+            $this->TicketCode = $this->createTicketCode();
         }
 
         if ($fields = $this->Fields()) {
@@ -394,10 +396,26 @@ class Attendee extends DataObject
      *
      * @return string
      */
-    public function generateTicketCode()
+    public function createTicketCode()
     {
-        return uniqid($this->ID);
+        $code = $this->generateTicketCode();
+        // Check if the code already exists
+        while (self::get()->find('TicketCode', $code)) {
+            $code = $this->generateTicketCode(time());
+        }
+
+        return $code;
     }
+
+    protected function generateTicketCode($time = null)
+    {
+        $codeLength = self::config()->get('code_length');
+        // Hash classname and id, and optionally the time
+        $hash = md5(implode('_', array_filter([$this->ClassName, $this->ID, $time])));
+        $converted = base_convert($hash, 16, 10);
+        return substr($converted, 0, $codeLength);
+    }
+
 
     /**
      * Get a base64 encoded QR png code

@@ -2,6 +2,7 @@
 
 namespace Broarm\EventTickets\Fields;
 
+use Broarm\EventTickets\Model\Buyable;
 use Broarm\EventTickets\Model\Ticket;
 use Composer\Installers\PPIInstaller;
 use SilverStripe\Forms\DropdownField;
@@ -156,18 +157,26 @@ class TicketsField extends FormField
             return false;
         }
 
-        // Throw an error when there are more tickets selected than available
-        if ($ticketCount > $available) {
-            $validator->validationError($this->name, _t(
-                'TicketsField.VALIDATION_TO_MUCH',
-                'There are {ticketCount} tickets left',
-                null,
-                array(
-                    'ticketCount' => $available
-                )
-            ), 'validation');
+        // Check if the ticket is still available
+        foreach ($this->value as $id => $amountArray) {
+            if (!isset($amountArray['Amount']) || !($amountArray['Amount']) > 0) {
+                continue;
+            }
 
-            return false;
+            $amount = $amountArray['Amount'];
+            $buyable = Buyable::get_by_id($id);
+            if ($buyable->getAvailability() < $amount) {
+                $validator->validationError($this->name, _t(
+                    'TicketsField.VALIDATION_TO_MUCH',
+                    'There are {ticketCount} tickets left',
+                    null,
+                    array(
+                        'ticketCount' => $available
+                    )
+                ), 'validation');
+
+                return false;
+            }
         }
 
         return false;
