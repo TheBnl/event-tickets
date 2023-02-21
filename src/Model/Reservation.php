@@ -15,12 +15,14 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TabSet;
+use SilverStripe\Forms\TextField;
 use SilverStripe\Omnipay\Extensions\Payable;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\ORM\DataObject;
@@ -147,6 +149,65 @@ class Reservation extends DataObject
         'GatewayNice' => 'Payment method',
         'Created.Nice' => 'Date'
     );
+
+    private static $searchable_fields = array(
+        'ReservationCode' => [
+            'title' => 'Reserverings #',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+        ],
+        'Title' => [
+            'title' => 'Naam',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+        ],
+        'Status' => [
+            'title' => 'Status',
+            'filter' => 'ExactMatchFilter',
+        ],
+        'Gateway' => [
+            'title' => 'Betaalmethode',
+            'filter' => 'ExactMatchFilter',
+        ],
+        'CreatedAfter' => [
+            'title' => 'Geplaatst na',
+            'field' => DateField::class,
+            'filter' => 'GreaterThanOrEqualFilter',
+            'match_any' => [
+                'Created'
+            ]
+        ],
+        'CreatedBefore' => [
+            'title' => 'Geplaatst voor',
+            'field' => DateField::class,
+            'filter' => 'LessThanOrEqualFilter',
+            'match_any' => [
+                'Created'
+            ]
+        ]
+    );
+
+    public function searchableFields()
+    {
+        $fields = parent::searchableFields();
+        if (isset($fields['Status'])) {
+            $fields['Status']['field'] = DropdownField::create(
+                'Status', 
+                _t(__CLASS__ . '.Status', 'Status'),
+                $this->getStatusOptions()
+            )->setEmptyString(_t(__CLASS__ . '.NoStatus', 'Alle'));
+        }
+
+        if (isset($fields['Gateway'])) {
+            $fields['Gateway']['field'] = DropdownField::create(
+                'Gateway', 
+                _t(__CLASS__ . '.Gateway', 'Betaalmethode'),
+                GatewayInfo::getSupportedGateways(true)
+            )->setEmptyString(_t(__CLASS__ . '.NoGateway', 'Alle'));
+        }
+        
+        return $fields;
+    }
 
     public function getCMSFields()
     {
