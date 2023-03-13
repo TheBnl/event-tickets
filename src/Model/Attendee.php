@@ -10,6 +10,7 @@ use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Forms\CheckInValidator;
 use Broarm\EventTickets\Model\UserFields\UserEmailField;
 use Broarm\EventTickets\Model\UserFields\UserField;
+use Broarm\EventTickets\Model\UserFields\UserOptionSetField;
 use Broarm\EventTickets\Model\UserFields\UserTextField;
 use Exception;
 use LeKoala\CmsActions\CustomAction;
@@ -164,10 +165,10 @@ class Attendee extends DataObject
         }
 
         foreach ($this->Fields() as $field) {
-            $fieldType = $field->getFieldType();
+            /** @var UserField $field */
             $fields->addFieldToTab(
                 'Root.Main',
-                $fieldType::create("{$field->Name}[$field->ID]", $field->Title, $field->getValue())
+                $field->createField("{$field->Name}[$field->ID]", $field->getField('Value'))
             );
         }
 
@@ -344,7 +345,7 @@ class Attendee extends DataObject
         if (isset(self::$cachedFields[$this->ID][$field])) {
             return self::$cachedFields[$this->ID][$field];
         } elseif (($userField = $this->Fields()->find('Name', $field)) && !is_int($userField)) {
-            return self::$cachedFields[$this->ID][$field] = (string)$userField->getField('Value');
+            return self::$cachedFields[$this->ID][$field] = (string)$userField->getValue();
         }
 
         return null;
