@@ -59,7 +59,7 @@ class UserOptionSetField extends UserField
     public function createField($fieldName, $defaultValue = null, $main = false)
     {
         /** @var OptionsetField $field */
-        $field = parent::createField($fieldName, $defaultValue ?: [], $main);
+        $field = parent::createField($fieldName, [], $main);
         $field->setSource($this->Options()->map()->toArray());
         $field->setValue($defaultValue);
         return $field;
