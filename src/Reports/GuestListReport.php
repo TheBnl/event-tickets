@@ -89,6 +89,7 @@ class GuestListReport extends Report
             $eventDates = $ticketPage->map('ID', 'EventStartDate')->toArray();
             $events = [];
             foreach ($eventDates as $id => $startDate) {
+                if (!$startDate) continue;
                 /** @var DBDate $startDate */
                 $startTime = $startDate->getTimestamp();
                 
