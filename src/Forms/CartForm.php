@@ -22,18 +22,16 @@ class CartForm extends FormStep
     {
         $fields = FieldList::create();
         $requiredFields = RequiredFields::create();
-        $actions = FieldList::create([
-            $checkoutAction = FormAction::create('handleCart', _t(__CLASS__ . '.HandleCart', 'Update cart'))
-        ]);
+        $actions = FieldList::create();
 
         if (($reservation = ReservationSession::get()) && !$reservation->isEmpty()) {
             $fields->add(CartTicketsField::create('OrderItems', '', $reservation->OrderItems()));
+            $actions->add(FormAction::create('handleCart', _t(__CLASS__ . '.HandleCart', 'Update cart')));
             $requiredFields->addRequiredField('OrderItems');
         } else {
             $fields->add(
                 LiteralField::create('CartEmpty', _t(__CLASS__ . '.CartEmpty', '<p>Your cart is empty</p>'))
             );
-            $checkoutAction->setDisabled(true);
         }
 
         parent::__construct($controller, $name, $fields, $actions, $requiredFields);

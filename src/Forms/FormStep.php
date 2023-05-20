@@ -73,7 +73,7 @@ abstract class FormStep extends Form
             $checkout = CheckoutPage::inst();
             $controller = CheckoutPageController::create($checkout);
         }
-
+        
         return $controller->redirect($controller->Link($this->nextStep));
     }
 

@@ -117,17 +117,17 @@ class TicketExtension extends DataExtension
         ));
 
         // Create Reservations tab
-        $reservationLabel = _t(__CLASS__ . '.Reservations', 'Reservations');
+        // $reservationLabel = _t(__CLASS__ . '.Reservations', 'Reservations');
         
         // hide carts in CMS
-        $reservations = $this->owner->Reservations()->exclude([
-            'Status' => Reservation::STATUS_CART
-        ]);
+        // $reservations = $this->owner->Reservations()->exclude([
+        //     'Status' => Reservation::STATUS_CART
+        // ]);
 
-        $fields->addFieldToTab(
-            "Root.$reservationLabel",
-            GridField::create('Reservations', $reservationLabel, $reservations, ReservationGridFieldConfig::create())
-        );
+        // $fields->addFieldToTab(
+        //     "Root.$reservationLabel",
+        //     GridField::create('Reservations', $reservationLabel, $reservations, ReservationGridFieldConfig::create())
+        // );
         
         // Create Attendees tab
         $guestListConfig = GuestListGridFieldConfig::create($this->owner);

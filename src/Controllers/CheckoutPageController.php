@@ -14,7 +14,7 @@ class CheckoutPageController extends PageController
     {
         parent::init();
 
-        $action = $this->getAction();
+        $action = $this->getRequest()->param('Action');
         $reservation = $this->getReservation();
         if ($action !== 'success' && (!$reservation || $reservation->isEmpty())) {
             $cartPage = CartPage::inst();

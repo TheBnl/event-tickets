@@ -2,22 +2,15 @@
 
 namespace Broarm\EventTickets\Forms;
 
-use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Fields\TicketsField;
-use Broarm\EventTickets\Model\Attendee;
 use Broarm\EventTickets\Model\Buyable;
 use Broarm\EventTickets\Model\OrderItem;
 use Broarm\EventTickets\Session\ReservationSession;
-use Huygens\EventTickets\Ticket;
-use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\HasManyList;
-use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\ValidationResult;
 
 /**
@@ -64,7 +57,6 @@ class TicketForm extends FormStep
     public function addToCart(array $data, TicketForm $form)
     {
         $reservation = $this->handleTicketForm($data, $form);
-        $this->extend('afterAddToCart', $data, $form, $reservation);
         $form->sessionMessage(_t(__CLASS__ . '.AddedToCart', 'Added to cart'), ValidationResult::TYPE_GOOD);
         return $this->getController()->redirectBack();
     }
@@ -72,7 +64,6 @@ class TicketForm extends FormStep
     public function checkout(array $data, TicketForm $form)
     {
         $reservation = $this->handleTicketForm($data, $form);
-        $this->extend('beforeNextStep', $data, $form, $reservation);
         return $this->nextStep();
     }
 
@@ -109,6 +100,7 @@ class TicketForm extends FormStep
 
         $reservation->calculateTotal();
         $reservation->write();
+        $this->extend('beforeNextStep', $data, $form, $reservation);
         return $reservation;
     }
 }

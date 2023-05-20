@@ -130,9 +130,11 @@ class Attendee extends DataObject
     ];
 
     private static $summary_fields = [
+        'Reservation.ReservationCode' => 'Reservation #',
         'TicketCode' => 'Ticket #',
         'Title' => 'Name',
         'Ticket.Title' => 'Ticket',
+        'TicketPage.Title' => 'Event',
         'TicketStatusNice' => 'Status',
         'CheckedIn.Nice' => 'Checked in',
     ];
