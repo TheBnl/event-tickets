@@ -4,6 +4,7 @@ namespace Broarm\EventTickets\Model;
 
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Forms\GridField\GridFieldConfig_ReservationViewer;
+use Broarm\EventTickets\Session\ReservationSession;
 use Exception;
 use LeKoala\CmsActions\CustomAction;
 use LeKoala\CmsActions\CustomLink;
@@ -412,6 +413,11 @@ class Reservation extends DataObject
         return $this->Total = $total;
     }
 
+    public function isEmpty()
+    {
+        return !$this->OrderItems()->exists();
+    }
+
     /**
      * Safely change to a state
      * todo check if state direction matches
@@ -443,6 +449,7 @@ class Reservation extends DataObject
         $this->send();
         $this->write();
         $this->extend('onAfterComplete');
+        ReservationSession::end();
     }
 
     /**
@@ -583,6 +590,21 @@ class Reservation extends DataObject
         $pdf = $this->createTicketFile();
         $fileName = FileNameFilter::create()->filter("Tickets {$eventName}.pdf");
         return $pdf->Output($fileName, Destination::INLINE);
+    }
+
+    public function ItemsSum()
+    {
+        return $this->OrderItems()->sum('Amount');
+    }
+
+    public function CartLink()
+    {
+        return CartPage::inst()->Link();
+    }
+
+    public function CheckoutLink()
+    {
+        return CheckoutPage::inst()->Link();
     }
 
     public function canCreate($member = null, $context = [])

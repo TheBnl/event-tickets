@@ -58,15 +58,15 @@ class TicketControllerExtension extends Extension
         }
     }
 
-    /**
-     * Go to the check in controller
-     *
-     * @return CheckInController
-     */
-    public function checkIn()
-    {
-        return new CheckInController($this->owner->data());
-    }
+    // /**
+    //  * Go to the check in controller
+    //  *
+    //  * @return CheckInController
+    //  */
+    // public function checkIn()
+    // {
+    //     return new CheckInController($this->owner->data());
+    // }
 
     /**
      * Checks the waiting list var

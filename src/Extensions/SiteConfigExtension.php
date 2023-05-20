@@ -2,6 +2,7 @@
 
 namespace Broarm\EventTickets\Extensions;
 
+use Broarm\EventTickets\Session\ReservationSession;
 use Page;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
@@ -35,7 +36,8 @@ class SiteConfigExtension extends DataExtension
 
     private static $has_one = array(
         'TicketLogo' => Image::class,
-        'TermsPage' => SiteTree::class
+        'TermsPage' => SiteTree::class,
+        'ContinueShoppingPage' => SiteTree::class,
     );
 
     private static $owns = [
@@ -87,6 +89,19 @@ class SiteConfigExtension extends DataExtension
             $uploadField,
             $printedTicket
         ));
+
+        if (ReservationSession::config()->get('cart_mode')) {
+            $fields->addFieldToTab(
+                'Root.Tickets',
+                TreeDropdownField::create(
+                    'ContinueShoppingPageID', 
+                    _t(__CLASS__ . '.ContinueShoppingPage', 'Page where the user can continue shopping'), 
+                    SiteTree::class
+                )
+            );
+        } else {
+            $fields->removeByName('ContinueShoppingPageID');
+        }
 
         return $fields;
     }

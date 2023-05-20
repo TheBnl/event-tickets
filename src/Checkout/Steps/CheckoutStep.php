@@ -2,7 +2,9 @@
 
 namespace Broarm\EventTickets\Checkout\Steps;
 
+use Broarm\EventTickets\Controllers\CheckoutPageController;
 use Broarm\EventTickets\Extensions\TicketControllerExtension;
+use Broarm\EventTickets\Model\CheckoutPage;
 use Broarm\EventTickets\Model\Reservation;
 use Broarm\EventTickets\Session\ReservationSession;
 use SilverStripe\Control\RequestHandler;
@@ -45,7 +47,13 @@ abstract class CheckoutStep extends Extension
      */
     public function getNextStepLink()
     {
-        return $this->owner->Link(CheckoutSteps::nextStep($this->step));
+        $controller = $this->owner;
+        if (ReservationSession::config()->get('cart_mode') && !($controller instanceof CheckoutPageController)) {
+            $checkout = CheckoutPage::inst();
+            $controller = CheckoutPageController::create($checkout);
+        }
+
+        return $controller->Link(CheckoutSteps::nextStep($this->step));
     }
 
     /**

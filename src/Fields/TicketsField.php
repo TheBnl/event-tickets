@@ -3,7 +3,9 @@
 namespace Broarm\EventTickets\Fields;
 
 use Broarm\EventTickets\Model\Buyable;
+use Broarm\EventTickets\Model\Reservation;
 use Broarm\EventTickets\Model\Ticket;
+use Broarm\EventTickets\Session\ReservationSession;
 use Composer\Installers\PPIInstaller;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FormField;
@@ -25,7 +27,7 @@ class TicketsField extends FormField
 
     //protected $template = 'TicketsField';
 
-    public function __construct($name, $title, DataList $tickets)
+    public function __construct($name, $title, $tickets)
     {
         $this->tickets = $tickets;
         parent::__construct($name, $title);
@@ -57,9 +59,10 @@ class TicketsField extends FormField
      *
      * @return ArrayList
      */
-    private function getEditableTickets()
+    protected function getEditableTickets()
     {
         $tickets = ArrayList::create();
+        $reservation = ReservationSession::get();
         foreach ($this->getTickets() as $ticket) {
             /** @var Ticket $ticket */
             $fieldName = $this->name . "[{$ticket->ID}][Amount]";
@@ -69,9 +72,8 @@ class TicketsField extends FormField
                 ->setHasEmptyDefault(true)
                 ->setEmptyString(_t('TicketsField.EMPTY', 'Tickets'));
 
-            // Set the first to hold the minimum
-            if ($this->getTickets()->count() === 1) {
-                $ticket->AmountField->setValue($ticket->OrderMin);
+            if ($reservation && ($orderItem = $reservation->OrderItems()->find('BuyableID', $ticket->ID))) {
+                $ticket->AmountField->setValue($orderItem->Amount);
             }
 
             // $availability = $ticket->TicketPage()->getAvailability();
@@ -88,6 +90,7 @@ class TicketsField extends FormField
             $this->extend('updateTicket', $ticket);
             $tickets->push($ticket);
         }
+
         return $tickets;
     }
 
@@ -140,8 +143,6 @@ class TicketsField extends FormField
             return false;
         }
 
-        // Get the availability
-        $available = $this->getForm()->getController()->getAvailability();
         // get the sum of selected tickets
         $ticketCount = array_sum(array_map(function ($item) {
             return $item['Amount'];
@@ -165,7 +166,8 @@ class TicketsField extends FormField
 
             $amount = $amountArray['Amount'];
             $buyable = Buyable::get_by_id($id);
-            if ($buyable->getAvailability() < $amount) {
+            $available = $buyable->getAvailability();
+            if ($available < $amount) {
                 $validator->validationError($this->name, _t(
                     'TicketsField.VALIDATION_TO_MUCH',
                     'There are {ticketCount} tickets left',

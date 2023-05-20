@@ -2,7 +2,10 @@
 
 namespace Broarm\EventTickets\Forms;
 
+use Broarm\EventTickets\Controllers\CheckoutPageController;
+use Broarm\EventTickets\Model\CheckoutPage;
 use Broarm\EventTickets\Model\Reservation;
+use Broarm\EventTickets\Session\ReservationSession;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\Forms\FieldList;
@@ -65,7 +68,13 @@ abstract class FormStep extends Form
      */
     public function nextStep()
     {
-        return $this->getController()->redirect($this->getController()->Link($this->nextStep));
+        $controller = $this->getController();
+        if (ReservationSession::config()->get('cart_mode')) {
+            $checkout = CheckoutPage::inst();
+            $controller = CheckoutPageController::create($checkout);
+        }
+
+        return $controller->redirect($controller->Link($this->nextStep));
     }
 
     /**

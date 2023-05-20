@@ -42,11 +42,19 @@ nl:
     SUCCESS_MESSAGE_HELP: 'Dit bericht word getoond op de succes pagina. Hij is per evenement te overschijven onder de "tickets" tab'
     MAIL_MESSAGE_HELP: 'Dit bericht word getoond op het ticket. Hij is per evenement te overschijven onder de "tickets" tab'
   Broarm\EventTickets\Forms\TicketForm:
+    DirectCheckout: 'Direct afrekenen'
+    AddToCart: 'Toevoegen aan winkelwagen'
+    AddedToCart: 'Toegevoegd aan winkelwagen'
     MakeReservation: 'Reserveer tickets'
     WAITINGLIST_INTRO: 'Het evenement is uitverkocht. U kunt zich hieronder inschrijven om op de hoogte te worden gehouden wanneer er plaatsen vrijkomen.'
     WAITINGLIST_SUCCESS: 'Bedankt voor uw inschrijving, wij houden u op de hoogte zodra er een plekken beschikbaar komen.'
     EXPIRED: 'Het evenement is afgelopen.'
     PENDING: 'Ticket verkoop begint vanaf {date}.'
+  Broarm\EventTickets\Forms\CartForm:
+    HandleCart: 'Winkelwagen bijwerken'
+    CartEmpty: '<p>Uw winkelwagen is leeg</p>'
+    ContinueShopping: 'Verder winkelen'
+    Checkout: 'Afrekenen'
   Broarm\EventTickets\Fields\TicketsField:
     TICKETS: 'Tickets'
     PRICE: 'Prijs'
