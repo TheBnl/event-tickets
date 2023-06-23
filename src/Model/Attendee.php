@@ -2,7 +2,6 @@
 
 namespace Broarm\EventTickets\Model;
 
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
@@ -10,12 +9,10 @@ use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Forms\CheckInValidator;
 use Broarm\EventTickets\Model\UserFields\UserEmailField;
 use Broarm\EventTickets\Model\UserFields\UserField;
-use Broarm\EventTickets\Model\UserFields\UserOptionSetField;
 use Broarm\EventTickets\Model\UserFields\UserTextField;
 use Exception;
 use LeKoala\CmsActions\CustomAction;
 use LeKoala\CmsActions\CustomLink;
-use LeKoala\CmsActions\SilverStripeIcons;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
 use SilverStripe\Assets\FileNameFilter;
@@ -23,6 +20,7 @@ use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
@@ -427,7 +425,7 @@ class Attendee extends DataObject
     {
         $renderer = new ImageRenderer(
             new RendererStyle(400),
-            new ImagickImageBackEnd()
+            Injector::inst()->get('BaconQrCode\Renderer\Image\ImageBackEnd'),
         );
 
         $writer = new Writer($renderer);
