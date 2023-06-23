@@ -164,7 +164,7 @@ class GuestListReport extends Report
             DropdownField::create(
                 'ReservationStatus', 
                 _t(__CLASS__ . '.ReservationStatus', 'Tickets with reservation status'), 
-                Reservation::singleton()->getStates(),
+                Reservation::singleton()->getStatusOptions(),
                 Reservation::STATUS_PAID
             ),
             DropdownField::create(
