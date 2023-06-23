@@ -128,7 +128,7 @@ class ReservationsReport extends Report
             DropdownField::create(
                 'ReservationStatus', 
                 _t(__CLASS__ . '.ReservationStatus', 'Status'), 
-                Reservation::singleton()->getStates(),
+                Reservation::singleton()->getStatusOptions(),
                 Reservation::STATUS_PAID
             ),
             DropdownField::create(
