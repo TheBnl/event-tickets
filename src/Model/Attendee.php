@@ -158,6 +158,7 @@ class Attendee extends DataObject
             'title' => 'Ticket',
             'field' => TextField::class,
             'filter' => 'PartialMatchFilter',
+            'general' => false,
         ],
         'TicketStatus' => [
             'title' => 'Status',
@@ -166,6 +167,7 @@ class Attendee extends DataObject
         'CheckedIn' => [
             'title' => 'Checked in',
             'filter' => 'ExactMatchFilter',
+            'general' => false,
         ],
     ];
 
