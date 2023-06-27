@@ -27,8 +27,10 @@ use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TabSet;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Security\Member;
@@ -134,6 +136,63 @@ class Attendee extends DataObject
         'TicketStatusNice' => 'Status',
         'CheckedIn.Nice' => 'Checked in',
     ];
+
+    
+    private static $searchable_fields = [
+        'TicketCode' => [
+            'title' => 'Ticket #',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+        ],
+        'Reservation.ReservationCode' => [
+            'title' => 'Reserverings #',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+        ],
+        'Title' => [
+            'title' => 'Name',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+        ],
+        'Ticket' => [
+            'title' => 'Ticket',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+        ],
+        'TicketStatus' => [
+            'title' => 'Status',
+            'filter' => 'ExactMatchFilter',
+        ],
+        'CheckedIn' => [
+            'title' => 'Checked in',
+            'filter' => 'ExactMatchFilter',
+        ],
+    ];
+
+    public function searchableFields()
+    {
+        $fields = parent::searchableFields();
+        if (isset($fields['TicketStatus'])) {
+            $fields['TicketStatus']['field'] = DropdownField::create(
+                'TicketStatus', 
+                _t(__CLASS__ . '.TicketStatus', 'Status'),
+                $this->getStatusOptions()
+            )->setEmptyString(_t(__CLASS__ . '.All', 'Alle'));
+        }
+
+        if (isset($fields['CheckedIn'])) {
+            $fields['CheckedIn']['field'] = DropdownField::create(
+                'CheckedIn', 
+                _t(__CLASS__ . '.CheckedIn', 'Checked in'),
+                [
+                    0 => _t(DBBoolean::class . '.NOANSWER', 'No'),
+                    1 => _t(DBBoolean::class . '.YESANSWER', 'Yes'),
+                ]
+            )->setEmptyString(_t(__CLASS__ . '.All', 'Alle'));
+        }
+
+        return $fields;
+    }
 
     protected static $cachedFields = [];
 
