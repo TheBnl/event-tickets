@@ -11,6 +11,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\ORM\ValidationException;
+use SilverStripe\Security\Security;
 
 /**
  * Class ReservationForm
@@ -101,6 +102,10 @@ class ReservationForm extends FormStep
                 // Set the main contact
                 if (isset($attendeeData['Main']) && (bool)$attendeeData['Main']) {
                     $reservation->setMainContact($attendeeID);
+                    if ($member = Security::getCurrentUser()) {
+                        $attendee->MemberID = $member->ID;
+                        $attendee->write();
+                    }
                 }
             }
         }
