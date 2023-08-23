@@ -3,6 +3,7 @@
 namespace Broarm\EventTickets\Fields;
 
 use Broarm\EventTickets\Model\Buyable;
+use Broarm\EventTickets\Model\OrderItem;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\ORM\ArrayList;
 
@@ -85,7 +86,8 @@ class CartTicketsField extends TicketsField
             }
 
             $amount = $amountArray['Amount'];
-            $buyable = Buyable::get_by_id($id);
+            $orderItem = OrderItem::get_by_id($id);
+            $buyable = $orderItem->Buyable();
             $available = $buyable->getAvailability();
             if ($available < $amount) {
                 $validator->validationError($this->name, _t(

@@ -45,17 +45,29 @@ class CartForm extends FormStep
             $amount = $buyableData['Amount'];
             
             $orderItem = $reservation->OrderItems()->byID($orderItemID);
+            $buyableID = $orderItem->BuyableID;
             if ($amount > 0) {
                 $orderItem->Amount = $amount;
                 $orderItem->write();
             } else {
                 $orderItem->delete();
             }
+
+            $existing = $reservation->Attendees()->filter(['TicketID' => $buyableID]);
+            $makeOrRemove = (int)$amount - (int)$existing->count();
+            if ($makeOrRemove < 0) {
+                foreach ($existing->limit(abs($makeOrRemove)) as $attendee) {
+                    $attendee->delete();
+                }
+            } elseif ($makeOrRemove > 0) {
+                $attendees = $orderItem->Buyable()->createAttendees($makeOrRemove);
+                $reservation->Attendees()->addMany($attendees);
+            }
             
             // Clear the old attendees and add the new amount
-            $reservation->Attendees()->filter(['TicketID' => $orderItem->BuyableID])->removeAll();
-            $attendees = $orderItem->Buyable()->createAttendees($amount);
-            $reservation->Attendees()->addMany($attendees);            
+            // $reservation->Attendees()->filter(['TicketID' => $orderItem->BuyableID])->removeAll();
+            // $attendees = $orderItem->Buyable()->createAttendees($amount);
+            // $reservation->Attendees()->addMany($attendees);            
         }
 
         $reservation->calculateTotal();

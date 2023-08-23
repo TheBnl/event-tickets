@@ -92,10 +92,20 @@ class TicketForm extends FormStep
                 $reservation->OrderItems()->add($item);
             }
 
-            // Clear the old attendees and add the new amount
-            $reservation->Attendees()->filter(['TicketID' => $buyable->ID])->removeAll();
-            $attendees = $buyable->createAttendees($amount);
-            $reservation->Attendees()->addMany($attendees);
+            $existing = $reservation->Attendees()->filter(['TicketID' => $buyable->ID]);
+            $makeOrRemove = (int)$amount - (int)$existing->count();
+            if ($makeOrRemove < 0) {
+                foreach ($existing->limit(abs($makeOrRemove)) as $attendee) {
+                    $attendee->delete();
+                }
+            } elseif ($makeOrRemove > 0) {
+                $attendees = $buyable->createAttendees($makeOrRemove);
+                $reservation->Attendees()->addMany($attendees);
+            }
+
+            // $reservation->Attendees()->filter(['TicketID' => $buyable->ID])->removeAll();
+            // $attendees = $buyable->createAttendees($amount);
+            // $reservation->Attendees()->addMany($attendees);
         }
 
         $reservation->calculateTotal();
