@@ -4,7 +4,7 @@
     <p><%t Broarm\EventTickets\Forms\TicketForm.WAITINGLIST_INTRO 'The event is sold out. You can sign up below to be informed when places are released.' %></p>
     $WaitingListRegistrationForm
 <% else_if $TicketSalePending %>
-    <p><%t Broarm\EventTickets\Forms\TicketForm.PENDING 'Ticket sale starts from {date}.' date=$TicketSaleStartDate.FormatI18N('%e %B %Y') %></p>
+    <p><%t Broarm\EventTickets\Forms\TicketForm.PENDING 'Ticket sale starts from {date}.' date=$TicketSaleStartDate.Nice %></p>
 <% else_if $EventExpired %>
     <p><%t Broarm\EventTickets\Forms\TicketForm.EXPIRED 'The event is expired.' %></p>
 <% else_if $TicketForm %>
