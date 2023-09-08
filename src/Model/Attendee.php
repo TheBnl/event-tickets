@@ -258,9 +258,6 @@ class Attendee extends DataObject
      */
     public function onBeforeWrite()
     {
-        // Set the title of the attendee
-        $this->Title = $this->getName();
-
         // Generate the ticket code
         if ($this->exists() && empty($this->TicketCode)) {
             $this->TicketCode = $this->createTicketCode();
@@ -273,6 +270,9 @@ class Attendee extends DataObject
                 }
             }
         }
+
+        // Set the title of the attendee
+        $this->Title = $this->getName();
 
         parent::onBeforeWrite();
     }

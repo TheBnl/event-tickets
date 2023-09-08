@@ -1,5 +1,10 @@
 nl:
+  Broarm\EventTickets\Model\Ticket:
+    SINGULARNAME: 'Ticket'
+    PLURALNAME: 'Tickets'
   Broarm\EventTickets\Model\Buyable:
+    SINGULARNAME: 'Product'
+    PLURALNAME: 'Producten'
     Title: 'Titel'
     TitleForTicket: 'Titel voor op het ticket'
     Price: 'Ticket prijs'

@@ -115,9 +115,6 @@ class TicketExtension extends DataExtension
             HtmlEditorField::create('SuccessMessageMail', _t(__CLASS__ . '.MailMessage', 'Mail message'))->addExtraClass('stacked')->setRows(4),
             HtmlEditorField::create('PrintedTicketContent', _t(__CLASS__ . '.PrintedTicketContent', 'Ticket description'))->addExtraClass('stacked')->setRows(4)
         ));
-
-        // Create Reservations tab
-        $reservationLabel = _t(__CLASS__ . '.Reservations', 'Reservations');
         
         // hide carts in CMS
         $reservations = $this->owner->Reservations()->exclude([
@@ -125,22 +122,28 @@ class TicketExtension extends DataExtension
         ]);
 
         $fields->addFieldToTab(
-            "Root.$reservationLabel",
-            GridField::create('Reservations', $reservationLabel, $reservations, ReservationGridFieldConfig::create())
+            "Root.Reservations",
+            GridField::create(
+                'Reservations', 
+                _t(__CLASS__ . '.Reservations', 'Reservations'), 
+                $reservations, 
+                ReservationGridFieldConfig::create()
+            )
         );
         
-        // Create Attendees tab
-        $guestListConfig = GuestListGridFieldConfig::create($this->owner);
-        $guestListLabel = _t(__CLASS__ . '.GuestList', 'GuestList');
-        
         // hide carts in CMS
-        $guestList = $this->owner->Attendees()->exclude([
+        $attendees = $this->owner->Attendees()->exclude([
             'Reservation.Status' => Reservation::STATUS_CART
         ]);
 
         $fields->addFieldToTab(
-            "Root.$guestListLabel",
-            $guestListGridField = GridField::create('Attendees', $guestListLabel, $guestList, $guestListConfig)
+            "Root.Attendees",
+            $attendeesGridField = GridField::create(
+                'Attendees', 
+                _t(__CLASS__ . '.Attendees', 'Attendees'), 
+                $attendees, 
+                GuestListGridFieldConfig::create($this->owner)
+            )
         );
 
         // Register any extra Fields on the gridfield so we can access them in the export
@@ -151,7 +154,7 @@ class TicketExtension extends DataExtension
                     return $record->getUserField($name);
                 };
             }
-            $guestListGridField->addDataFields($dataFields);
+            $attendeesGridField->addDataFields($dataFields);
         }
 
         // Create WaitingList tab

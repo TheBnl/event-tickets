@@ -5,12 +5,15 @@ namespace Broarm\EventTickets\Model;
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Exception;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\CurrencyField;
 use SilverStripe\Forms\DatetimeField;
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDate;
@@ -94,8 +97,10 @@ class Buyable extends DataObject
     {
         $fields = parent::getCMSFields();
         $fields->removeByName(['TicketPageID', 'Sort', 'OrderMin', 'OrderMax', 'AvailableFromDate', 'AvailableTillDate']);
-
+        
+        
         $fields->addFieldsToTab('Root.Main', array(
+            $this->getTypeField(),
             TextField::create('Title', _t(__CLASS__ . '.TitleForTicket', 'Title for the ticket')),
             CurrencyField::create('Price', _t(__CLASS__ . '.Price', 'Ticket price')),
             CheckboxField::create('IsAvailable', _t(__CLASS__ . '.IsAvailable', 'Is available')),
@@ -128,6 +133,27 @@ class Buyable extends DataObject
         }
 
         return $fields;
+    }
+
+    public function getTypeField()
+    {
+        $ticketTypes = ClassInfo::subclassesFor(Buyable::class);
+        $ticketTypes = array_combine($ticketTypes, $ticketTypes);
+        $ticketTypes = array_map(fn($class) => singleton($class)->i18n_singular_name(), $ticketTypes);
+        $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->count();
+        if ($sold > 0) {
+            return ReadonlyField::create(
+                'Type', 
+                _t(__CLASS__ . '.Type', 'Type'),
+                $this->i18n_singular_name()
+            )->setDescription('Er zijn al tickets van dit type verkocht, deze kan niet meer aangepast worden.');
+        } else {
+            return DropdownField::create(
+                'ClassName', 
+                _t(__CLASS__ . '.Type', 'Type'),
+                $ticketTypes,
+            );
+        }
     }
 
     /**
