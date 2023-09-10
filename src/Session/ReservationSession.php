@@ -90,9 +90,9 @@ class ReservationSession
      */
     public static function end()
     {
-        // If the session is ended while in cart or pending state, remove the reservation.
+        // If the session is ended while in cart state, remove the reservation.
         // The session is only ended in these states when iffy business is going on.
-        if (self::get() && in_array(self::get()->Status, array('CART', 'PENDING'))) {
+        if (self::get() && in_array(self::get()->Status, array('CART'))) {
             self::get()->delete();
         }
 
