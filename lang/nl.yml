@@ -41,6 +41,13 @@ nl:
     MESSAGE_ALREADY_CHECKED_IN: '{ticket} is al ingecheckt.'
     MESSAGE_CHECK_OUT_SUCCESS: '{ticket} is succesvol uitgecheckt.'
     MESSAGE_CHECK_IN_SUCCESS: '{ticket} is succesvol ingecheckt.'
+    Label_MESSAGE_ERROR: 'Error'
+    Label_MESSAGE_NO_CODE: 'Geen ticket nr'
+    Label_MESSAGE_CODE_NOT_FOUND: 'Ticket nr niet gevonden'
+    Label_MESSAGE_TICKET_CANCELLED: 'Ticket geannulleerd'
+    Label_MESSAGE_ALREADY_CHECKED_IN: 'Ticket al ingecheckt'
+    Label_MESSAGE_CHECK_OUT_SUCCESS: 'Check out succesvol'
+    Label_MESSAGE_CHECK_IN_SUCCESS: 'Check in succesvol'
   Broarm\EventTickets\Extensions\CurrencyExtension:
     FREE: 'Gratis'
   Broarm\EventTickets\Extensions\SiteConfigExtension:

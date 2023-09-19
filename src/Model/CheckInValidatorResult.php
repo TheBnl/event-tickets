@@ -18,13 +18,18 @@ class CheckInValidatorResult extends DataObject
     private static $summary_fields = [
         'Created' => 'Created',
         'TicketCode' => 'TicketCode',
-        'Message' => 'Message',
+        'MessageLabel' => 'Message',
         'Attendee.Title' => 'Attendee',
     ];
 
     private static $has_one = [
         'Attendee' => Attendee::class
     ];
+
+    public function getMessageLabel()
+    {
+        return CheckInValidator::messageLabel($this->MessageCode);
+    }
 
     public function getMessage()
     {

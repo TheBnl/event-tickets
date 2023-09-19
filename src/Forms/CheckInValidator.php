@@ -145,4 +145,9 @@ class CheckInValidator
     public static function message($message, $ticket = null) {
         return _t(__CLASS__ . ".$message", $message, null, array('ticket' => $ticket));
     }
+
+    public static function messageLabel($message)
+    {
+        return _t(__CLASS__ . ".Label_{$message}", $message);
+    }
 }
