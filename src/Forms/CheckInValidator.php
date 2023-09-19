@@ -88,6 +88,8 @@ class CheckInValidator
             );
         }
 
+        // TODO: check if the ticket is not expired (event window is open)
+
         // Check if the ticket is already checked in and not allowed to check out
         elseif ((bool)$this->attendee->CheckedIn && !(bool)self::config()->get('allow_checkout')) {
             return array(
@@ -140,7 +142,7 @@ class CheckInValidator
      *
      * @return string
      */
-    private static function message($message, $ticket = null) {
+    public static function message($message, $ticket = null) {
         return _t(__CLASS__ . ".$message", $message, null, array('ticket' => $ticket));
     }
 }
