@@ -5,7 +5,9 @@ namespace Broarm\EventTickets\Reports;
 use Broarm\EventTickets\Model\Attendee;
 use Broarm\EventTickets\Model\Reservation;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Omnipay\GatewayInfo;
 use SilverStripe\Omnipay\Model\Payment;
@@ -34,7 +36,7 @@ class TicketSalesReport extends Report
             $eventId = $params['TicketPage'];
             $reservations = Reservation::get()->filter(['TicketPageID' => $eventId])->column();   
         }
-    
+
         $groupParam = isset($params['GroupBy']) ? $params['GroupBy'] : 'Day';
         switch($groupParam) {
             default:
@@ -69,6 +71,49 @@ class TicketSalesReport extends Report
         if (count($reservations)) {
             $reservations = implode(',', $reservations);
             $select = $select->addWhere("ReservationID IN ($reservations)");
+        }
+
+
+        $from = null;
+        $till = null;
+        if (isset($params['DefinedPeriod'])) {
+            $definedPeriod = $params['DefinedPeriod'];
+            switch($definedPeriod) {
+                case 'Day':
+                    $from = date('Y-m-d');
+                    $till = date('Y-m-d', strtotime('+1 day'));
+                    break;
+                case 'Week':
+                    $from = date('Y-m-d', strtotime('-1 week'));
+                    $till = date('Y-m-d', strtotime('+1 day'));
+                    break;
+                case 'Month':
+                    $from = date('Y-m') . '-01';
+                    $till = date('Y-m-t');
+                    break;
+                case 'Year':
+                    $from = date('Y') . '-01-01';
+                    $till = date('Y', strtotime('+1 year')) . '-01-01';
+                    break;
+                default:
+                case 'Other':
+                    break;
+            }
+        }
+
+        if (isset($params['CustomPeriodFrom'])) {
+            $from = $params['CustomPeriodFrom'];
+        }
+
+        if (isset($params['CustomPeriodTill'])) {
+            $till = $params['CustomPeriodTill'];
+        }
+        
+        if ($from && $till) {
+            $select = $select->addWhere([
+                "$paymentTable.Created >= ?" => $from,
+                "$paymentTable.Created <= ?" => $till
+            ]);
         }
 
         $list = new ArrayList();
@@ -128,7 +173,19 @@ class TicketSalesReport extends Report
                 _t(__CLASS__ . '.Gateway', 'Toon betalingen van'), 
                 GatewayInfo::getSupportedGateways()
             )->setEmptyString(_t(__CLASS__ . '.Gateway', 'Toon betalingen van')),
-
+            DropdownField::create(
+                'DefinedPeriod', 
+                _t('Broarm\EventTickets\Reports.DefinedPeriod', 'Period'), 
+                [
+                    'Day' => _t('Broarm\EventTickets\Reports.Day', 'Today'),
+                    'Week' => _t('Broarm\EventTickets\Reports.Week', 'This week'),
+                    'Month' => _t('Broarm\EventTickets\Reports.Month', 'This month'),
+                    'Year' => _t('Broarm\EventTickets\Reports.Year', 'This year'),
+                    'Other' => _t('Broarm\EventTickets\Reports.Other', 'Custom period'),
+                ]
+            )->setEmptyString(_t('Broarm\EventTickets\Reports.FilterPeriod', 'Filter on period')),
+            DateField::create('CustomPeriodFrom',  _t('Broarm\EventTickets\Reports.CustomPeriodFrom', 'From date')),
+            DateField::create('CustomPeriodTill',  _t('Broarm\EventTickets\Reports.CustomPeriodTill', 'Till date')),
             DropdownField::create(
                 'GroupBy', 
                 _t('Broarm\EventTickets\Reports.GroupBy', 'Group by'), 
@@ -139,21 +196,6 @@ class TicketSalesReport extends Report
                     'Year' => _t('Broarm\EventTickets\Reports.GroupByYear', 'Year'),
                 ]
             ),
-            // DropdownField::create(
-            //     'DefinedPeriod', 
-            //     _t('Broarm\EventTickets\Reports.DefinedPeriod', 'Period'), 
-            //     [
-            //         'Day' => _t('Broarm\EventTickets\Reports.Day', 'Today'),
-            //         'Week' => _t('Broarm\EventTickets\Reports.Week', 'This week'),
-            //         'Month' => _t('Broarm\EventTickets\Reports.Month', 'This month'),
-            //         'Year' => _t('Broarm\EventTickets\Reports.Year', 'This year'),
-            //         'Other' => _t('Broarm\EventTickets\Reports.Other', 'Custom period'),
-            //     ]
-            // )->setEmptyString(_t('Broarm\EventTickets\Reports.FilterPeriod', 'Filter on period')),
-            // FieldGroup::create([
-            //     DateField::create('CustomPeriodFrom',  _t('Broarm\EventTickets\Reports.CustomPeriodFrom', 'From date')),
-            //     DateField::create('CustomPeriodTill',  _t('Broarm\EventTickets\Reports.CustomPeriodTill', 'Till date')),
-            // ])  
         );
 
         $this->extend('updateParameterFields', $fields);
