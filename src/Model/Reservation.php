@@ -514,9 +514,12 @@ class Reservation extends DataObject
         $email->setTo($this->MainContact()->getEmail());
         $email->setHTMLTemplate('Broarm\\EventTickets\\ReservationEmail');
 
-        $pdf = $this->createTicketFile();
-        $fileName = FileNameFilter::create()->filter("Tickets {$eventName}.pdf");
-        $email->addAttachmentFromData($pdf->Output($fileName, Destination::STRING_RETURN), $fileName, 'application/pdf');
+        // if no attendees are in the reservation, don't create the ticket pdf
+        if ($this->Attendees()->exists()) {
+            $pdf = $this->createTicketFile();
+            $fileName = FileNameFilter::create()->filter("Tickets {$eventName}.pdf");
+            $email->addAttachmentFromData($pdf->Output($fileName, Destination::STRING_RETURN), $fileName, 'application/pdf');
+        }
 
         $email->setData($this);
         $this->extend('updateReservationMail', $email);
