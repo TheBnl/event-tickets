@@ -61,10 +61,38 @@ class TicketForm extends FormStep
      */
     public function handleTicketForm(array $data, TicketForm $form)
     {
-        $reservation = ReservationSession::start($this->getController()->data());
-        // $reservation->OrderItems()->removeAll();
+        $controller = $this->getController();
+        $reservation = ReservationSession::start($controller->data());
+
         foreach ($data['Tickets'] as $buyableID => $buyableData) {
             $buyable = Buyable::get_by_id($buyableID);
+            $data['Tickets'][$buyableID]['Buyable'] = $buyable;
+        }
+        
+        $amountSum = array_sum(array_map(function ($ticket) {
+            if ($ticket->createsAttendees()) {
+                return $ticket['Amount'];
+            } else {
+                return 0;
+            }
+        }, $data['Tickets']));
+        
+        // is sum is bigger than available throw error
+        $amountAvailable = $controller->getAvailability();
+        if ($amountSum > $amountAvailable) {
+            $form->sessionError(_t(
+                __CLASS__ . '.OnlyAmountAvailable', 
+                'There are only {amount} places available',
+                null,
+                [
+                    'amount' => $amountAvailable,
+                ]
+            ));
+            return $form->getController()->redirectBack();
+        }
+        
+        foreach ($data['Tickets'] as $buyableID => $buyableData) {
+            $buyable = $buyableData['Buyable'];
             $amount = $buyableData['Amount'];
 
             if ($amount) {
@@ -81,17 +109,6 @@ class TicketForm extends FormStep
                 $attendees = $buyable->createAttendees($buyableData['Amount']);
                 $reservation->Attendees()->addMany($attendees);
             }
-        
-            
-
-            // for ($i = 0; $i < $ticketData['Amount']; $i++) {
-            //     $attendee = Attendee::create();
-            //     $attendee->TicketID = $ticketID;
-            //     $attendee->ReservationID = $reservation->ID;
-            //     $attendee->TicketPageID = $reservation->TicketPageID;
-            //     $attendee->write();
-            //     $reservation->Attendees()->add($attendee);
-            // }
         }
 
         $reservation->calculateTotal();

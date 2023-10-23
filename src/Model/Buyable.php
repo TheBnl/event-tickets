@@ -251,9 +251,8 @@ class Buyable extends DataObject
     public function getAvailability()
     {
         if ($this->Capacity !== 0) {
-            $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->count();
-            $available = $this->Capacity - $sold;
-            return $available < 0 ? 0 : $available;
+            $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->sum('Amount');;
+            return max($this->Capacity - $sold, 0);
         }
 
         // fallback to page availability if capacity is not set
@@ -307,6 +306,11 @@ class Buyable extends DataObject
         $startDate = $this->TicketPage()->getEventStartDate();
         $this->extend('updateEventStartDate', $startDate);
         return $startDate;
+    }
+
+    public function createsAttendees()
+    {
+        return false;
     }
 
     /**

@@ -59,6 +59,7 @@ nl:
     WAITINGLIST_SUCCESS: 'Bedankt voor uw inschrijving, wij houden u op de hoogte zodra er een plekken beschikbaar komen.'
     EXPIRED: 'Het evenement is afgelopen.'
     PENDING: 'Ticket verkoop begint vanaf {date}.'
+    OnlyAmountAvailable: 'Er zijn nog {amount} plaatsen beschikbaar'
   Broarm\EventTickets\Fields\TicketsField:
     TICKETS: 'Tickets'
     PRICE: 'Prijs'
