@@ -70,7 +70,7 @@ class TicketForm extends FormStep
         }
         
         $amountSum = array_sum(array_map(function ($ticket) {
-            if ($ticket->createsAttendees()) {
+            if ($ticket['Buyable']->createsAttendees()) {
                 return $ticket['Amount'];
             } else {
                 return 0;
