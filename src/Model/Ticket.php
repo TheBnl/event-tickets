@@ -2,19 +2,6 @@
 
 namespace Broarm\EventTickets\Model;
 
-use Broarm\EventTickets\Extensions\TicketExtension;
-use Exception;
-use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Forms\CurrencyField;
-use SilverStripe\Forms\DatetimeField;
-use SilverStripe\Forms\LiteralField;
-use SilverStripe\Forms\NumericField;
-use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBDate;
-use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\ORM\FieldType\DBField;
-
 /**
  * Class Ticket
  *

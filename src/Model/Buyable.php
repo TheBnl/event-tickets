@@ -83,7 +83,8 @@ class Buyable extends DataObject
         'Price.Nice' => 'Price',
         'AvailableFrom' => 'Available from',
         'AvailableTill' => 'Available till',
-        'AvailableSummary' => 'Available'
+        'AvailableSummary' => 'Available',
+        'SoldStatus' => 'Sold',
     ];
 
     private static $searchable_fields = [
@@ -97,7 +98,6 @@ class Buyable extends DataObject
     {
         $fields = parent::getCMSFields();
         $fields->removeByName(['TicketPageID', 'Sort', 'OrderMin', 'OrderMax', 'AvailableFromDate', 'AvailableTillDate']);
-        
         
         $fields->addFieldsToTab('Root.Main', array(
             $this->getTypeField(),
@@ -244,15 +244,48 @@ class Buyable extends DataObject
         return true;
     }
 
+    public function getSoldStatus()
+    {
+        $sold = $this->getSoldAmount();
+        if (!$capacity = $this->Capacity) {
+            $capacity = $this->TicketPage()->getCapacity();
+        }
+        
+        return "{$sold}/{$capacity}";
+    }
+
+    public function getSoldAmount()
+    {
+        return OrderItem::get()->filter([
+            'Reservation.Status' => [
+                Reservation::STATUS_PAID,
+            ],
+            'BuyableID' => $this->ID
+        ])->sum('Amount');
+    }
+
+    public function getReservedAmount()
+    {
+        return OrderItem::get()->filter([
+            'Reservation.Status' => [
+                Reservation::STATUS_PAID,
+                Reservation::STATUS_CART,
+                Reservation::STATUS_PENDING,
+            ],
+            'BuyableID' => $this->ID
+        ])->sum('Amount');
+    }
+
     /**
      * Get the ticket availability for this type
      * A buyable always checks own capacity before event capacity
      */
     public function getAvailability()
     {
-        if ($this->Capacity !== 0) {
-            $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->sum('Amount');;
-            return max($this->Capacity - $sold, 0);
+        $capacity = $this->Capacity;
+        if ($capacity !== 0) {
+            $reserved = $this->getReservedAmount();
+            return max($capacity - $reserved, 0);
         }
 
         // fallback to page availability if capacity is not set

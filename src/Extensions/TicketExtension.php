@@ -96,14 +96,10 @@ class TicketExtension extends DataExtension
             'guestListStatus' => $this->owner->getGuestListStatus()
         ]);
 
-        $fields->addFieldsToTab('Root.Main', [
-            LiteralField::create('GuestListStatus', "<p class='message notice'>{$guestListStatusDescription}</p>")
-        ], 'Title');
-
-        $ticketLabel = _t(__CLASS__ . '.Tickets', 'Tickets');
         $fields->addFieldsToTab(
-            "Root.$ticketLabel", array(
-            GridField::create('Tickets', $ticketLabel, $this->owner->Tickets(), TicketsGridFieldConfig::create()),
+            'Root.Tickets', array(
+            LiteralField::create('GuestListStatus', "<p class='message notice'>{$guestListStatusDescription}</p>"),
+            GridField::create('Tickets', _t(__CLASS__ . '.Tickets', 'Tickets'), $this->owner->Tickets(), TicketsGridFieldConfig::create()),
             NumericField::create('MaxCapacity', _t(__CLASS__ . '.MaxCapacity', 'Maximaal beschikbare plaatsen'))
                 ->setDescription(_t(
                     __CLASS__ . 'MaxCapacityDescription', 
