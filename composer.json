@@ -25,6 +25,7 @@
         "silverstripe/silverstripe-omnipay": "*",
         "symbiote/silverstripe-gridfieldextensions": "*",
         "lekoala/silverstripe-cms-actions": "*",
+        "lekoala/silverstripe-excel-import-export": "dev-master",
         "omnipay/manual": "*",
         "bacon/bacon-qr-code": "*",
         "mpdf/mpdf": "*"
