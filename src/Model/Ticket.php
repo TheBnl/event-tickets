@@ -45,7 +45,7 @@ class Ticket extends Buyable
             return $placesAvailable;
         }
 
-        return $placesAvailable;
+        return $available;
     }
 
     public function createsAttendees()
