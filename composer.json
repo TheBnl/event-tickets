@@ -20,8 +20,8 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "^4 || ^5",
-        "silverstripe/cms": "^4 || ^5",
+        "silverstripe/framework": "^5",
+        "silverstripe/cms": "^5",
         "silverstripe/silverstripe-omnipay": "*",
         "symbiote/silverstripe-gridfieldextensions": "*",
         "lekoala/silverstripe-cms-actions": "*",
