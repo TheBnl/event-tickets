@@ -145,7 +145,7 @@ class TicketsField extends FormField
 
         // get the sum of selected tickets
         $ticketCount = array_sum(array_map(function ($item) {
-            return $item['Amount'];
+            return (int) $item['Amount'];
         }, $this->value));
 
         // If the sum of tickets is 0 trow the same error as empty
