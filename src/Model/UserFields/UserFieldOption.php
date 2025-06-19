@@ -49,24 +49,4 @@ class UserFieldOption extends DataObject
 
         return $fields;
     }
-
-    public function canView($member = null)
-    {
-        return $this->Field()->canView($member);
-    }
-
-    public function canEdit($member = null)
-    {
-        return $this->Field()->canEdit($member);
-    }
-
-    public function canDelete($member = null)
-    {
-        return $this->Field()->canDelete($member);
-    }
-
-    public function canCreate($member = null, $context = array())
-    {
-        return $this->Field()->canCreate($member, $context);
-    }
 }

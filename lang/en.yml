@@ -1,5 +1,5 @@
 en:
-  Ticket:
+  Broarm\EventTickets\Model\Buyable:
     TITLE_LABEL: 'Ticket title'
     PRICE_LABEL: 'Ticket price'
     SALE_START_LABEL: 'Ticket sale starts at'
@@ -10,7 +10,7 @@ en:
     UNAVAILABLE: 'Not for sale'
     OrderMin: 'Minimum allowed amount of tickets from this type'
     OrderMax: 'Maximum allowed amount of tickets from this type'
-  CheckoutSteps:
+  Broarm\EventTickets\Checkout\Steps\CheckoutSteps:
     TICKETS_FOR: 'Tickets for {event}'
     HAVE_FUN_AT: 'Have fun at {event}'
     register: 'Register'
@@ -19,39 +19,42 @@ en:
   CheckIn:
     GUESTLIST: 'Guest list'
     CHECK_IN_TITLE: 'Check in guests for {event}'
-  CheckInForm:
+  Broarm\EventTickets\Forms\CheckInForm:
     TICKET_CODE: 'Ticket number'
     CheckIn: 'Check in'
-  CheckInValidator:
+  Broarm\EventTickets\Forms\CheckInValidator:
     MESSAGE_NO_CODE: 'Enter a ticket number'
     MESSAGE_CODE_NOT_FOUND: 'The ticket number #{ticket} is not found.'
     MESSAGE_TICKET_CANCELLED: '{ticket} is part of a cancelled reservation.'
     MESSAGE_ALREADY_CHECKED_IN: '{ticket} is already checked in.'
     MESSAGE_CHECK_OUT_SUCCESS: '{ticket} is successfully checked out.'
     MESSAGE_CHECK_IN_SUCCESS: '{ticket} is successfully checked in.'
-  CurrencyExtension:
+  Broarm\EventTickets\Extensions\CurrencyExtension:
     FREE: 'Free'
-  SiteConfigExtension:
+  Broarm\EventTickets\Extensions\SiteConfigExtension:
     SUCCESS_MESSAGE_HELP: 'This message is used on the success page. It can be overwritten on the event page.'
     MAIL_MESSAGE_HELP: 'This message is shown on the ticket. It can be overwritten on the event page.'
-  TicketForm:
+  Broarm\EventTickets\Forms\TicketForm:
     MAKE_RESERVATION: 'Make a reservation'
     WAITINGLIST_INTRO: 'The event is sold out. You can subscribe to the waiting list in order to get notified when tickets come available.'
     WAITINGLIST_SUCCESS: 'Thank you for subscribing to our waiting list, you will hear from us when tickets come available.'
     PENDING: 'Ticket sale starts from {date}.'
-  TicketsField:
+  Broarm\EventTickets\Fields\TicketsField:
     TICKETS: 'Tickets'
     PRICE: 'Price'
     AMOUNT: 'Amount'
     EMPTY: 'Tickets'
     VALIDATION_TO_MUCH: 'There are {ticketCount} tickets left'
     VALIDATION_EMPTY: 'Select at least one ticket'
-  TicketExtension:
+  Broarm\EventTickets\Fields\PaymentGatewayField:
+    SelectGateway: Select payment method
+    NoGateway: No payment method available
+  Broarm\EventTickets\Extensions\TicketExtension:
     Tickets: 'Tickets'
     Capacity: 'Capacity'
     Reservations: 'Reservations'
     GuestList: 'Guest list'
-  TicketControllerExtension:
+  Broarm\EventTickets\Extensions\TicketControllerExtension:
     PERMISSIONS_CAT: 'Event tickets'
     HANDLE_CHECK_IN: 'Authorised for scanning tickets'
   TicketEmail:
@@ -79,21 +82,24 @@ en:
   MainContactMail:
     TITLE: 'Your tickets for {event}'
     CONTENT: 'Here are your tickets for <a href="{link}">{event}</a>.'
-  Reservation:
+  Broarm\EventTickets\Model\Reservation:
     CART: 'Cart'
     PENDING: 'Pending'
     PAID: 'Paid'
     CANCELED: 'Cancelled'
     RESEND: 'Send reservation'
     AgreeToTermsAndConditions: 'Agreed to terms and conditions'
-  ReservationForm:
+  Broarm\EventTickets\Forms\ReservationForm:
     PAYMENT: 'Continue to payment'
     RESERVE: 'Reserve tickets'
-  Attendee:
+  Broarm\EventTickets\Model\Attendee:
+    GuestOf: 'Guest of {name}'
     Ticket: 'Ticket'
     Title: 'Name'
     Email: 'Email'
-  AttendeeField:
+    Status_Active: 'Active'
+    Status_Cancelled: 'Cancelled'
+  Broarm\EventTickets\Fields\AttendeeField:
     FirstName: 'First name'
     Surname: 'Surname'
     Email: 'Email'
@@ -102,15 +108,15 @@ en:
   SuccessController:
     DOWNLOAD_TICKETS: 'Download your tickets'
     BACK: 'Go back'
-  SummaryForm:
+  Broarm\EventTickets\Forms\SummaryForm:
     COMMENTS: 'Comments'
-  SummaryField:
+  Broarm\EventTickets\Fields\SummaryField:
     EMAIL_RECEIVER: 'Email receiver'
     TICKET: 'Ticket'
     PRICE: 'Price'
     SUBTOTAL: 'Subtotal'
     TOTAL: 'Total'
     TICKET_RECEIVER_HELP: 'Send tickets to this person'
-  TermsAndConditionsField:
+  Broarm\EventTickets\Fields\TermsAndConditionsField:
     TERMS_CONDITIONS: 'I agree to the terms and conditions stated on the <a href="{link}" target="new" title="Read the shop terms and conditions for this site">{title}</a> page'
     AGREE_TO_TERMS: 'You must agree to the terms and conditions'

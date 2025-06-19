@@ -5,12 +5,15 @@ namespace Broarm\EventTickets\Model;
 use Broarm\EventTickets\Extensions\TicketExtension;
 use Exception;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\CurrencyField;
 use SilverStripe\Forms\DatetimeField;
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDate;
@@ -80,7 +83,8 @@ class Buyable extends DataObject
         'Price.Nice' => 'Price',
         'AvailableFrom' => 'Available from',
         'AvailableTill' => 'Available till',
-        'AvailableSummary' => 'Available'
+        'AvailableSummary' => 'Available',
+        'SoldStatus' => 'Sold',
     ];
 
     private static $searchable_fields = [
@@ -94,8 +98,9 @@ class Buyable extends DataObject
     {
         $fields = parent::getCMSFields();
         $fields->removeByName(['TicketPageID', 'Sort', 'OrderMin', 'OrderMax', 'AvailableFromDate', 'AvailableTillDate']);
-
+        
         $fields->addFieldsToTab('Root.Main', array(
+            $this->getTypeField(),
             TextField::create('Title', _t(__CLASS__ . '.TitleForTicket', 'Title for the ticket')),
             CurrencyField::create('Price', _t(__CLASS__ . '.Price', 'Ticket price')),
             CheckboxField::create('IsAvailable', _t(__CLASS__ . '.IsAvailable', 'Is available')),
@@ -128,6 +133,27 @@ class Buyable extends DataObject
         }
 
         return $fields;
+    }
+
+    public function getTypeField()
+    {
+        $ticketTypes = ClassInfo::subclassesFor(Buyable::class);
+        $ticketTypes = array_combine($ticketTypes, $ticketTypes);
+        $ticketTypes = array_map(fn($class) => singleton($class)->i18n_singular_name(), $ticketTypes);
+        $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->count();
+        if ($sold > 0) {
+            return ReadonlyField::create(
+                'Type', 
+                _t(__CLASS__ . '.Type', 'Type'),
+                $this->i18n_singular_name()
+            )->setDescription('Er zijn al tickets van dit type verkocht, deze kan niet meer aangepast worden.');
+        } else {
+            return DropdownField::create(
+                'ClassName', 
+                _t(__CLASS__ . '.Type', 'Type'),
+                $ticketTypes,
+            );
+        }
     }
 
     /**
@@ -218,16 +244,48 @@ class Buyable extends DataObject
         return true;
     }
 
+    public function getSoldStatus()
+    {
+        $sold = $this->getSoldAmount();
+        if (!$capacity = $this->Capacity) {
+            $capacity = $this->TicketPage()->getCapacity();
+        }
+        
+        return "{$sold}/{$capacity}";
+    }
+
+    public function getSoldAmount()
+    {
+        return OrderItem::get()->filter([
+            'Reservation.Status' => [
+                Reservation::STATUS_PAID,
+            ],
+            'BuyableID' => $this->ID
+        ])->sum('Amount');
+    }
+
+    public function getReservedAmount()
+    {
+        return OrderItem::get()->filter([
+            'Reservation.Status' => [
+                Reservation::STATUS_PAID,
+                Reservation::STATUS_CART,
+                Reservation::STATUS_PENDING,
+            ],
+            'BuyableID' => $this->ID
+        ])->sum('Amount');
+    }
+
     /**
      * Get the ticket availability for this type
      * A buyable always checks own capacity before event capacity
      */
     public function getAvailability()
     {
-        if ($this->Capacity !== 0) {
-            $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->count();
-            $available = $this->Capacity - $sold;
-            return $available < 0 ? 0 : $available;
+        $capacity = $this->Capacity;
+        if ($capacity !== 0) {
+            $reserved = $this->getReservedAmount();
+            return max($capacity - $reserved, 0);
         }
 
         // fallback to page availability if capacity is not set
@@ -281,6 +339,11 @@ class Buyable extends DataObject
         $startDate = $this->TicketPage()->getEventStartDate();
         $this->extend('updateEventStartDate', $startDate);
         return $startDate;
+    }
+
+    public function createsAttendees()
+    {
+        return false;
     }
 
     /**

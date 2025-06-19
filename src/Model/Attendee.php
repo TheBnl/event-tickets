@@ -2,7 +2,6 @@
 
 namespace Broarm\EventTickets\Model;
 
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
@@ -10,12 +9,10 @@ use Broarm\EventTickets\Extensions\TicketExtension;
 use Broarm\EventTickets\Forms\CheckInValidator;
 use Broarm\EventTickets\Model\UserFields\UserEmailField;
 use Broarm\EventTickets\Model\UserFields\UserField;
-use Broarm\EventTickets\Model\UserFields\UserOptionSetField;
 use Broarm\EventTickets\Model\UserFields\UserTextField;
 use Exception;
 use LeKoala\CmsActions\CustomAction;
 use LeKoala\CmsActions\CustomLink;
-use LeKoala\CmsActions\SilverStripeIcons;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
 use SilverStripe\Assets\FileNameFilter;
@@ -23,14 +20,17 @@ use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TabSet;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Security\Member;
@@ -139,6 +139,65 @@ class Attendee extends DataObject
         'CheckedIn.Nice' => 'Checked in',
     ];
 
+    
+    private static $searchable_fields = [
+        'TicketCode' => [
+            'title' => 'Ticket #',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+        ],
+        'Reservation.ReservationCode' => [
+            'title' => 'Reserverings #',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+        ],
+        'Title' => [
+            'title' => 'Name',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+        ],
+        'Ticket' => [
+            'title' => 'Ticket',
+            'field' => TextField::class,
+            'filter' => 'PartialMatchFilter',
+            'general' => false,
+        ],
+        'TicketStatus' => [
+            'title' => 'Status',
+            'filter' => 'ExactMatchFilter',
+        ],
+        'CheckedIn' => [
+            'title' => 'Checked in',
+            'filter' => 'ExactMatchFilter',
+            'general' => false,
+        ],
+    ];
+
+    public function searchableFields()
+    {
+        $fields = parent::searchableFields();
+        if (isset($fields['TicketStatus'])) {
+            $fields['TicketStatus']['field'] = DropdownField::create(
+                'TicketStatus', 
+                _t(__CLASS__ . '.TicketStatus', 'Status'),
+                $this->getStatusOptions()
+            )->setEmptyString(_t(__CLASS__ . '.All', 'Alle'));
+        }
+
+        if (isset($fields['CheckedIn'])) {
+            $fields['CheckedIn']['field'] = DropdownField::create(
+                'CheckedIn', 
+                _t(__CLASS__ . '.CheckedIn', 'Checked in'),
+                [
+                    0 => _t(DBBoolean::class . '.NOANSWER', 'No'),
+                    1 => _t(DBBoolean::class . '.YESANSWER', 'Yes'),
+                ]
+            )->setEmptyString(_t(__CLASS__ . '.All', 'Alle'));
+        }
+
+        return $fields;
+    }
+
     protected static $cachedFields = [];
 
     public function getCMSFields()
@@ -201,9 +260,6 @@ class Attendee extends DataObject
      */
     public function onBeforeWrite()
     {
-        // Set the title of the attendee
-        $this->Title = $this->getName();
-
         // Generate the ticket code
         if ($this->exists() && empty($this->TicketCode)) {
             $this->TicketCode = $this->createTicketCode();
@@ -216,6 +272,9 @@ class Attendee extends DataObject
                 }
             }
         }
+
+        // Set the title of the attendee
+        $this->Title = $this->getName();
 
         parent::onBeforeWrite();
     }
@@ -429,7 +488,7 @@ class Attendee extends DataObject
     {
         $renderer = new ImageRenderer(
             new RendererStyle(400),
-            new ImagickImageBackEnd()
+            Injector::inst()->get('BaconQrCode\Renderer\Image\ImageBackEnd'),
         );
 
         $writer = new Writer($renderer);

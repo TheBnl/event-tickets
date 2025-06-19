@@ -17,6 +17,7 @@ use SilverStripe\Omnipay\Exception\InvalidStateException;
 use SilverStripe\Omnipay\Model\Message\GatewayErrorMessage;
 use SilverStripe\Omnipay\Model\Payment;
 use SilverStripe\ORM\ValidationException;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * Class SummaryForm
@@ -32,8 +33,7 @@ class SummaryForm extends FormStep
         $fields = FieldList::create(
             SummaryField::create('Summary', '', $this->reservation = $reservation, true),
             TextareaField::create('Comments', _t(__CLASS__ . '.Comments', 'Comments')),
-            PaymentGatewayField::create(),
-            TermsAndConditionsField::create('AgreeToTermsAndConditions')
+            PaymentGatewayField::create()
         );
 
         $paymentLabel = $reservation->Total == 0
@@ -44,7 +44,13 @@ class SummaryForm extends FormStep
             FormAction::create('makePayment', $paymentLabel)
         );
 
-        $validator = RequiredFields::create(array('AgreeToTermsAndConditions'));
+        $required = [];
+        if (($termsPage = SiteConfig::current_site_config()->TermsPage()) && $termsPage->exists()) {
+            $fields->push(TermsAndConditionsField::create('AgreeToTermsAndConditions', $termsPage));
+            $required[] = 'AgreeToTermsAndConditions';
+        }
+
+        $validator = RequiredFields::create($required);
 
         parent::__construct($controller, $name, $fields, $actions, $validator);
 

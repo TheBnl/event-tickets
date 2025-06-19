@@ -2,19 +2,6 @@
 
 namespace Broarm\EventTickets\Model;
 
-use Broarm\EventTickets\Extensions\TicketExtension;
-use Exception;
-use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Forms\CurrencyField;
-use SilverStripe\Forms\DatetimeField;
-use SilverStripe\Forms\LiteralField;
-use SilverStripe\Forms\NumericField;
-use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBDate;
-use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\ORM\FieldType\DBField;
-
 /**
  * Class Ticket
  *
@@ -52,14 +39,18 @@ class Ticket extends Buyable
      */
     public function getAvailability()
     {
+        $available = parent::getAvailability();
         $placesAvailable = $this->TicketPage()->getAvailability();
-        if ($placesAvailable > 0 && $this->Capacity !== 0) {
-            $sold = OrderItem::get()->filter(['BuyableID' => $this->ID])->sum('Amount');
-            $available = $this->Capacity - $sold;
-            return $available < 0 ? 0 : $available;
+        if ($placesAvailable < $available) {
+            return $placesAvailable;
         }
 
-        return $placesAvailable;
+        return $available;
+    }
+
+    public function createsAttendees()
+    {
+        return true;
     }
 
     public function createAttendees($amount)

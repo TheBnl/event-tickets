@@ -1,5 +1,10 @@
 nl:
+  Broarm\EventTickets\Model\Ticket:
+    SINGULARNAME: 'Ticket'
+    PLURALNAME: 'Tickets'
   Broarm\EventTickets\Model\Buyable:
+    SINGULARNAME: 'Product'
+    PLURALNAME: 'Producten'
     Title: 'Titel'
     TitleForTicket: 'Titel voor op het ticket'
     Price: 'Ticket prijs'
@@ -36,6 +41,13 @@ nl:
     MESSAGE_ALREADY_CHECKED_IN: '{ticket} is al ingecheckt.'
     MESSAGE_CHECK_OUT_SUCCESS: '{ticket} is succesvol uitgecheckt.'
     MESSAGE_CHECK_IN_SUCCESS: '{ticket} is succesvol ingecheckt.'
+    Label_MESSAGE_ERROR: 'Error'
+    Label_MESSAGE_NO_CODE: 'Geen ticket nr'
+    Label_MESSAGE_CODE_NOT_FOUND: 'Ticket nr niet gevonden'
+    Label_MESSAGE_TICKET_CANCELLED: 'Ticket geannulleerd'
+    Label_MESSAGE_ALREADY_CHECKED_IN: 'Ticket al ingecheckt'
+    Label_MESSAGE_CHECK_OUT_SUCCESS: 'Check out succesvol'
+    Label_MESSAGE_CHECK_IN_SUCCESS: 'Check in succesvol'
   Broarm\EventTickets\Extensions\CurrencyExtension:
     FREE: 'Gratis'
   Broarm\EventTickets\Extensions\SiteConfigExtension:
@@ -55,6 +67,7 @@ nl:
     CartEmpty: '<p>Uw winkelwagen is leeg</p>'
     ContinueShopping: 'Verder winkelen'
     Checkout: 'Afrekenen'
+    OnlyAmountAvailable: 'Er zijn nog {amount} plaatsen beschikbaar'
   Broarm\EventTickets\Fields\TicketsField:
     TICKETS: 'Tickets'
     PRICE: 'Prijs'

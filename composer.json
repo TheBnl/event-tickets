@@ -20,11 +20,12 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "^4",
-        "silverstripe/cms": "^4",
+        "silverstripe/framework": "^5",
+        "silverstripe/cms": "^5",
         "silverstripe/silverstripe-omnipay": "*",
         "symbiote/silverstripe-gridfieldextensions": "*",
         "lekoala/silverstripe-cms-actions": "*",
+        "lekoala/silverstripe-excel-import-export": "^3.0.6",
         "omnipay/manual": "*",
         "bacon/bacon-qr-code": "*",
         "mpdf/mpdf": "*"

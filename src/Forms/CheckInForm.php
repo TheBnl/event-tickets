@@ -3,6 +3,8 @@
 namespace Broarm\EventTickets\Forms;
 
 use Broarm\EventTickets\Controllers\CheckInController;
+use Broarm\EventTickets\Model\CheckInValidatorResult;
+use Exception;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\FieldList;
@@ -45,6 +47,13 @@ class CheckInForm extends Form
         $controller = $form->getController();
         $validator = new CheckInValidator();
         $result = $validator->validate($data['TicketCode']);
+        
+        try {
+            CheckInValidatorResult::createFromValidatorResult($result)->write();
+        } catch (Exception $e) {
+            // soft fail
+        }
+
         switch ($result['Code']) {
             case CheckInValidator::MESSAGE_CHECK_OUT_SUCCESS:
                 $validator->getAttendee()->checkOut();
@@ -55,12 +64,13 @@ class CheckInForm extends Form
         }
 
         if (Director::is_ajax()) {
-            return json_encode($result);
+            $response = new HTTPResponse(json_encode($result), 200);
+            $response->addHeader('Content-Type', 'application/json');
+            return $response;
         } else {
             $form->sessionMessage($result['Message'], $result['Type'], ValidationResult::CAST_TEXT);
             $this->extend('onAfterCheckIn', $response, $form, $result);
-            
-            return $response ? $response : $controller->redirectBack();// redirect($controller->Link());
+            return $response ? $response : $controller->redirectBack();
         }
     }
 }
